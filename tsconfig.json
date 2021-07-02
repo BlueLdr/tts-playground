@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react",
+    "jsxFactory": "Preact.h",
+    "lib": ["dom", "es2015", "es2016", "es2017"],
+    "module": "esNext",
+    "moduleResolution": "node",
+    "sourceRoot": "./src",
+    "noUnusedLocals": true,
+    "outDir": "./site/static/scripts",
+    "resolveJsonModule": true,
+    "target": "ES5",
+    "paths": {
+      "~/*": ["./src/*"]
+    },
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["**/*.ts", "**/*.tsx"]
+}

@@ -1,0 +1,4 @@
+node_modules/
+# Used by parcel bundler
+.cache/
+dist/
