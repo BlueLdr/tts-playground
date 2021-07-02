@@ -7,7 +7,7 @@ declare namespace TTS {
 
   interface MessageOptions {
     max_length: number;
-    use_speed: boolean;
+    speed: boolean;
   }
 
   interface Snippet {
@@ -38,5 +38,17 @@ declare namespace TTS {
     volume: number;
     message: number;
     editor: EditorState;
+  }
+
+  interface RequestStatus {
+    pending: boolean;
+    success: boolean;
+    error?: any;
+  }
+
+  interface TTSRequest {
+    text: string;
+    promise: Promise<string>;
+    data: string;
   }
 }

@@ -79,5 +79,5 @@ export const useRequestStatus = <T extends any[], R>(
     [send_request]
   );
 
-  return [state, make_request];
+  return [state, make_request] as const;
 };

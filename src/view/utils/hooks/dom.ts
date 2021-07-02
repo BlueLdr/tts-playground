@@ -112,7 +112,7 @@ export const useTempAnimation = (duration: number, delay?: number) => {
     }
   }, [active]);
 
-  return [active, trigger, set_active];
+  return [active, trigger, set_active] as const;
 };
 
 export const useCopyToClipboard = (text?: string) => {
