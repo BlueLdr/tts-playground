@@ -1,5 +1,5 @@
 import * as Preact from "preact";
-import { App } from "../view";
+import { App } from "~/view/components";
 
 const container = document.getElementById("app");
 if (container) {
