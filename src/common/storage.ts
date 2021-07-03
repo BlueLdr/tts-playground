@@ -18,7 +18,7 @@ export const get_stored_messages = (): TTS.Message[] =>
 export const set_stored_messages = (value: TTS.Message[]) =>
   localStorage.setItem("tts-messages", JSON.stringify(value));
 
-export const get_stored_settings = (): TTS.AppState =>
+export const get_stored_state = (): TTS.AppState =>
   JSON.parse(localStorage.getItem("tts-state"));
-export const set_stored_settings = (value: TTS.AppState) =>
+export const set_stored_state = (value: TTS.AppState) =>
   localStorage.setItem("tts-state", JSON.stringify(value));

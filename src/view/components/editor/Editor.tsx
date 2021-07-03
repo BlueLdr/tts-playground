@@ -1,5 +1,11 @@
 import * as Preact from "preact";
-import { useCallback, useContext, useEffect, useMemo } from "preact/hooks";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "preact/hooks";
 import {
   StatusIndicator,
   EditorHeader,
@@ -9,16 +15,21 @@ import {
   ClipboardButton,
   EditorMain,
   AudioPlayer,
+  SaveMessage,
 } from "~/view/components";
-import { ensure_number, usePlayMessage, useStateIfMounted } from "~/view/utils";
+import {
+  ensure_number,
+  useContextState,
+  usePlayMessage,
+  useStateIfMounted,
+} from "~/view/utils";
 
-export const Editor: Preact.FunctionComponent<{ message?: TTS.Message }> = ({
-  message,
-}) => {
-  const { value: editor_state, setValue: set_editor_state } =
-    useContext(EDITOR_STATE);
-  const { value: is_unsaved, setValue: set_unsaved } =
-    useContext(EDITOR_UNSAVED);
+export const Editor: Preact.FunctionComponent<{
+  message?: TTS.Message;
+  updateMessages: (index: number, value: TTS.Message) => boolean;
+}> = ({ message, updateMessages }) => {
+  const [editor_state, set_editor_state] = useContextState(EDITOR_STATE);
+  const [is_unsaved, set_unsaved] = useContextState(EDITOR_UNSAVED);
   const set_loaded_message = useContext(LOADED_MESSAGE).setValue;
 
   const [text, set_text] = useStateIfMounted(editor_state?.text ?? "");
@@ -51,7 +62,12 @@ export const Editor: Preact.FunctionComponent<{ message?: TTS.Message }> = ({
 
   const [data, status, on_submit, message_text] = usePlayMessage(new_message);
 
+  const first_render = useRef(true);
   useEffect(() => {
+    if (first_render.current) {
+      first_render.current = false;
+      return;
+    }
     if (message) {
       set_text(message.text);
       set_speed(message.options?.speed);
@@ -95,11 +111,11 @@ export const Editor: Preact.FunctionComponent<{ message?: TTS.Message }> = ({
         <div className="error">{JSON.stringify(status.error, null, 2)}</div>
       )}
       <div className="row tts-main-bottom">
-        {/*<TTSSaveMessage
+        <SaveMessage
           disabled={!is_unsaved}
-          loadedMessage={message}
           message={new_message}
-        />*/}
+          updateMessages={updateMessages}
+        />
         <ClipboardButton text={message_text} disabled={!text} />
       </div>
     </Preact.Fragment>

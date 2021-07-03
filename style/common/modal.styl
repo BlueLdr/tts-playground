@@ -1,0 +1,52 @@
+.modal
+  background-color $Gray48
+  border-radius 8px
+  box-shadow 2px 4px 8px -3px rgba($Black, 0.8)
+  position absolute
+  top 50%
+  left 50%
+  transform translate(-50%, -50%)
+  min-height 10rem
+  min-width 30rem
+  display flex
+  flex-direction column
+  justify-content space-between
+  align-items flex-start
+
+  &-container
+    position fixed
+    top 0
+    left 0
+    z-index 99
+  &:empty
+    display none
+
+  &-backdrop
+    background-color rgba(24,24,24,.9)
+    position relative
+    width 100vw
+    height 100vh
+    z-index 100
+
+  &-header,
+  &-footer,
+  &-body
+    padding 1.25rem
+    width 100%
+
+  &-header,
+  &-footer
+    display flex
+    justify-content space-between
+    align-items center
+    flex 0 0 auto
+  &-header
+    border-bottom 1px solid $Gray72
+    h3
+      margin 0
+
+  &-body
+    flex 1 1 auto
+
+  &-footer
+    border-top 1px solid $Gray72

@@ -81,3 +81,10 @@ export const useRequestStatus = <T extends any[], R>(
 
   return [state, make_request] as const;
 };
+
+export const useContextState = <V, S>(
+  ctx: preact.Context<{ value: V; setValue: S }>
+) => {
+  const { value, setValue } = hooks.useContext(ctx);
+  return [value, setValue] as const;
+};

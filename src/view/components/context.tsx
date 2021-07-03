@@ -27,14 +27,14 @@ const CtxProvider = <T extends any>({
   return <context.Provider value={ctx_value}>{children}</context.Provider>;
 };
 
-const stored_settings = storage.get_stored_settings();
-const initial_settings: TTS.AppState = {
-  volume: stored_settings?.volume ?? 1,
-  message: stored_settings?.message ?? -1,
+const stored_state = storage.get_stored_state();
+const initial_state: TTS.AppState = {
+  volume: stored_state?.volume ?? 1,
+  message: stored_state?.message ?? -1,
   editor: {
-    text: stored_settings?.editor?.text ?? "",
-    max_length: stored_settings?.editor?.max_length ?? 255,
-    speed: stored_settings?.editor?.speed ?? false,
+    text: stored_state?.editor?.text ?? "",
+    max_length: stored_state?.editor?.max_length ?? 255,
+    speed: stored_state?.editor?.speed ?? false,
   },
 };
 
@@ -42,18 +42,21 @@ const stored_messages: TTS.Message[] = storage.get_stored_messages() ?? [];
 const stored_scratch: TTS.ScratchSection[] = storage.get_stored_scratch() ?? [];
 
 export const VOLUME_CTX = createNamedContext<number>(
-  initial_settings.volume,
+  initial_state.volume,
   "VOLUME_CTX"
 );
 export const EDITOR_STATE = createNamedContext<TTS.EditorState>(
-  initial_settings.editor,
+  initial_state.editor,
   "EDITOR_UNSAVED"
 );
 
 export const LOADED_MESSAGE = createNamedContext<number>(
-  initial_settings.message ?? -1,
+  initial_state.message ?? -1,
   "LOADED_MESSAGE"
-);
+) as Preact.Context<{
+  value: number;
+  setValue: (index: number, force?: boolean) => boolean;
+}>;
 
 export const EDITOR_UNSAVED = createNamedContext<boolean>(
   true,
@@ -78,8 +81,8 @@ export const SCRATCH = createNamedContext<TTS.ScratchSection[]>(
 );
 
 const all_contexts = [
-  [VOLUME_CTX, initial_settings.volume],
-  [EDITOR_STATE, initial_settings.editor],
+  [VOLUME_CTX, initial_state.volume],
+  [EDITOR_STATE, initial_state.editor],
   [EDITOR_UNSAVED, true],
   [EDIT_MSG_TARGET, undefined],
   [ADD_SNIPPET_CALLBACK, () => {}],
@@ -110,20 +113,22 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
 
   const editor_unsaved = hooks.useContext(EDITOR_UNSAVED).value;
   const [loaded_message, set_loaded_message] = useStateIfMounted(
-    initial_settings?.message ?? -1
+    initial_state?.message ?? -1
   );
   const editor_unsaved_ref = useValueRef(editor_unsaved);
-  const load_message = hooks.useCallback((index) => {
+  const load_message = hooks.useCallback((index: number, force?: boolean) => {
     if (index == null) {
-      return;
+      return false;
     }
     let discard = true;
-    if (editor_unsaved_ref.current) {
+    if (editor_unsaved_ref.current && force !== true) {
       discard = confirm("Are you sure you want to discard your changes?");
     }
     if (discard) {
       set_loaded_message(index);
+      return true;
     }
+    return false;
   }, []);
   const ctx_value = hooks.useMemo(
     () => ({ value: loaded_message, setValue: load_message }),
@@ -131,7 +136,7 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
   );
 
   useEffect(() => {
-    storage.set_stored_settings({
+    storage.set_stored_state({
       volume,
       message: loaded_message,
       editor: editor_state,

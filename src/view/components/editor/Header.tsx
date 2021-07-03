@@ -1,5 +1,5 @@
 import * as Preact from "preact";
-import { ensure_number, useStateIfMounted } from "~/view/utils";
+import { ensure_number, useDebounce, useStateIfMounted } from "~/view/utils";
 
 export const EditorHeader: Preact.FunctionComponent<{
   reset: () => void;
@@ -7,6 +7,8 @@ export const EditorHeader: Preact.FunctionComponent<{
   setMaxLength: (value: number) => void;
 }> = ({ maxLength, setMaxLength, reset }) => {
   const [open, set_open] = useStateIfMounted(false);
+  const [value, set_value] = useStateIfMounted(maxLength);
+  const set_max_length = useDebounce(setMaxLength, 75);
   return (
     <div className="tts-header">
       <div className="tts-header-top">
@@ -22,20 +24,20 @@ export const EditorHeader: Preact.FunctionComponent<{
       <div className="tts-settings" data-open={`${open}`}>
         <div className="row">
           <label className="tts-settings-char-limit">
-            <span>Character Limit: {maxLength}</span>
+            <span>Character Limit: {value}</span>
             <input
               type="range"
               min={255}
               max={500}
-              onInput={(e) =>
-                setMaxLength(
-                  ensure_number(
-                    (e.target as HTMLInputElement).valueAsNumber,
-                    255
-                  )
-                )
-              }
-              value={maxLength}
+              onInput={(e) => {
+                const new_value = ensure_number(
+                  (e.target as HTMLInputElement).valueAsNumber,
+                  255
+                );
+                set_value(new_value);
+                set_max_length(new_value);
+              }}
+              value={value}
             />
           </label>
           <button className="btn btn-with-icon btn-negative" onClick={reset}>

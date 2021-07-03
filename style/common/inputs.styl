@@ -1,0 +1,25 @@
+textarea, input
+  font-family 'Helvetica Neue', arial, sans-serif
+  font-size 1rem
+  color $Gray248
+  background-color $Gray72
+  border-radius 4px
+  padding 0.25rem
+  &:focus
+    background-color $Gray64
+
+textarea
+  &.invisible
+    visibility visible
+
+  &.clipboard-input
+    position fixed
+    top 50%
+
+input
+  background-color $Gray96
+  border 1px solid $Gray128
+  padding 0.5rem
+  &:focus
+    background-color $Gray72
+    border-color $Gray160

@@ -1,0 +1,141 @@
+.tts-col-messages
+  margin-right 1rem
+  flex 1 1 25%
+  min-width 15rem
+  max-width 22rem
+
+.tts-message
+  &-modal
+    &-name.row
+      align-items flex-end
+    &-input
+      flex 1 1 30rem
+      p
+        margin-top 0
+      input
+        width 100%
+      & + button
+        padding 0.5625rem 1rem
+        flex 0 0 auto
+
+    &-preview
+      background-color $Gray64
+      border 1px solid $Gray96
+      border-radius 4px
+      padding 0.5rem
+      margin 1rem 0
+      max-width 40rem
+
+    &-details
+      .row
+        color $Gray216
+        strong
+          color $Gray248
+
+    .modal-footer
+      .btn,
+      .btn-left,
+      .btn-primary,
+      .btn-negative
+        padding 1rem
+        min-width 7rem
+      > *:not(:last-child)
+        margin-right 1rem
+      .tts-clipboard-button
+        padding 0
+
+
+.tts-message
+  &-item
+    border 1px solid transparent
+    display flex
+    justify-content space-between
+    align-items center
+    position relative
+    padding 0
+    transition background-color 150ms ease
+
+    &, &:nth-child(odd)
+      background-color $Gray72
+    &:nth-child(even)
+      background-color $Gray64
+    &:first-child,
+    &:first-child &-header
+      border-top-right-radius 4px
+      border-top-left-radius 4px
+
+    &:last-child,
+    &:last-child &-header
+      border-bottom-right-radius 4px
+      border-bottom-left-radius 4px
+
+    &:nth-child(even)
+    &:nth-child(odd)
+      &:hover
+        background-color $Gray96
+
+    &[data-active="true"]
+      background-color $BlueG
+
+    &-header
+      display flex
+      justify-content space-between
+      align-items center
+      width 100%
+      & > *
+        padding 0.5rem 0.75rem
+
+    &-title
+      padding 0.5rem 0.75rem
+      flex 1 1 100%
+      cursor pointer
+      white-space nowrap
+      text-overflow ellipsis
+      overflow hidden
+
+    &-copy
+      opacity 0
+      transition-property background-color, opacity, color
+
+      &:hover,
+      &:focus,
+      &:active
+        background-color transparent
+
+      .tts-col-messages:focus-within &,
+      .tts-col-messages:hover &
+        opacity 0.2
+
+    &:focus-within &-copy,
+    &:hover &-copy
+      opacity 1
+
+    .tts-message-item-controls
+      height 100%
+
+/*
+.tts-message-item[data-open="true"]
+  background-color #444444
+  border-color #999
+  border-bottom-color transparent
+  border-bottom-left-radius 0
+  border-bottom-right-radius 0
+
+.tts-message-item-controls[data-open="false"] .tts-message-item-controls-menu
+  display none
+
+.tts-message-item-controls-menu
+  background-color #444
+  border 1px solid #999
+  border-top-color #494949
+  border-bottom-left-radius 4px
+  border-bottom-right-radius 4px
+  display flex
+  justify-content space-evenly
+  align-items center
+  position absolute
+  width calc(100% + 2px)
+  padding 0.25rem
+  top 100%
+  left -0.5px
+  z-index 100*/
