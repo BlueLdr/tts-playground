@@ -14,6 +14,7 @@ import {
   EDITOR_UNSAVED,
   LOADED_MESSAGE,
   MESSAGES,
+  Scratch,
 } from "~/view/components";
 import { useContextState, useValueRef } from "~/view/utils";
 
@@ -82,7 +83,9 @@ export const View: Preact.FunctionComponent = memo(() => {
         <div className="tts-col tts-col-main">
           <Editor message={loaded_message} updateMessages={update_messages} />
         </div>
-        <div className="tts-col tts-col-scratch"></div>
+        <div className="tts-col tts-col-scratch">
+          <Scratch />
+        </div>
       </div>
     </div>
   );

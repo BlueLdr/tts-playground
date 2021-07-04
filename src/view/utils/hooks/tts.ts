@@ -32,10 +32,44 @@ export const usePlayMessage = (
   }, [full_text]);
 
   hooks.useEffect(() => {
-    if (data) play_audio();
+    if (data) play_audio(player_id);
   }, [data]);
 
   return [data, status, on_submit, full_text] as const;
+};
+
+export const usePlaySnippet = (
+  player_id?: string,
+  request?: TTS.TTSRequest
+) => {
+  const [data, set_data, data_ref] = useStateRef("");
+
+  const [status, fetch_tts] = useRequestStatus(get_tts_data);
+  const on_submit = hooks.useCallback(
+    (snippet: TTS.Snippet, count?: number) => {
+      const {
+        text,
+        options: { prefix, default_count },
+      } = snippet;
+      const full_text = `${prefix ?? ""}${text.repeat(
+        count || default_count || 1
+      )}`;
+      return fetch_tts(full_text, request).then((d) => {
+        if (d === data_ref.current) {
+          if (data_ref.current) play_audio(player_id);
+        } else {
+          set_data(d);
+        }
+      });
+    },
+    []
+  );
+
+  hooks.useEffect(() => {
+    if (data) play_audio(player_id);
+  }, [data]);
+
+  return [data, status, on_submit] as const;
 };
 
 export const useAudioPlayer = (

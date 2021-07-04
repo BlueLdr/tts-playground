@@ -68,8 +68,10 @@ export const EDIT_MSG_TARGET = createNamedContext<number | undefined>(
   "EDIT_MSG_TARGET"
 );
 
-export const ADD_SNIPPET_CALLBACK = createNamedContext(() => {},
-"ADD_SNIPPET_CALLBACK");
+export const ADD_SNIPPET_CALLBACK = createNamedContext<(value: string) => void>(
+  () => {},
+  "ADD_SNIPPET_CALLBACK"
+);
 
 export const MESSAGES = createNamedContext<TTS.Message[]>(
   stored_messages,

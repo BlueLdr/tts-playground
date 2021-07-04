@@ -16,12 +16,14 @@ import {
   EditorMain,
   AudioPlayer,
   SaveMessage,
+  ADD_SNIPPET_CALLBACK,
 } from "~/view/components";
 import {
   ensure_number,
   useContextState,
   usePlayMessage,
   useStateIfMounted,
+  useValueRef,
 } from "~/view/utils";
 
 export const Editor: Preact.FunctionComponent<{
@@ -31,6 +33,7 @@ export const Editor: Preact.FunctionComponent<{
   const [editor_state, set_editor_state] = useContextState(EDITOR_STATE);
   const [is_unsaved, set_unsaved] = useContextState(EDITOR_UNSAVED);
   const set_loaded_message = useContext(LOADED_MESSAGE).setValue;
+  const set_add_snippet_callback = useContext(ADD_SNIPPET_CALLBACK).setValue;
 
   const [text, set_text] = useStateIfMounted(editor_state?.text ?? "");
   const [speed, set_speed] = useStateIfMounted(editor_state?.speed ?? false);
@@ -87,6 +90,17 @@ export const Editor: Preact.FunctionComponent<{
     set_unsaved(false);
     set_loaded_message(-1);
   }, [is_unsaved]);
+
+  const text_ref = useValueRef(text);
+  const length_ref = useValueRef(max_length);
+  useEffect(() => {
+    set_add_snippet_callback(() => (value) => {
+      if (text_ref.current?.endsWith(" ") && value.startsWith(" ")) {
+        value = value.slice(1);
+      }
+      set_text(`${text_ref.current}${value}`.slice(0, length_ref.current));
+    });
+  }, []);
 
   return (
     <Preact.Fragment>
