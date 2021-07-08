@@ -8,6 +8,10 @@
   align-items center
 
 .tts-settings
+  background-color rgba($Gray64, 0.5)
+  border 1px solid $Gray72
+  border-radius 4px
+  padding 1rem
   display none
   &[data-open="true"]
     display block
@@ -28,11 +32,33 @@
       border-color $Gray128
     &:active
       background-color $Gray64
-  &-char-limit
+
+  &-item
+    display flex
+    justify-content flex-start
+    align-items flex-start
+    flex-direction column
+    height 4rem
+    &:not(:last-child)
+      margin-right 1rem
+
+    &-label
       display flex
-      flex-direction column
       justify-content flex-start
-      align-items flex-start
+      align-items center
+      padding 0.125rem 0
+
+    &-control
+      display flex
+      justify-content flex-start
+      align-items center
+      height 2.25rem
+
+  &-item&-insert
+    label:first-child
+      margin-right 0.75rem
+    input
+      margin-right 0.5rem
 
 .tts-textarea
   position relative

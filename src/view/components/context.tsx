@@ -31,6 +31,10 @@ const stored_state = storage.get_stored_state();
 const initial_state: TTS.AppState = {
   volume: stored_state?.volume ?? 1,
   message: stored_state?.message ?? -1,
+  settings: stored_state?.settings ?? {
+    open: stored_state?.settings?.open ?? false,
+    insert_at_cursor: stored_state?.settings?.insert_at_cursor ?? false,
+  },
   editor: {
     text: stored_state?.editor?.text ?? "",
     max_length: stored_state?.editor?.max_length ?? 255,
@@ -68,8 +72,12 @@ export const EDIT_MSG_TARGET = createNamedContext<number | undefined>(
   "EDIT_MSG_TARGET"
 );
 
-export const ADD_SNIPPET_CALLBACK = createNamedContext<(value: string) => void>(
-  () => {},
+export const ADD_SNIPPET_CALLBACK = createNamedContext<
+  (value: string, flag?: "start" | "end") => void
+>(() => {}, "ADD_SNIPPET_CALLBACK");
+
+export const EDITOR_SETTINGS = createNamedContext<TTS.EditorSettings>(
+  initial_state.settings,
   "ADD_SNIPPET_CALLBACK"
 );
 
@@ -85,6 +93,7 @@ export const SCRATCH = createNamedContext<TTS.ScratchSection[]>(
 const all_contexts = [
   [VOLUME_CTX, initial_state.volume],
   [EDITOR_STATE, initial_state.editor],
+  [EDITOR_SETTINGS, initial_state.settings],
   [EDITOR_UNSAVED, true],
   [EDIT_MSG_TARGET, undefined],
   [ADD_SNIPPET_CALLBACK, () => {}],
@@ -112,6 +121,7 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
   const scratch = hooks.useContext(SCRATCH).value;
   const volume = hooks.useContext(VOLUME_CTX).value;
   const editor_state = hooks.useContext(EDITOR_STATE).value;
+  const editor_settings = hooks.useContext(EDITOR_SETTINGS).value;
 
   const editor_unsaved = hooks.useContext(EDITOR_UNSAVED).value;
   const [loaded_message, set_loaded_message] = useStateIfMounted(
@@ -142,8 +152,9 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
       volume,
       message: loaded_message,
       editor: editor_state,
+      settings: editor_settings,
     });
-  }, [volume, editor_state, loaded_message]);
+  }, [volume, editor_state, loaded_message, editor_settings]);
 
   useEffect(() => {
     storage.set_stored_messages(messages);

@@ -6,14 +6,16 @@ export const EditorMain: Preact.FunctionComponent<{
   text: string;
   onChange: (text: string) => void;
   onSubmit: (text?: string) => void;
+  inputRef: Preact.Ref<HTMLTextAreaElement>;
   speed: boolean;
   setSpeed: (speed: boolean) => void;
   status: TTS.RequestStatus;
-}> = ({ text, onChange, onSubmit, speed, setSpeed, status }) => {
+}> = ({ text, onChange, onSubmit, speed, setSpeed, status, inputRef }) => {
   const { max_length } = useContext(EDITOR_STATE).value;
   return (
     <p className="tts-textarea-container">
       <TTSTextArea
+        inputRef={inputRef}
         id="tts-main-input"
         value={text}
         onChange={onChange}
@@ -43,7 +45,7 @@ export const EditorMain: Preact.FunctionComponent<{
         <div className="tts-textarea-submit">
           <button
             className="btn btn-primary"
-            disabled={status.pending}
+            disabled={status.pending || !text}
             type="submit"
             onClick={(e) => {
               e.preventDefault();
@@ -61,10 +63,11 @@ export const EditorMain: Preact.FunctionComponent<{
 export const TTSTextArea: Preact.FunctionComponent<{
   value: string;
   onChange: (text: string) => void;
+  inputRef: Preact.Ref<HTMLTextAreaElement>;
   speed: boolean;
   id: string;
   maxLength: number;
-}> = ({ value, onChange, speed, id, maxLength }) => {
+}> = ({ value, onChange, speed, id, maxLength, inputRef }) => {
   let end = "";
   const max_len = parseInt(`${maxLength}`);
   if (speed && max_len !== value.length) {
@@ -74,6 +77,7 @@ export const TTSTextArea: Preact.FunctionComponent<{
     <div className="tts-textarea">
       <textarea
         id={id}
+        ref={inputRef}
         className="tts-textarea-input"
         value={value}
         rows={12}

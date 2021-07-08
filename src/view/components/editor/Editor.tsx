@@ -21,9 +21,9 @@ import {
 import {
   ensure_number,
   useContextState,
+  useInsertSnippet,
   usePlayMessage,
   useStateIfMounted,
-  useValueRef,
 } from "~/view/utils";
 
 export const Editor: Preact.FunctionComponent<{
@@ -35,6 +35,7 @@ export const Editor: Preact.FunctionComponent<{
   const set_loaded_message = useContext(LOADED_MESSAGE).setValue;
   const set_add_snippet_callback = useContext(ADD_SNIPPET_CALLBACK).setValue;
 
+  const input_ref = useRef<HTMLTextAreaElement>();
   const [text, set_text] = useStateIfMounted(editor_state?.text ?? "");
   const [speed, set_speed] = useStateIfMounted(editor_state?.speed ?? false);
   const [max_len, set_max_length] = useStateIfMounted(
@@ -91,14 +92,11 @@ export const Editor: Preact.FunctionComponent<{
     set_loaded_message(-1);
   }, [is_unsaved]);
 
-  const text_ref = useValueRef(text);
-  const length_ref = useValueRef(max_length);
+  const insert_snippet = useInsertSnippet(text, max_length, input_ref);
   useEffect(() => {
-    set_add_snippet_callback(() => (value) => {
-      if (text_ref.current?.endsWith(" ") && value.startsWith(" ")) {
-        value = value.slice(1);
-      }
-      set_text(`${text_ref.current}${value}`.slice(0, length_ref.current));
+    set_add_snippet_callback(() => (value: string, flag?: "start" | "end") => {
+      const new_text = insert_snippet(value, flag);
+      set_text(new_text);
     });
   }, []);
 
@@ -110,6 +108,7 @@ export const Editor: Preact.FunctionComponent<{
         reset={reset}
       />
       <EditorMain
+        inputRef={input_ref}
         text={text}
         onChange={set_text}
         onSubmit={on_submit}

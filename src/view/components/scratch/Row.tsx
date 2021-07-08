@@ -26,7 +26,7 @@ export const ScratchRow: Preact.FunctionComponent<{
       if (e?.button === 2) {
         e.preventDefault();
         is_right_click.current = true;
-        addToMessage(text);
+        addToMessage(text, e?.initialClick ? "start" : undefined);
       } else if (!e?.initialClick) {
         addToMessage(text);
       } else {
@@ -34,7 +34,8 @@ export const ScratchRow: Preact.FunctionComponent<{
         addToMessage(
           `${space_before ? " " : ""}${msg}${text.repeat(
             count || default_count || 1
-          )}`
+          )}`,
+          "start"
         );
       }
     },
@@ -43,7 +44,9 @@ export const ScratchRow: Preact.FunctionComponent<{
 
   const on_end_hold = useCallback(() => {
     if (!is_right_click.current && options_ref.current?.space_after) {
-      addToMessage(" ");
+      addToMessage(" ", "end");
+    } else {
+      addToMessage("", "end");
     }
     is_right_click.current = false;
     document.getElementById("tts-editor-input")?.focus();

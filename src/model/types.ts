@@ -34,10 +34,16 @@ declare namespace TTS {
     speed: boolean;
   }
 
+  interface EditorSettings {
+    open: boolean;
+    insert_at_cursor: boolean;
+  }
+
   interface AppState {
     volume: number;
     message: number;
     editor: EditorState;
+    settings: EditorSettings;
   }
 
   interface RequestStatus {
