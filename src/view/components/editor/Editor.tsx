@@ -7,16 +7,18 @@ import {
   useRef,
 } from "preact/hooks";
 import {
-  StatusIndicator,
-  EditorHeader,
+  ADD_SNIPPET_CALLBACK,
   EDITOR_STATE,
   EDITOR_UNSAVED,
   LOADED_MESSAGE,
+} from "~/model";
+import {
+  StatusIndicator,
+  EditorHeader,
   ClipboardButton,
   EditorMain,
   AudioPlayer,
   SaveMessage,
-  ADD_SNIPPET_CALLBACK,
 } from "~/view/components";
 import {
   ensure_number,

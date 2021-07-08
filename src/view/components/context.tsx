@@ -1,120 +1,143 @@
 import * as Preact from "preact";
+import { PureComponent } from "preact/compat";
 import { useEffect } from "preact/hooks";
 import * as hooks from "preact/hooks";
-import * as storage from "~/common/storage";
+import * as storage from "~/common";
+import {
+  ADD_SNIPPET_CALLBACK,
+  EDIT_MSG_TARGET,
+  EDITOR_SETTINGS,
+  EDITOR_STATE,
+  EDITOR_UNSAVED,
+  ImmutableContextValue,
+  LOADED_MESSAGE,
+  MESSAGES,
+  SCRATCH,
+  VOLUME_CTX,
+  INITIAL_STATE,
+} from "~/model";
 import { useStateIfMounted, useValueRef } from "~/view/utils";
 
-const createNamedContext = <T extends any>(
-  initialValue: T,
-  name
-): Preact.Context<{ value: T; setValue: hooks.StateUpdater<T> }> => {
-  const ctx = Preact.createContext({ value: initialValue, setValue: () => {} });
-  ctx.displayName = name;
-  return ctx;
-};
-
-const CtxProvider = <T extends any>({
-  context,
-  initialValue,
-  children,
-}: Preact.RenderableProps<{
-  context: Preact.Context<{ value: T; setValue: hooks.StateUpdater<T> }>;
-  initialValue: T;
-  onUpdate?: (new_value: T) => void;
-}>): Preact.VNode | null => {
-  const [value, setValue] = useStateIfMounted(initialValue);
-  const ctx_value = hooks.useMemo(() => ({ value, setValue }), [value]);
-  return <context.Provider value={ctx_value}>{children}</context.Provider>;
-};
-
-const stored_state = storage.get_stored_state();
-const initial_state: TTS.AppState = {
-  volume: stored_state?.volume ?? 1,
-  message: stored_state?.message ?? -1,
-  settings: stored_state?.settings ?? {
-    open: stored_state?.settings?.open ?? false,
-    insert_at_cursor: stored_state?.settings?.insert_at_cursor ?? false,
+const CONTEXTS = {
+  VOLUME_CTX: {
+    context: VOLUME_CTX,
+    initialValue: INITIAL_STATE.volume,
   },
-  editor: {
-    text: stored_state?.editor?.text ?? "",
-    max_length: stored_state?.editor?.max_length ?? 255,
-    speed: stored_state?.editor?.speed ?? false,
+  EDITOR_STATE: {
+    context: EDITOR_STATE,
+    initialValue: INITIAL_STATE.editor,
   },
-};
+  EDITOR_SETTINGS: {
+    context: EDITOR_SETTINGS,
+    initialValue: INITIAL_STATE.settings,
+  },
+  EDITOR_UNSAVED: {
+    context: EDITOR_UNSAVED,
+    initialValue: true,
+  },
+  EDIT_MSG_TARGET: {
+    context: EDIT_MSG_TARGET,
+    initialValue: undefined,
+  },
+  ADD_SNIPPET_CALLBACK: {
+    context: ADD_SNIPPET_CALLBACK,
+    initialValue: () => {},
+  },
+  MESSAGES: {
+    context: MESSAGES,
+    initialValue: INITIAL_STATE.messages,
+  },
+  SCRATCH: {
+    context: SCRATCH,
+    initialValue: INITIAL_STATE.scratch,
+  },
+} as const;
 
-const stored_messages: TTS.Message[] = storage.get_stored_messages() ?? [];
-const stored_scratch: TTS.ScratchSection[] = storage.get_stored_scratch() ?? [];
+type Contexts = typeof CONTEXTS;
+type ContextValue<K extends keyof Contexts> =
+  Contexts[K]["context"] extends Preact.Context<
+    ImmutableContextValue<infer T, infer S>
+  >
+    ? T
+    : any;
+type ContextSetter<K extends keyof Contexts> =
+  Contexts[K]["context"] extends Preact.Context<
+    ImmutableContextValue<infer T, infer S>
+  >
+    ? S
+    : any;
 
-export const VOLUME_CTX = createNamedContext<number>(
-  initial_state.volume,
-  "VOLUME_CTX"
-);
-export const EDITOR_STATE = createNamedContext<TTS.EditorState>(
-  initial_state.editor,
-  "EDITOR_UNSAVED"
-);
+export class WithGlobalContexts extends PureComponent {
+  constructor(props) {
+    super(props);
+    // @ts-expect-error:
+    this._state = {};
+    // @ts-expect-error:
+    this._setters = {};
+    // @ts-expect-error:
+    this._ctx_values = {};
+    Object.entries(CONTEXTS).forEach(([key, { context, initialValue }]) => {
+      this._state[key] = initialValue;
+      this._setters[key] = this.createSetter(key as keyof Contexts);
+      this._ctx_values[key] = new ImmutableContextValue(
+        this._state[key],
+        this._setters[key]
+      );
+    });
+  }
+  mounted: boolean = false;
+  _state: { [K in keyof Contexts]: ContextValue<K> };
+  _setters: { [K in keyof Contexts]: ContextSetter<K> };
+  _ctx_values: {
+    [K in keyof Contexts]: ImmutableContextValue<
+      ContextValue<K>,
+      ContextSetter<K>
+    >;
+  };
 
-export const LOADED_MESSAGE = createNamedContext<number>(
-  initial_state.message ?? -1,
-  "LOADED_MESSAGE"
-) as Preact.Context<{
-  value: number;
-  setValue: (index: number, force?: boolean) => boolean;
-}>;
+  componentDidMount() {
+    this.mounted = true;
+  }
+  componentWillUnmount() {
+    this.mounted = false;
+  }
 
-export const EDITOR_UNSAVED = createNamedContext<boolean>(
-  true,
-  "EDITOR_UNSAVED"
-);
+  createSetter = <K extends keyof Contexts>(key: K): ContextSetter<K> =>
+    ((s) => {
+      const cur_value = this._state[key];
+      const new_value: ContextValue<K> =
+        typeof s === "function" ? s(cur_value) : s;
+      if (cur_value !== new_value) {
+        // @ts-expect-error:
+        this._state[key] = new_value;
+        // @ts-expect-error:
+        this._ctx_values[key] = new ImmutableContextValue(
+          new_value,
+          this._setters[key] as ContextSetter<K>
+        );
+        if (this.mounted) {
+          this.forceUpdate();
+        }
+      }
+    }) as ContextSetter<K>;
 
-export const EDIT_MSG_TARGET = createNamedContext<number | undefined>(
-  undefined,
-  "EDIT_MSG_TARGET"
-);
-
-export const ADD_SNIPPET_CALLBACK = createNamedContext<
-  (value: string, flag?: "start" | "end") => void
->(() => {}, "ADD_SNIPPET_CALLBACK");
-
-export const EDITOR_SETTINGS = createNamedContext<TTS.EditorSettings>(
-  initial_state.settings,
-  "ADD_SNIPPET_CALLBACK"
-);
-
-export const MESSAGES = createNamedContext<TTS.Message[]>(
-  stored_messages,
-  "MESSAGES"
-);
-export const SCRATCH = createNamedContext<TTS.ScratchSection[]>(
-  stored_scratch,
-  "MESSAGES"
-);
-
-const all_contexts = [
-  [VOLUME_CTX, initial_state.volume],
-  [EDITOR_STATE, initial_state.editor],
-  [EDITOR_SETTINGS, initial_state.settings],
-  [EDITOR_UNSAVED, true],
-  [EDIT_MSG_TARGET, undefined],
-  [ADD_SNIPPET_CALLBACK, () => {}],
-  [MESSAGES, stored_messages],
-  [SCRATCH, stored_scratch],
-] as const;
-
-export const WithGlobalContexts: Preact.FunctionComponent = ({ children }) => {
-  return (
-    <Preact.Fragment>
-      {all_contexts.reduce(
-        (prev, [ctx, value]) => (
-          <CtxProvider context={ctx} initialValue={value}>
-            {prev}
-          </CtxProvider>
-        ),
-        children
-      )}
-    </Preact.Fragment>
-  );
-};
+  render() {
+    const { children } = this.props;
+    return (
+      <Preact.Fragment>
+        {Object.entries(CONTEXTS).reduce((prev, [key, spec]) => {
+          const { Provider } = spec.context;
+          return (
+            // @ts-expect-error:
+            <Provider context={spec.context} value={this._ctx_values[key]}>
+              {prev}
+            </Provider>
+          );
+        }, children)}
+      </Preact.Fragment>
+    );
+  }
+}
 
 export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
   const messages = hooks.useContext(MESSAGES).value;
@@ -125,7 +148,7 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
 
   const editor_unsaved = hooks.useContext(EDITOR_UNSAVED).value;
   const [loaded_message, set_loaded_message] = useStateIfMounted(
-    initial_state?.message ?? -1
+    INITIAL_STATE?.message ?? -1
   );
   const editor_unsaved_ref = useValueRef(editor_unsaved);
   const load_message = hooks.useCallback((index: number, force?: boolean) => {
@@ -143,7 +166,7 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
     return false;
   }, []);
   const ctx_value = hooks.useMemo(
-    () => ({ value: loaded_message, setValue: load_message }),
+    () => new ImmutableContextValue(loaded_message, load_message),
     [load_message, loaded_message]
   );
 

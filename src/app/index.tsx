@@ -1,3 +1,4 @@
+import "preact/debug";
 import * as Preact from "preact";
 import { App } from "~/view/components";
 

@@ -1,8 +1,8 @@
 import * as Preact from "preact";
 import { useCallback } from "preact/hooks";
+import { SCRATCH } from "~/model";
 import {
   AudioPlayer,
-  SCRATCH,
   ScratchSection,
   ScratchSectionModal,
 } from "~/view/components";

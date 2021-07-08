@@ -20,7 +20,11 @@
     "stylus": "0.54.7",
     "typescript": "4.3.5"
   },
+  "alias": {
+    "react": "preact/compat",
+    "react-dom": "preact/compat"
+  },
   "dependencies": {
-    "preact": "10.5.14"
+    "preact": "10.5.12"
   }
 }

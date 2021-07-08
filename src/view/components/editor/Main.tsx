@@ -1,6 +1,7 @@
 import * as Preact from "preact";
 import { useContext } from "preact/hooks";
-import { EDITOR_STATE, PauseAddControl } from "~/view/components";
+import { EDITOR_STATE } from "~/model";
+import { PauseAddControl } from "~/view/components";
 
 export const EditorMain: Preact.FunctionComponent<{
   text: string;

@@ -8,20 +8,20 @@ import {
   useRef,
 } from "preact/hooks";
 import {
-  Editor,
-  MessagesList,
   EDITOR_STATE,
   EDITOR_UNSAVED,
   LOADED_MESSAGE,
   MESSAGES,
-  Scratch,
-} from "~/view/components";
+} from "~/model";
+import { Editor, MessagesList, Scratch } from "~/view/components";
 import { useContextState, useValueRef } from "~/view/utils";
 
-export const View: Preact.FunctionComponent = memo(() => {
+const View: Preact.FunctionComponent = () => {
   const [messages, set_messages] = useContextState(MESSAGES);
   const [loaded_index, set_loaded_index] = useContextState(LOADED_MESSAGE);
-  const { text, speed, max_length } = useContext(EDITOR_STATE).value;
+  const {
+    value: { text, speed, max_length },
+  } = useContext(EDITOR_STATE);
   const [is_unsaved, set_unsaved] = useContextState(EDITOR_UNSAVED);
   const loaded_message = messages[loaded_index];
 
@@ -89,4 +89,6 @@ export const View: Preact.FunctionComponent = memo(() => {
       </div>
     </div>
   );
-});
+};
+
+export default memo(View);

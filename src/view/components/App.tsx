@@ -1,10 +1,5 @@
 import * as Preact from "preact";
-import {
-  WithContextHooks,
-  WithGlobalContexts,
-} from "~/view/components/context";
-import { View } from "~/view/components/View";
-
+import { WithContextHooks, WithGlobalContexts, View } from "~/view/components";
 export const App: Preact.FunctionComponent = () => {
   return (
     <WithGlobalContexts>

@@ -4,4 +4,5 @@ export * from "./common";
 export * from "./editor";
 export * from "./messages";
 export * from "./scratch";
-export * from "./View";
+import View from "./View";
+export { View };

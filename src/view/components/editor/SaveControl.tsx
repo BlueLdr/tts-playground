@@ -1,6 +1,7 @@
 import * as Preact from "preact";
 import { useContext } from "preact/hooks";
-import { LOADED_MESSAGE, MessageModalBase, MESSAGES } from "~/view/components";
+import { LOADED_MESSAGE, MESSAGES } from "~/model";
+import { MessageModalBase } from "~/view/components";
 import { useModal, useStateIfMounted } from "~/view/utils";
 
 export const SaveMessage: Preact.FunctionComponent<{

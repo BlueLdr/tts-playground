@@ -1,6 +1,7 @@
 import * as Preact from "preact";
 import { useContext } from "preact/hooks";
-import { AudioPlayer, LOADED_MESSAGE, MESSAGES } from "~/view/components";
+import { LOADED_MESSAGE, MESSAGES } from "~/model";
+import { AudioPlayer } from "~/view/components";
 import { MessageModal } from "~/view/components/messages/Modal";
 import {
   useAudioPlayer,

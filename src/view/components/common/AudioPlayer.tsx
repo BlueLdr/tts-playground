@@ -1,6 +1,6 @@
 import * as Preact from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
-import { VOLUME_CTX } from "~/view/components";
+import { VOLUME_CTX } from "~/model";
 import { maybeClassName, useContextState, useDebounce } from "~/view/utils";
 
 export const AudioPlayer: Preact.FunctionComponent<{

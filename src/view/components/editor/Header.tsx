@@ -1,6 +1,6 @@
 import * as Preact from "preact";
 import { useCallback } from "preact/hooks";
-import { EDITOR_SETTINGS } from "~/view/components";
+import { EDITOR_SETTINGS } from "~/model";
 import {
   ensure_number,
   useContextState,

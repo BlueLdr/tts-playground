@@ -1,6 +1,6 @@
 import * as hooks from "preact/hooks";
 import { get_tts_data, play_audio } from "~/common";
-import { EDITOR_SETTINGS } from "~/view/components";
+import { EDITOR_SETTINGS } from "~/model";
 import {
   insert_text_at_selection,
   useRequestStatus,

@@ -1,6 +1,7 @@
 import * as Preact from "preact";
 import { useCallback, useContext, useRef } from "preact/hooks";
-import { ADD_SNIPPET_CALLBACK, ScratchRowControls } from "~/view/components";
+import { ADD_SNIPPET_CALLBACK } from "~/model";
+import { ScratchRowControls } from "~/view/components";
 import { useHoldClick, useStateIfMounted, useValueRef } from "~/view/utils";
 
 export const ScratchRow: Preact.FunctionComponent<{
@@ -12,16 +13,14 @@ export const ScratchRow: Preact.FunctionComponent<{
 }> = ({ row, updateRow, onClickDelete, onClickEdit, previewText }) => {
   const addToMessage = useContext(ADD_SNIPPET_CALLBACK).value;
   const [edit, set_edit] = useStateIfMounted(!row.text);
-  const [count, set_count] = useStateIfMounted(row.options?.default_count || 1);
   const is_right_click = useRef(false);
   const options_ref = useValueRef(row?.options);
 
-  // TODO: space before/after not working right
   const add_to_message = useCallback(
-    e => {
+    (e) => {
       const {
         text = "",
-        options: { prefix, space_before, default_count }
+        options: { prefix, space_before, default_count },
       } = row;
       if (e?.button === 2) {
         e.preventDefault();
@@ -32,14 +31,12 @@ export const ScratchRow: Preact.FunctionComponent<{
       } else {
         let msg = prefix ? prefix : "";
         addToMessage(
-          `${space_before ? " " : ""}${msg}${text.repeat(
-            count || default_count || 1
-          )}`,
+          `${space_before ? " " : ""}${msg}${text.repeat(default_count || 1)}`,
           "start"
         );
       }
     },
-    [addToMessage, count, row]
+    [addToMessage, row]
   );
 
   const on_end_hold = useCallback(() => {
@@ -63,7 +60,7 @@ export const ScratchRow: Preact.FunctionComponent<{
           className="icon-button tts-scratch-row-control tts-scratch-row-control-add"
           title="Add to message"
           {...add_listeners}
-          onContextMenu={e => e.preventDefault()}
+          onContextMenu={(e) => e.preventDefault()}
         >
           <i className="fas fa-plus" />
         </button>
