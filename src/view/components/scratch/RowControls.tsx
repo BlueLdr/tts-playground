@@ -13,7 +13,7 @@ export const ScratchRowControls: Preact.FunctionComponent<{
 }> = ({ row, open, setOpen, onClickEdit, onClickDelete, previewText }) => {
   const {
     text,
-    options: { prefix, default_count },
+    options: { prefix = "", default_count, suffix = "" },
   } = row;
   const [status, fetch_tts] = useRequestStatus(previewText);
   useEffect(() => {
@@ -39,7 +39,7 @@ export const ScratchRowControls: Preact.FunctionComponent<{
   }, [onClickDelete]);
 
   const copy_all = useCopyToClipboard(
-    `${prefix ?? ""}${text.repeat(default_count || 1)}`
+    `${prefix}${text.repeat(default_count || 1)}${suffix}`
   );
   const copy_main = useCopyToClipboard(
     row.text.repeat(Math.round((default_count || 2) / 2))

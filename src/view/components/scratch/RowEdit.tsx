@@ -16,6 +16,7 @@ export const ScratchRowEdit: Preact.FunctionComponent<{
 }> = ({ row = {}, updateRow, dismiss }) => {
   const [value, set_value] = useStateIfMounted(row.text ?? "");
   const [prefix, set_prefix] = useStateIfMounted(row.options?.prefix ?? "");
+  const [suffix, set_suffix] = useStateIfMounted(row.options?.suffix ?? "");
   const [count, set_count] = useStateIfMounted(row.options?.default_count || 1);
   const [space_before, set_space_before] = useStateIfMounted(
     row.options?.space_before
@@ -38,6 +39,7 @@ export const ScratchRowEdit: Preact.FunctionComponent<{
     text: value,
     options: {
       prefix,
+      suffix,
       default_count: count,
       space_before: space_before,
       space_after: space_after,
@@ -68,11 +70,24 @@ export const ScratchRowEdit: Preact.FunctionComponent<{
               />
             </label>
             <label className="tts-scratch-modal-input">
-              <span>Repeated Text</span>
+              <span>Main Text</span>
               <input
                 ref={input_ref}
                 value={value}
                 onInput={(e) => set_value((e.target as HTMLInputElement).value)}
+              />
+            </label>
+            <label
+              className="tts-scratch-modal-suffix"
+              title="Text to insert after all repetitions of the snippet (e.g. punctuation)"
+            >
+              <span>Suffix</span>
+              <input
+                ref={input_ref}
+                value={suffix}
+                onInput={(e) =>
+                  set_suffix((e.target as HTMLInputElement).value)
+                }
               />
             </label>
             <button

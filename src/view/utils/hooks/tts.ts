@@ -55,11 +55,11 @@ export const usePlaySnippet = (
     (snippet: TTS.Snippet, count?: number) => {
       const {
         text,
-        options: { prefix, default_count },
+        options: { prefix = "", default_count, suffix = "" },
       } = snippet;
-      const full_text = `${prefix ?? ""}${text.repeat(
+      const full_text = `${prefix}${text.repeat(
         count || default_count || 1
-      )}`;
+      )}${suffix}`;
       return fetch_tts(full_text, request).then((d) => {
         if (d === data_ref.current) {
           if (data_ref.current) play_audio(player_id);
@@ -144,7 +144,10 @@ export const useInsertSnippet = (
         new_text = new_text_;
         cursor_pos.current = new_index;
       } else {
-        if (text_ref.current.endsWith(" ") && value.startsWith(" ")) {
+        if (
+          value.startsWith(" ") &&
+          (!text_ref.current || text_ref.current.endsWith(" "))
+        ) {
           value = value.slice(1);
         }
         new_text = `${text_ref.current}${value}`.slice(0, length_ref.current);

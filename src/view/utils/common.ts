@@ -29,7 +29,7 @@ export const insert_text_at_selection = (
   }
   const text_start = text?.slice(0, selectionStart) ?? "";
   let text_end = text?.slice(selectionEnd) ?? "";
-  if (text_start.endsWith(" ") && snippet.startsWith(" ")) {
+  if (snippet.startsWith(" ") && (!text || text_start.endsWith(" "))) {
     snippet = snippet.slice(1);
   }
   if (snippet.endsWith(" ") && text_end.startsWith(" ")) {

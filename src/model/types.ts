@@ -17,6 +17,7 @@ declare namespace TTS {
 
   interface SnippetOptions {
     prefix?: string;
+    suffix?: string;
     space_before: boolean;
     space_after: boolean;
     default_count: number;

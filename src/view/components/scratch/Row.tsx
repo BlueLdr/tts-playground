@@ -18,10 +18,10 @@ export const ScratchRow: Preact.FunctionComponent<{
 
   // TODO: space before/after not working right
   const add_to_message = useCallback(
-    (e) => {
+    e => {
       const {
         text = "",
-        options: { prefix, space_before, default_count },
+        options: { prefix, space_before, default_count }
       } = row;
       if (e?.button === 2) {
         e.preventDefault();
@@ -43,8 +43,9 @@ export const ScratchRow: Preact.FunctionComponent<{
   );
 
   const on_end_hold = useCallback(() => {
-    if (!is_right_click.current && options_ref.current?.space_after) {
-      addToMessage(" ", "end");
+    const { space_after, suffix = "" } = options_ref.current ?? {};
+    if (!is_right_click.current && (suffix || space_after)) {
+      addToMessage(`${suffix}${space_after ? " " : ""}`, "end");
     } else {
       addToMessage("", "end");
     }
@@ -62,7 +63,7 @@ export const ScratchRow: Preact.FunctionComponent<{
           className="icon-button tts-scratch-row-control tts-scratch-row-control-add"
           title="Add to message"
           {...add_listeners}
-          onContextMenu={(e) => e.preventDefault()}
+          onContextMenu={e => e.preventDefault()}
         >
           <i className="fas fa-plus" />
         </button>
@@ -73,6 +74,11 @@ export const ScratchRow: Preact.FunctionComponent<{
             </span>
           ) : null}
           {row.text ?? " "}
+          {row.options?.suffix ? (
+            <span className="tts-scratch-row-text-suffix">
+              {row.options.suffix}
+            </span>
+          ) : null}
         </div>
       </div>
       <ScratchRowControls
