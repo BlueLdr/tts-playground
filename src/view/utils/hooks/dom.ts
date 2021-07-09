@@ -153,6 +153,13 @@ export const useDebounce = <T extends any[]>(
     [callback]
   );
 
+  const cancel = hooks.useCallback(() => {
+    if (timer.current) {
+      clearTimeout(timer.current);
+      timer.current = null;
+    }
+  }, []);
+
   hooks.useEffect(() => {
     return () => {
       clearTimeout(timer.current);
@@ -160,5 +167,5 @@ export const useDebounce = <T extends any[]>(
     };
   }, [callback]);
 
-  return cb;
+  return [cb, cancel] as const;
 };

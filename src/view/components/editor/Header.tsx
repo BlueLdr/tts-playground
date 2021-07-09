@@ -29,21 +29,31 @@ export const EditorHeader: Preact.FunctionComponent<{
   );
 
   const [value, set_value] = useStateIfMounted(maxLength);
-  const set_max_length = useDebounce(setMaxLength, 75);
+  const [set_max_length] = useDebounce(setMaxLength, 75);
   return (
     <div className="tts-header">
       <div className="tts-header-top">
         <h4>TTS Message</h4>
-        <button
-          className="tts-settings-button"
-          type="button"
-          onClick={() => on_change_settings("open", !settings.open)}
-        >
-          <i className="fas fa-cog" />
-        </button>
+        <div className="tts-header-controls">
+          <button
+            className="btn btn-with-icon icon-only btn-negative tts-settings-reset"
+            title="Clear the editor and start a new message"
+            onClick={reset}
+          >
+            <i className="fas fa-undo" />
+          </button>
+          <button
+            className="tts-settings-button"
+            type="button"
+            onClick={() => on_change_settings("open", !settings.open)}
+            data-open={`${settings.open}`}
+          >
+            <i className="fas fa-cog" />
+          </button>
+        </div>
       </div>
       <div className="tts-settings" data-open={`${settings.open}`}>
-        <div className="row">
+        <div className="row tts-settings-section tts-settings-section-tall">
           <div className="tts-settings-item tts-settings-char-limit">
             <label
               for="tts-settings-char-limit"
@@ -74,34 +84,46 @@ export const EditorHeader: Preact.FunctionComponent<{
           >
             <div className="tts-settings-item-label">Insert Snippets At:</div>
             <div className="tts-settings-item-control">
-              <label className="tts-settings-insert-input">
+              <label className="radio-button tts-settings-insert-input">
                 <input
                   type="radio"
                   value="true"
                   onInput={() => on_change_settings("insert_at_cursor", true)}
                   checked={settings.insert_at_cursor === true}
                 />
-                <span>Cursor</span>
+                <span className="radio-label">Cursor</span>
               </label>
-              <label className="tts-settings-insert-input">
+              <label className="radio-button tts-settings-insert-input">
                 <input
                   type="radio"
                   value="true"
                   onInput={() => on_change_settings("insert_at_cursor", false)}
                   checked={settings.insert_at_cursor === false}
                 />
-                <span>End</span>
+                <span className="radio-label">End</span>
               </label>
             </div>
           </div>
+        </div>
+        <div className="tts-settings-section-label">Message Optimization</div>
+        <div className="row tts-settings-section">
           <div className="tts-settings-item">
-            <button
-              className="btn btn-with-icon btn-negative tts-settings-item-control"
-              onClick={reset}
+            <label
+              className="checkbox tts-settings-whitespace"
+              title="Automatically remove any duplicate, leading, or trailing whitespace"
             >
-              <i className="fas fa-undo" />
-              Clear
-            </button>
+              <input
+                type="checkbox"
+                checked={settings.trim_whitespace}
+                onInput={() =>
+                  on_change_settings(
+                    "trim_whitespace",
+                    !settings.trim_whitespace
+                  )
+                }
+              />
+              <span className="checkbox-label">Automatically Trim Spaces</span>
+            </label>
           </div>
         </div>
       </div>

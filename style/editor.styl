@@ -2,10 +2,17 @@
   max-width 40rem
   flex 1 1 100%
 
-.tts-header-top
-  display flex
-  justify-content space-between
-  align-items center
+.tts-header
+  &-top
+    display flex
+    justify-content space-between
+    align-items center
+  &-controls
+    display flex
+    justify-content flex-end
+    align-items center
+    > *:not(:last-child)
+      margin-right 0.75rem
 
 .tts-settings
   background-color rgba($Gray64, 0.5)
@@ -15,30 +22,33 @@
   display none
   &[data-open="true"]
     display block
+  &-reset,
   &-button
-    appearance none
-    color $Gray232
     font-size 1.25rem
-    background-color $Gray72
-    border 2px solid $Gray96
-    border-radius 4px
-    transition background-color 150ms
     display flex
     justify-content center
     align-items center
     padding 0.5rem
+  &-reset
+    border 2px solid transparent
+  &-button
+    color $Gray232
+    background-color $Gray72
+    border 2px solid transparent
+    border-radius 4px
+    transition background-color 150ms
     &:hover
       background-color $Gray96
-      border-color $Gray128
     &:active
       background-color $Gray64
+    &[data-open="true"]
+      border-color $Gray112
 
   &-item
     display flex
     justify-content flex-start
     align-items flex-start
     flex-direction column
-    height 4rem
     &:not(:last-child)
       margin-right 1rem
 
@@ -56,9 +66,10 @@
 
   &-item&-insert
     label:first-child
-      margin-right 0.75rem
-    input
-      margin-right 0.5rem
+      margin-right 1rem
+
+  &-section-tall &-item
+    height 4rem
 
 .tts-textarea
   position relative
@@ -117,6 +128,15 @@
       margin-inline-end 0.125rem
     span:last-child
       word-break break-all
+
+    &::after
+      content attr(data-cursor)
+      color $Gray112
+      display block
+      position absolute
+      bottom 0.125rem
+      right 1.25rem
+      z-index 3
 
   &-bottom
     background $Gray64

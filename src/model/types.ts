@@ -38,6 +38,7 @@ declare namespace TTS {
   interface EditorSettings {
     open: boolean;
     insert_at_cursor: boolean;
+    trim_whitespace: boolean;
   }
 
   interface AppState {

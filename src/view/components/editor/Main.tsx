@@ -1,13 +1,14 @@
 import * as Preact from "preact";
-import { useContext } from "preact/hooks";
+import { useContext, useRef } from "preact/hooks";
 import { EDITOR_STATE } from "~/model";
 import { PauseAddControl } from "~/view/components";
+import { useDebounce, useTextOptimization } from "~/view/utils";
 
 export const EditorMain: Preact.FunctionComponent<{
   text: string;
   onChange: (text: string) => void;
   onSubmit: (text?: string) => void;
-  inputRef: Preact.Ref<HTMLTextAreaElement>;
+  inputRef: Preact.RefObject<HTMLTextAreaElement>;
   speed: boolean;
   setSpeed: (speed: boolean) => void;
   status: TTS.RequestStatus;
@@ -64,11 +65,15 @@ export const EditorMain: Preact.FunctionComponent<{
 export const TTSTextArea: Preact.FunctionComponent<{
   value: string;
   onChange: (text: string) => void;
-  inputRef: Preact.Ref<HTMLTextAreaElement>;
+  inputRef: Preact.RefObject<HTMLTextAreaElement>;
   speed: boolean;
   id: string;
   maxLength: number;
 }> = ({ value, onChange, speed, id, maxLength, inputRef }) => {
+  const preview_ref = useRef<HTMLDivElement>();
+  const optimize_text = useTextOptimization(value, onChange, inputRef);
+  const [on_blur, cancel_optimize] = useDebounce(optimize_text, 300);
+
   let end = "";
   const max_len = parseInt(`${maxLength}`);
   if (speed && max_len !== value.length) {
@@ -85,8 +90,34 @@ export const TTSTextArea: Preact.FunctionComponent<{
         cols={82}
         maxLength={maxLength}
         onInput={(e) => onChange((e.target as HTMLTextAreaElement).value)}
+        onBlur={() => on_blur(value)}
+        onFocus={cancel_optimize}
+        onSelect={() => {
+          preview_ref.current?.setAttribute(
+            "data-cursor",
+            `${inputRef?.current?.selectionStart}`
+          );
+        }}
+        onKeyDown={() => {
+          preview_ref.current?.setAttribute(
+            "data-cursor",
+            `${inputRef?.current?.selectionStart}`
+          );
+        }}
+        onKeyUp={() => {
+          preview_ref.current?.setAttribute(
+            "data-cursor",
+            `${inputRef?.current?.selectionStart}`
+          );
+        }}
+        onClick={() => {
+          preview_ref.current?.setAttribute(
+            "data-cursor",
+            `${inputRef?.current?.selectionStart}`
+          );
+        }}
       />
-      <div className="tts-textarea-preview">
+      <div className="tts-textarea-preview" ref={preview_ref}>
         <span>{value}</span> <span>{end}</span>
       </div>
     </div>

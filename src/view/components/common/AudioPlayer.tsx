@@ -18,7 +18,7 @@ export const AudioPlayer: Preact.FunctionComponent<{
     },
     [onChangeVolume]
   );
-  const set_volume = useDebounce(set_volume_cb);
+  const [set_volume] = useDebounce(set_volume_cb);
   useEffect(() => {
     window.addEventListener("set-volume", (e: CustomEvent) => {
       if (audio_ref.current && e.detail != null) {

@@ -23,3 +23,13 @@ input
   &:focus
     background-color $Gray72
     border-color $Gray160
+
+label.checkbox
+label.radio-button
+  display flex
+  justify-content flex-start
+  align-items center
+input[type="checkbox"] + .checkbox-label
+input[type="radio"] + .radio-label
+  font-size 0.875rem
+  margin-left 0.5rem;
