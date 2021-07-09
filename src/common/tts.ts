@@ -1,5 +1,5 @@
-export const TTS_URL =
-  "https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=";
+export const TTS_URL = (voice: string = "Brian") =>
+  `https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=`;
 
 const REQUEST: TTS.TTSRequest = {
   text: "",
@@ -10,22 +10,26 @@ const REQUEST: TTS.TTSRequest = {
 /**
  * @param text {string}
  * @param request {TTS.TTSRequest} cached request to handle resending the same string
+ * @param voice {string}
  * @returns {Promise<string>}
  */
 export const get_tts_data = async (
   text: string,
-  request: TTS.TTSRequest = REQUEST
+  request: TTS.TTSRequest = REQUEST,
+  voice: string = "Brian"
 ): Promise<string> => {
   if (!text) {
     return Promise.reject();
   }
   let speak;
-  if (text === request.text && request.promise) {
+  console.log(`voice: `, voice);
+  console.log(`previous voice`, request.text.split(":")[0]);
+  if (`${voice}:${text}` === request.text && request.promise) {
     speak = await request.promise;
   } else {
-    request.text = text;
+    request.text = `${voice}:${text}`;
     request.data = "";
-    speak = await fetch(TTS_URL + encodeURIComponent(text.trim()));
+    speak = await fetch(TTS_URL(voice) + encodeURIComponent(text.trim()));
     request.promise = speak;
   }
 

@@ -1,6 +1,6 @@
-import * as storage from "~/common";
+import * as common from "~/common";
 
-const stored_state = storage.get_stored_state();
+const stored_state = common.get_stored_state();
 const initial_state: TTS.AppState = {
   volume: stored_state?.volume ?? 1,
   message: stored_state?.message ?? -1,
@@ -8,6 +8,7 @@ const initial_state: TTS.AppState = {
     open: stored_state?.settings?.open ?? false,
     insert_at_cursor: stored_state?.settings?.insert_at_cursor ?? false,
     trim_whitespace: stored_state?.settings?.trim_whitespace ?? false,
+    voice: stored_state?.settings?.voice ?? common.VOICE_NAMES[0],
   },
   editor: {
     text: stored_state?.editor?.text ?? "",
@@ -16,8 +17,8 @@ const initial_state: TTS.AppState = {
   },
 };
 
-const messages: TTS.Message[] = storage.get_stored_messages() ?? [];
-const scratch: TTS.ScratchSection[] = storage.get_stored_scratch() ?? [];
+const messages: TTS.Message[] = common.get_stored_messages() ?? [];
+const scratch: TTS.ScratchSection[] = common.get_stored_scratch() ?? [];
 
 export const INITIAL_STATE = {
   ...initial_state,

@@ -14,6 +14,8 @@ export const usePlayMessage = (
   player_id?: string,
   request?: TTS.TTSRequest
 ) => {
+  const voice = hooks.useContext(EDITOR_SETTINGS).value?.voice;
+  const voice_ref = useValueRef(voice);
   const {
     text,
     options: { speed, max_length },
@@ -29,7 +31,7 @@ export const usePlayMessage = (
 
   const [status, fetch_tts] = useRequestStatus(get_tts_data);
   const on_submit = hooks.useCallback(() => {
-    fetch_tts(full_text, request).then((d) => {
+    fetch_tts(full_text, request, voice_ref.current).then((d) => {
       if (d === data_ref.current) {
         if (data_ref.current) play_audio(player_id);
       } else {
@@ -49,6 +51,8 @@ export const usePlaySnippet = (
   player_id?: string,
   request?: TTS.TTSRequest
 ) => {
+  const voice = hooks.useContext(EDITOR_SETTINGS).value?.voice;
+  const voice_ref = useValueRef(voice);
   const [data, set_data, data_ref] = useStateRef("");
 
   const [status, fetch_tts] = useRequestStatus(get_tts_data);
@@ -61,7 +65,7 @@ export const usePlaySnippet = (
       const full_text = `${prefix}${text.repeat(
         count || default_count || 1
       )}${suffix}`;
-      return fetch_tts(full_text, request).then((d) => {
+      return fetch_tts(full_text, request, voice_ref.current).then((d) => {
         if (d === data_ref.current) {
           if (data_ref.current) play_audio(player_id);
         } else {
@@ -83,6 +87,8 @@ export const useAudioPlayer = (
   player_id?: string,
   request?: TTS.TTSRequest
 ) => {
+  const voice = hooks.useContext(EDITOR_SETTINGS).value?.voice;
+  const voice_ref = useValueRef(voice);
   const [data, set_data, data_ref] = useStateRef<string>("");
   hooks.useEffect(() => {
     if (data) play_audio(player_id);
@@ -91,7 +97,7 @@ export const useAudioPlayer = (
     if (!text) {
       return Promise.resolve();
     }
-    return get_tts_data(text, request).then((d) => {
+    return get_tts_data(text, request, voice_ref.current).then((d) => {
       if (d === data_ref.current) {
         play_audio(player_id);
       } else {
@@ -131,7 +137,6 @@ export const useInsertSnippet = (
   const insert_snippet = hooks.useCallback(
     (value: string, flag?: "start" | "end") => {
       if (!flag && cursor_pos.current !== -1) {
-        console.log(`forcing cursor position`, cursor_pos.current);
         input_ref.current.selectionStart = cursor_pos.current;
         input_ref.current.selectionEnd = cursor_pos.current;
       }
@@ -172,14 +177,12 @@ export const useInsertSnippet = (
 
   hooks.useEffect(() => {
     if (cursor_pos.current !== -1) {
-      console.log(`eff forcing cursor position`, cursor_pos.current);
       input_ref.current?.focus();
       input_ref.current.selectionStart = cursor_pos.current;
       input_ref.current.selectionEnd = cursor_pos.current;
       cursor_pos.current = -1;
     }
     if (reset_pos.current) {
-      console.log(`resetting cursor force pos`);
       cursor_pos.current = -1;
       reset_pos.current = false;
     }

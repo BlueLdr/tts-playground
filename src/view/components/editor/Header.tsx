@@ -1,5 +1,6 @@
 import * as Preact from "preact";
 import { useCallback } from "preact/hooks";
+import { VOICE_NAMES } from "~/common";
 import { EDITOR_SETTINGS } from "~/model";
 import {
   ensure_number,
@@ -102,6 +103,29 @@ export const EditorHeader: Preact.FunctionComponent<{
                 />
                 <span className="radio-label">End</span>
               </label>
+            </div>
+          </div>
+          <div
+            className="tts-settings-item tts-settings-voice"
+            title="Select a TTS voice"
+          >
+            <div className="tts-settings-item-label">TTS Voice</div>
+            <div className="tts-settings-item-control">
+              <select
+                value={settings.voice}
+                onChange={(e) =>
+                  on_change_settings(
+                    "voice",
+                    (e.target as HTMLSelectElement).value
+                  )
+                }
+              >
+                {VOICE_NAMES.map((name) => (
+                  <option value={name} key={name}>
+                    {name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>

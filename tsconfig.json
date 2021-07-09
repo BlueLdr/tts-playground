@@ -10,6 +10,7 @@
     "noUnusedLocals": true,
     "outDir": "./site/static/scripts",
     "resolveJsonModule": true,
+    "sourceMap": true,
     "target": "ES5",
     "paths": {
       "~/*": ["./src/*"]

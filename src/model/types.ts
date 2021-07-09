@@ -39,6 +39,7 @@ declare namespace TTS {
     open: boolean;
     insert_at_cursor: boolean;
     trim_whitespace: boolean;
+    voice: string;
   }
 
   interface AppState {
