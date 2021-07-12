@@ -1,11 +1,11 @@
 import * as Preact from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { ScratchRow, ScratchRowEdit } from "~/view/components";
+import { SnippetsRow, SnippetsRowEdit } from "~/view/components";
 import { useModal, useStateIfMounted } from "~/view/utils";
 
-export const ScratchSection: Preact.FunctionComponent<{
-  section: TTS.ScratchSection;
-  updateSection: (value: TTS.ScratchSection) => void;
+export const SnippetsSection: Preact.FunctionComponent<{
+  section: TTS.SnippetsSection;
+  updateSection: (value: TTS.SnippetsSection) => void;
   onClickEdit: () => void;
   previewText: (snippet: TTS.Snippet, count?: number) => Promise<void>;
 }> = ({ section, updateSection, onClickEdit, previewText }) => {
@@ -26,13 +26,13 @@ export const ScratchSection: Preact.FunctionComponent<{
   const [edit_target, set_edit_target] = useStateIfMounted(undefined);
 
   return (
-    <div className="tts-scratch-section" data-open={`${open}`}>
-      <div className="tts-scratch-section-header">
+    <div className="tts-snippets-section" data-open={`${open}`}>
+      <div className="tts-snippets-section-header">
         <div
-          className="tts-scratch-section-title"
+          className="tts-snippets-section-title"
           onClick={() => set_open(!open)}
         >
-          <div className="tts-scratch-section-expand">
+          <div className="tts-snippets-section-expand">
             {open ? (
               <i className="fas fa-chevron-down" />
             ) : (
@@ -43,7 +43,7 @@ export const ScratchSection: Preact.FunctionComponent<{
         </div>
         {open && (
           <button
-            className="icon-button tts-scratch-section-edit"
+            className="icon-button tts-snippets-section-edit"
             onClick={onClickEdit}
           >
             <i className="fas fa-edit" />
@@ -52,7 +52,7 @@ export const ScratchSection: Preact.FunctionComponent<{
       </div>
       <ul>
         {section.data?.map((r, i) => (
-          <ScratchRow
+          <SnippetsRow
             key={i}
             row={r}
             updateRow={(value) => update_row(i, value)}
@@ -61,9 +61,9 @@ export const ScratchSection: Preact.FunctionComponent<{
             previewText={previewText}
           />
         ))}
-        <li className="tts-scratch-row tts-scratch-section-add-row-item">
+        <li className="tts-snippets-row tts-snippets-section-add-row-item">
           <button
-            className="tts-scratch-section-add-row"
+            className="tts-snippets-section-add-row"
             type="button"
             onClick={() => set_edit_target(section.data?.length ?? 0)}
           >
@@ -74,7 +74,7 @@ export const ScratchSection: Preact.FunctionComponent<{
       </ul>
       {edit_target != null &&
         useModal(
-          <ScratchRowEdit
+          <SnippetsRowEdit
             row={section.data[edit_target]}
             updateRow={(value) => update_row(edit_target, value)}
             onClickDelete={() => update_row(edit_target)}

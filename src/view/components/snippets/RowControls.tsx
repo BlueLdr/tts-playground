@@ -3,7 +3,7 @@ import { useCallback, useEffect } from "preact/hooks";
 import { useCopyToClipboard, useRequestStatus } from "~/view/utils";
 
 const listener_opts = { once: true };
-export const ScratchRowControls: Preact.FunctionComponent<{
+export const SnippetsRowControls: Preact.FunctionComponent<{
   row: TTS.Snippet;
   open: boolean;
   setOpen: (value: boolean) => void;
@@ -45,16 +45,16 @@ export const ScratchRowControls: Preact.FunctionComponent<{
     row.text.repeat(Math.round((default_count || 2) / 2))
   );
   return (
-    <div className="tts-scratch-row-controls" data-open={`${open}`}>
+    <div className="tts-snippets-row-controls" data-open={`${open}`}>
       <button
-        className="tts-scratch-row-control icon-button tts-scratch-row-controls-button"
+        className="tts-snippets-row-control icon-button tts-snippets-row-controls-button"
         onClick={() => setOpen(!open)}
       >
         <i className="fas fa-cog" />
       </button>
-      <div className="tts-scratch-row-controls-menu">
+      <div className="tts-snippets-row-controls-menu">
         <button
-          className="icon-button tts-scratch-row-control"
+          className="icon-button tts-snippets-row-control"
           title="Listen"
           onClick={() => fetch_tts(row, default_count)}
           disabled={status.pending}
@@ -62,7 +62,7 @@ export const ScratchRowControls: Preact.FunctionComponent<{
           <i className="fas fa-volume-up" />
         </button>
         <button
-          className="icon-button tts-scratch-row-control"
+          className="icon-button tts-snippets-row-control"
           title="Copy to Clipboard"
           onClick={copy_all}
           // @ts-expect-error:
@@ -75,14 +75,14 @@ export const ScratchRowControls: Preact.FunctionComponent<{
           <i className="fas fa-clipboard" />
         </button>
         <button
-          className="icon-button tts-scratch-row-control"
+          className="icon-button tts-snippets-row-control"
           title="Edit"
           onClick={onClickEdit}
         >
           <i className="fas fa-edit" />
         </button>
         <button
-          className="icon-button tts-scratch-row-control"
+          className="icon-button tts-snippets-row-control"
           title="Delete"
           onClick={on_delete}
         >

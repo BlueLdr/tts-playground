@@ -2,7 +2,7 @@ import * as Preact from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { useStateIfMounted } from "~/view/utils";
 
-export const ScratchSectionModal: Preact.FunctionComponent<{
+export const SnippetsSectionModal: Preact.FunctionComponent<{
   name: string;
   setName: (value: string) => void;
   deleteSection: () => void;
@@ -23,7 +23,7 @@ export const ScratchSectionModal: Preact.FunctionComponent<{
 
   return (
     <div className="modal-backdrop">
-      <div className="modal tts-scratch-section-modal">
+      <div className="modal tts-snippets-section-modal">
         <div className="modal-header">
           <h3>{!name ? "Create New" : "Edit"} Snippet Group</h3>
           <button className="icon-button modal-close" onClick={dismiss}>
@@ -31,7 +31,7 @@ export const ScratchSectionModal: Preact.FunctionComponent<{
           </button>
         </div>
         <div className="modal-body">
-          <label className="tts-scratch-section-modal-input">
+          <label className="tts-snippets-section-modal-input">
             <span>Group Name</span>
             <input
               ref={input_ref}

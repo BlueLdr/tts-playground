@@ -3,12 +3,12 @@ import { useEffect, useRef } from "preact/hooks";
 import { AudioPlayer } from "~/view/components";
 import { usePlaySnippet, useStateIfMounted } from "~/view/utils";
 
-const SCRATCH_EDIT_MODAL_REQUEST: TTS.TTSRequest = {
+const SNIPPETS_EDIT_MODAL_REQUEST: TTS.TTSRequest = {
   text: "",
   promise: new Promise(() => {}),
   data: "",
 };
-export const ScratchRowEdit: Preact.FunctionComponent<{
+export const SnippetsRowEdit: Preact.FunctionComponent<{
   row: TTS.Snippet;
   updateRow: (row: TTS.Snippet) => void;
   onClickDelete: () => void;
@@ -27,7 +27,7 @@ export const ScratchRowEdit: Preact.FunctionComponent<{
 
   const [tts_data, status, preview_tts] = usePlaySnippet(
     "snippet-modal-player",
-    SCRATCH_EDIT_MODAL_REQUEST
+    SNIPPETS_EDIT_MODAL_REQUEST
   );
 
   const input_ref = useRef<HTMLInputElement>();
@@ -47,7 +47,7 @@ export const ScratchRowEdit: Preact.FunctionComponent<{
   };
   return (
     <div className="modal-backdrop">
-      <div className="modal tts-scratch-modal">
+      <div className="modal tts-snippets-modal">
         <div className="modal-header">
           <h3>{!row.text ? "Create New" : "Edit"} Snippet</h3>
           <button className="icon-button modal-close" onClick={dismiss}>
@@ -55,9 +55,9 @@ export const ScratchRowEdit: Preact.FunctionComponent<{
           </button>
         </div>
         <div className="modal-body">
-          <div className="row tts-scratch-modal-text">
+          <div className="row tts-snippets-modal-text">
             <label
-              className="tts-scratch-modal-prefix"
+              className="tts-snippets-modal-prefix"
               title="Some snippets need to start with a different string than the repeated characters (e.g. the 'y' in yDRDRDR)."
             >
               <span>Prefix</span>
@@ -69,7 +69,7 @@ export const ScratchRowEdit: Preact.FunctionComponent<{
                 }
               />
             </label>
-            <label className="tts-scratch-modal-input">
+            <label className="tts-snippets-modal-input">
               <span>Main Text</span>
               <input
                 ref={input_ref}
@@ -78,7 +78,7 @@ export const ScratchRowEdit: Preact.FunctionComponent<{
               />
             </label>
             <label
-              className="tts-scratch-modal-suffix"
+              className="tts-snippets-modal-suffix"
               title="Text to insert after all repetitions of the snippet (e.g. punctuation)"
             >
               <span>Suffix</span>
@@ -116,7 +116,7 @@ export const ScratchRowEdit: Preact.FunctionComponent<{
           <h4>Options</h4>
           <div className="row">
             <label
-              className="tts-scratch-modal-checkbox"
+              className="tts-snippets-modal-checkbox"
               title="When adding this snippet to the message, put a space between the existing text and the snippet."
             >
               <input
@@ -129,7 +129,7 @@ export const ScratchRowEdit: Preact.FunctionComponent<{
               Space Before
             </label>
             <label
-              className="tts-scratch-modal-checkbox"
+              className="tts-snippets-modal-checkbox"
               title="When adding this snippet to the message, put a space after the snippet."
             >
               <input
@@ -142,7 +142,7 @@ export const ScratchRowEdit: Preact.FunctionComponent<{
               Space After
             </label>
             <label
-              className="tts-scratch-modal-count"
+              className="tts-snippets-modal-count"
               title="By default, the snippet's main text will be repeated this many times. This can be overridden in the Snippet sidebar."
             >
               <input

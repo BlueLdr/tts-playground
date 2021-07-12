@@ -81,7 +81,7 @@ export const EditorHeader: Preact.FunctionComponent<{
           </div>
           <div
             className="tts-settings-item tts-settings-insert"
-            title="Insert a snippet from the scratch pad at either the cursor position or at the end of the message"
+            title="Insert a snippet from the snippets pad at either the cursor position or at the end of the message"
           >
             <div className="tts-settings-item-label">Insert Snippets At:</div>
             <div className="tts-settings-item-control">

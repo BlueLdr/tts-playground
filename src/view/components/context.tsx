@@ -12,7 +12,7 @@ import {
   ImmutableContextValue,
   LOADED_MESSAGE,
   MESSAGES,
-  SCRATCH,
+  SNIPPETS,
   VOLUME_CTX,
   INITIAL_STATE,
 } from "~/model";
@@ -47,9 +47,9 @@ const CONTEXTS = {
     context: MESSAGES,
     initialValue: INITIAL_STATE.messages,
   },
-  SCRATCH: {
-    context: SCRATCH,
-    initialValue: INITIAL_STATE.scratch,
+  SNIPPETS: {
+    context: SNIPPETS,
+    initialValue: INITIAL_STATE.snippets,
   },
 } as const;
 
@@ -141,7 +141,7 @@ export class WithGlobalContexts extends PureComponent {
 
 export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
   const messages = hooks.useContext(MESSAGES).value;
-  const scratch = hooks.useContext(SCRATCH).value;
+  const snippets = hooks.useContext(SNIPPETS).value;
   const volume = hooks.useContext(VOLUME_CTX).value;
   const editor_state = hooks.useContext(EDITOR_STATE).value;
   const editor_settings = hooks.useContext(EDITOR_SETTINGS).value;
@@ -184,8 +184,8 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
   }, [messages]);
 
   useEffect(() => {
-    storage.set_stored_scratch(scratch);
-  }, [scratch]);
+    storage.set_stored_snippets(snippets);
+  }, [snippets]);
 
   return (
     <LOADED_MESSAGE.Provider value={ctx_value}>
