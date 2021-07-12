@@ -69,7 +69,7 @@ export const MESSAGES = createNamedContext<TTS.Message[]>(
   INITIAL_STATE.messages,
   "MESSAGES"
 );
-export const SCRATCH = createNamedContext<TTS.ScratchSection[]>(
-  INITIAL_STATE.scratch,
-  "SCRATCH"
+export const SNIPPETS = createNamedContext<TTS.SnippetsSection[]>(
+  INITIAL_STATE.snippets,
+  "SNIPPETS"
 );

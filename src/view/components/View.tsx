@@ -13,7 +13,7 @@ import {
   LOADED_MESSAGE,
   MESSAGES,
 } from "~/model";
-import { Editor, MessagesList, Scratch } from "~/view/components";
+import { Editor, MessagesList, Snippets } from "~/view/components";
 import { useContextState, useValueRef } from "~/view/utils";
 
 const View: Preact.FunctionComponent = () => {
@@ -83,8 +83,8 @@ const View: Preact.FunctionComponent = () => {
         <div className="tts-col tts-col-main">
           <Editor message={loaded_message} updateMessages={update_messages} />
         </div>
-        <div className="tts-col tts-col-scratch">
-          <Scratch />
+        <div className="tts-col tts-col-snippets">
+          <Snippets />
         </div>
       </div>
     </div>

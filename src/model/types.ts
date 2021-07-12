@@ -23,7 +23,7 @@ declare namespace TTS {
     default_count: number;
   }
 
-  interface ScratchSection {
+  interface SnippetsSection {
     name: string;
     open: boolean;
     data: Snippet[];

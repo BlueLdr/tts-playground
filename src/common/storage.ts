@@ -1,5 +1,5 @@
-export const get_stored_scratch = (): TTS.ScratchSection[] =>
-  (JSON.parse(localStorage.getItem("tts-scratch")) || []).map((section) => ({
+export const get_stored_snippets = (): TTS.SnippetsSection[] =>
+  (JSON.parse(localStorage.getItem("tts-snippets")) || []).map((section) => ({
     ...section,
     data: section.data.map((row) => {
       const { defaultCount, ...options } = row.options ?? {};
@@ -10,8 +10,8 @@ export const get_stored_scratch = (): TTS.ScratchSection[] =>
       return mapped;
     }),
   }));
-export const set_stored_scratch = (value: TTS.ScratchSection[]) =>
-  localStorage.setItem("tts-scratch", JSON.stringify(value));
+export const set_stored_snippets = (value: TTS.SnippetsSection[]) =>
+  localStorage.setItem("tts-snippets", JSON.stringify(value));
 
 export const get_stored_messages = (): TTS.Message[] =>
   JSON.parse(localStorage.getItem("tts-messages"));

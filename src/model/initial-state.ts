@@ -18,10 +18,10 @@ const initial_state: TTS.AppState = {
 };
 
 const messages: TTS.Message[] = common.get_stored_messages() ?? [];
-const scratch: TTS.ScratchSection[] = common.get_stored_scratch() ?? [];
+const snippets: TTS.SnippetsSection[] = common.get_stored_snippets() ?? [];
 
 export const INITIAL_STATE = {
   ...initial_state,
   messages,
-  scratch,
+  snippets,
 } as const;

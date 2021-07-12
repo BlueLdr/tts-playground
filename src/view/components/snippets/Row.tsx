@@ -1,10 +1,10 @@
 import * as Preact from "preact";
 import { useCallback, useContext, useRef } from "preact/hooks";
 import { ADD_SNIPPET_CALLBACK } from "~/model";
-import { ScratchRowControls } from "~/view/components";
+import { SnippetsRowControls } from "~/view/components";
 import { useHoldClick, useStateIfMounted, useValueRef } from "~/view/utils";
 
-export const ScratchRow: Preact.FunctionComponent<{
+export const SnippetsRow: Preact.FunctionComponent<{
   row: TTS.Snippet;
   updateRow: (row: TTS.Snippet) => void;
   onClickDelete: () => void;
@@ -53,32 +53,32 @@ export const ScratchRow: Preact.FunctionComponent<{
   const add_listeners = useHoldClick(add_to_message, on_end_hold, 100);
 
   return (
-    <li className="tts-scratch-row" data-edit={`${edit}`}>
-      <div className="tts-scratch-row-left">
+    <li className="tts-snippets-row" data-edit={`${edit}`}>
+      <div className="tts-snippets-row-left">
         <button
           type="button"
-          className="icon-button tts-scratch-row-control tts-scratch-row-control-add"
+          className="icon-button tts-snippets-row-control tts-snippets-row-control-add"
           title="Add to message"
           {...add_listeners}
           onContextMenu={(e) => e.preventDefault()}
         >
           <i className="fas fa-plus" />
         </button>
-        <div className="tts-scratch-row-text">
+        <div className="tts-snippets-row-text">
           {row.options?.prefix ? (
-            <span className="tts-scratch-row-text-prefix">
+            <span className="tts-snippets-row-text-prefix">
               {row.options.prefix}
             </span>
           ) : null}
           {row.text ?? " "}
           {row.options?.suffix ? (
-            <span className="tts-scratch-row-text-suffix">
+            <span className="tts-snippets-row-text-suffix">
               {row.options.suffix}
             </span>
           ) : null}
         </div>
       </div>
-      <ScratchRowControls
+      <SnippetsRowControls
         row={row}
         open={edit}
         setOpen={set_edit}
