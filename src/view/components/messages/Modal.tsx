@@ -82,7 +82,7 @@ export const MessageModal: Preact.FunctionComponent<{
         onClick={() => {
           updateMessage({
             name: value,
-            text,
+            text: message.text,
             options,
           });
           dismiss();

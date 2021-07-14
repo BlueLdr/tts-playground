@@ -23,7 +23,7 @@ export const MessagesList: Preact.FunctionComponent<{
 
   return (
     <div className="tts-messages">
-      <div className="row tts-messages-header">
+      <div className="row tts-col-header tts-messages-header">
         <h4>Messages</h4>
       </div>
       <div className="tts-message-list">

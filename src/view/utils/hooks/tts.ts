@@ -115,7 +115,7 @@ export const useMessageFullText = (message: TTS.Message) => {
     options: { max_length, speed },
   } = message;
   return hooks.useMemo(() => {
-    if (!speed) {
+    if (!speed || text.length === max_length) {
       return text;
     }
     return `${text} ${"¡".repeat(max_length - text.length - 1)}`;
