@@ -61,7 +61,7 @@ export const Snippets: Preact.FunctionComponent = () => {
 
   return (
     <div className="tts-snippets">
-      <div className="row tts-snippets-header">
+      <div className="row tts-col-header tts-snippets-header">
         <h4>Snippets</h4>
 
         <button
