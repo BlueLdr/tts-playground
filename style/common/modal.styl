@@ -7,7 +7,9 @@
   left 50%
   transform translate(-50%, -50%)
   min-height 10rem
+  max-height calc(100% - 2rem)
   min-width 30rem
+  max-width calc(100% - 2rem)
   display flex
   flex-direction column
   justify-content space-between
@@ -50,3 +52,41 @@
 
   &-footer
     border-top 1px solid $Gray72
+
+
+  &-header-tab
+    &s
+      display flex
+      justify-content space-between
+      align-items center
+      .modal-close
+        width 2.5rem
+
+    reset-button-full()
+    color $Gray248
+    font-size 1rem
+    border-right 1px solid $Gray72
+    flex 1 1 auto
+    text-align center
+
+    &, &s .modal-close
+      height 2.5rem
+    &:first-child
+      border-top-left-radius 8px
+
+    &:hover
+    &:focus
+      background-color $GrayL
+
+    &:active
+      background-color $Gray
+
+    &[data-active="true"]
+      background-color $BlueG
+
+  &-scroll-content
+    position relative
+    overflow-x hidden
+    overflow-y auto
+
+

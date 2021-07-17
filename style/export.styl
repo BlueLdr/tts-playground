@@ -1,0 +1,237 @@
+.tts-export
+  &-button.icon-button
+    position relative
+
+    .fa-file
+      color $Gray96
+      margin-left -0.5rem
+    .fa-exchange-alt
+      color $Gray128
+      font-size 0.875rem
+      position absolute
+      top 52%
+      left 20%
+      z-index 1
+      transform translate(-85%, -50%)
+
+    &:hover
+      .fa-file
+        color $Gray176
+      .fa-exchange-alt
+        color $Gray144
+
+    &:active
+      .fa-file
+        color $Gray144
+      .fa-exchange-alt
+        color $Gray112
+
+  &-modal
+    .modal-header
+      padding 0
+
+
+  &-export
+    &-form
+      h4
+        margin-top 0
+      ul
+        reset-list()
+        margin 1.5rem 0
+      li
+        margin 0.25rem 0
+        .checkbox, .checkbox-label
+          font-size 1rem
+
+      .row
+        justify-content center
+        button
+
+
+.tts-import
+  &-file
+    padding 0.5rem
+  &-input
+    color $Gray160
+    border 6px dashed $Gray128
+    border-radius 0.75rem
+    display flex
+    flex-direction column
+    justify-content center
+    align-items center
+    padding 6rem 0
+    cursor pointer
+    .fa-file-upload
+      font-size 5rem
+    &[data-dragged="true"]
+      background-color $Gray72
+    &-main
+      display flex
+      justify-content center
+      align-items center
+    &-text
+      display flex
+      justify-content center
+      align-items center
+      flex-direction column
+      margin-left 1rem
+      span
+        &:first-child, &:last-child
+          font-size 1.125rem
+        &:nth-child(2)
+          color $Gray144
+          font-weight 500
+          margin 0.125rem 0
+    &-error
+      color $RedD
+      margin-top 2rem
+
+  &-conflicts.modal-body
+    max-height calc(100vh - 10.5rem)
+    overflow hidden
+    display flex
+    flex-direction column
+    justify-content flex-start
+    align-items flex-start
+
+  &-compare
+    &-row
+      padding 1.5rem 1rem
+      &:not(:last-child)
+        border-bottom 2px solid $Gray128
+      &-top
+        display flex
+        justify-content space-evenly
+        align-items center
+      &:first-child
+        background-color $Gray64
+        position sticky
+        top 0
+        z-index 10
+    &-side
+      label.btn
+        display flex
+        justify-content center
+        align-items center
+        cursor pointer
+        padding 0.75rem 1.5rem
+      input
+        margin-right 1rem
+      &[data-selected="false"]
+        label.btn:not(:hover):not(:focus)
+          background-color transparent
+      &[data-selected="true"]
+        label.btn
+          background-color $BlueG
+          &:hover
+            background-color $BlueD
+
+    &-header
+      display flex
+      flex-direction column
+      justify-content center
+      align-items center
+      cursor pointer
+      &[data-static="true"]
+        cursor auto
+      &-input
+        font-size 0.875rem
+        margin-top 0.5rem
+
+    &-message
+      &-text
+        background-color $Gray64
+        border 1px solid $Gray96
+        border-radius 8px
+        padding 1rem
+        margin-top 1rem
+
+    &-snippet
+      &-section
+        background-color $Gray112
+        padding 1rem
+        position sticky
+        top 4.875rem
+        z-index 10
+        > *
+          border-top 1px solid $Gray144
+          border-bottom 1px solid $Gray144
+        .tts-import-compare-row
+          padding 0.75rem 1rem
+          &:first-child
+            position static
+      &s
+        min-width 560px
+        width 100%
+
+  &-snippets
+    &-duplicates
+      width fit-content
+      table
+        width 100%
+
+  &-rename,
+  &-compare
+    table
+      position relative
+      border 1px solid $Gray96
+      border-top none
+    tr
+      display table-row
+      &.tts-import-compare-row:nth-child(even)
+        background-color $Gray64
+    th,
+    td
+      display table-cell
+    th
+      background-color $Gray72
+      border-top 1px solid $Gray96
+      border-bottom 1px solid $Gray96
+      padding 1rem 0.375rem
+      text-align left
+      height 4.875rem
+      position sticky
+      top 0
+    td
+      vertical-align top
+      padding 0.5rem 0.375rem
+      &:not(:last-child)
+        border-right 1px solid rgba($Gray128, 0.1)
+      label.btn
+        justify-content flex-start
+
+  &-rename
+
+    &-name input
+      min-width 18rem
+
+    &-discard
+      width 6.5rem
+      td&, th&
+        text-align right
+      label, input
+        cursor pointer
+      input
+        margin-left 0.625rem
+      td&
+        line-height $InputHeight
+
+    .tts-import-compare-message-text
+      margin-top 0
+
+  &-categorize-snippets
+    &, table
+      width 100%
+
+  &-success
+    display flex
+    flex-direction column
+    justify-content center
+    align-items center
+    width 100%
+    height 18rem
+
+    i.fa-check-circle
+      color $statusGreen
+      font-size 8rem
+      font-weight 200

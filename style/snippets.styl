@@ -280,3 +280,48 @@
       display none !important
     & audio::-webkit-media-controls-time-remaining-display
       display none !important
+
+.snippet
+  display flex
+  justify-content flex-start
+  align-items flex-start
+  line-height 1.5em
+
+  &-prefix,
+  &-suffix
+    opacity 0.6
+  &-prefix
+    margin-right 0.125rem
+  &-suffix
+    margin-left 0.125rem
+
+  &-text
+    font-weight 600
+    margin 0 0.0625em
+  &-text-repeats
+    margin 0 0.0625em
+    display inline-flex
+    justify-content flex-start
+    align-items center
+    &::before,
+    &::after
+      font-size 0.875em
+      opacity 0.5
+      vertical-align middle
+    &::before
+      content "["
+    &::after
+      content "]"
+
+  &-space-before,
+  &-space-after
+    width 0.375rem
+    border-bottom 1px solid transparent
+    height 1.5em
+    &[data-show="true"]
+      border-bottom-color $Gray128
+      background-color rgba($Gray160, 0.5)
+  &-space-before
+    margin-right 0.125rem
+  &-space-after
+    margin-left 0.125rem
