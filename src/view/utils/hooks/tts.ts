@@ -31,7 +31,7 @@ export const usePlayMessage = (
 
   const [status, fetch_tts] = useRequestStatus(get_tts_data);
   const on_submit = hooks.useCallback(() => {
-    fetch_tts(full_text, request, voice_ref.current).then((d) => {
+    fetch_tts(full_text, request, voice_ref.current).then(d => {
       if (d === data_ref.current) {
         if (data_ref.current) play_audio(player_id);
       } else {
@@ -65,7 +65,7 @@ export const usePlaySnippet = (
       const full_text = `${prefix}${text.repeat(
         count || default_count || 1
       )}${suffix}`;
-      return fetch_tts(full_text, request, voice_ref.current).then((d) => {
+      return fetch_tts(full_text, request, voice_ref.current).then(d => {
         if (d === data_ref.current) {
           if (data_ref.current) play_audio(player_id);
         } else {
@@ -97,7 +97,7 @@ export const useAudioPlayer = (
     if (!text) {
       return Promise.resolve();
     }
-    return get_tts_data(text, request, voice_ref.current).then((d) => {
+    return get_tts_data(text, request, voice_ref.current).then(d => {
       if (d === data_ref.current) {
         play_audio(player_id);
       } else {

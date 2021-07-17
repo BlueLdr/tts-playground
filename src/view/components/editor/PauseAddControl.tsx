@@ -1,15 +1,16 @@
 import * as Preact from "preact";
-import { useCallback, useEffect, useRef } from "preact/hooks";
+import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 import { ensure_number, useModal, useStateIfMounted } from "~/view/utils";
+import { ADD_SNIPPET_CALLBACK } from "~/model";
 
 export const PAUSE_CHAR_SPEED_MODIFIED = "ᴾ";
 
 export const SLASH_DURATION = 2.5 / 14; // seconds
 export const MOD_PAUSE_CHAR_DURATION = 1.067 / 14; // seconds
 
-export const generate_unmodified_pause = (duration) =>
+export const generate_unmodified_pause = duration =>
   "/ ".repeat(Math.max(1, Math.round(duration / SLASH_DURATION)));
-export const generate_modified_pause = (duration) =>
+export const generate_modified_pause = duration =>
   PAUSE_CHAR_SPEED_MODIFIED.repeat(
     Math.max(1, Math.round(duration / MOD_PAUSE_CHAR_DURATION))
   );
@@ -21,13 +22,13 @@ export const generate_pause = (duration, preserve_speed = false) =>
 
 export const PauseAddControl: Preact.FunctionComponent<{
   text: string;
-  onAdd: (text: string) => void;
   speedModified: boolean;
-}> = ({ text, onAdd, speedModified }) => {
+}> = ({ text, speedModified }) => {
   const [open, set_open] = useStateIfMounted(false);
   const [duration, set_duration] = useStateIfMounted(1);
   const [preserve, set_preserve] = useStateIfMounted(speedModified);
   const input_ref = useRef<HTMLInputElement>();
+  const on_add_pause = useContext(ADD_SNIPPET_CALLBACK).value;
 
   const dismiss = () => set_open(false);
   const add_pause = useCallback(() => {
@@ -64,7 +65,7 @@ export const PauseAddControl: Preact.FunctionComponent<{
                   min={0.1}
                   max={10}
                   step={0.1}
-                  onInput={(e) =>
+                  onInput={e =>
                     set_duration(
                       ensure_number(
                         (e.target as HTMLInputElement).valueAsNumber,
@@ -81,7 +82,7 @@ export const PauseAddControl: Preact.FunctionComponent<{
               <input
                 type="checkbox"
                 checked={preserve}
-                onInput={(e) =>
+                onInput={e =>
                   set_preserve((e.target as HTMLInputElement).checked)
                 }
               />
@@ -96,7 +97,7 @@ export const PauseAddControl: Preact.FunctionComponent<{
           <button
             className="btn btn-primary"
             onClick={() => {
-              onAdd(add_pause());
+              on_add_pause(add_pause(), "end");
               dismiss();
             }}
           >
