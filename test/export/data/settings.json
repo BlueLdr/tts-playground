@@ -2,5 +2,6 @@
   "open": true,
   "insert_at_cursor": true,
   "trim_whitespace": true,
-  "voice": "Brian"
+  "voice": "Brian",
+  "bits_string": "uni300"
 }

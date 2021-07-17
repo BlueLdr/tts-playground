@@ -43,27 +43,37 @@ export const Editor: Preact.FunctionComponent<{
   const [max_len, set_max_length] = useStateIfMounted(
     editor_state?.max_length ?? 255
   );
+  const [bits, set_bits] = useStateIfMounted(editor_state?.bits ?? "");
   const max_length = useMemo(() => ensure_number(max_len, 255), [max_len]);
 
   useEffect(() => {
+    const trimmed_text =
+      bits && `${text} ${bits}`.length > max_length
+        ? text.slice(0, max_length - bits.length - 1)
+        : text;
     set_editor_state({
       max_length: max_length,
       speed,
-      text,
+      text: trimmed_text,
+      bits,
     });
-  }, [max_length, speed, text]);
+  }, [max_length, speed, text, bits]);
 
   const new_message = useMemo(
     () => ({
-      text,
+      text:
+        bits && `${text} ${bits}`.length > max_length
+          ? text.slice(0, max_length - bits.length - 1)
+          : text,
       name: message?.name,
       options: {
         max_length,
         speed,
+        bits,
       },
     }),
 
-    [max_length, speed, text, message?.name]
+    [max_length, speed, text, message?.name, bits]
   );
 
   const [data, status, on_submit, message_text] = usePlayMessage(new_message);
@@ -78,6 +88,7 @@ export const Editor: Preact.FunctionComponent<{
       set_text(message.text);
       set_speed(message.options?.speed);
       set_max_length(message.options?.max_length);
+      set_bits(message.options?.bits ?? "");
     }
   }, [message]);
 
@@ -91,6 +102,7 @@ export const Editor: Preact.FunctionComponent<{
     set_text("");
     set_speed(false);
     set_unsaved(false);
+    set_bits("");
     set_loaded_message(-1);
   }, [is_unsaved]);
 
@@ -117,6 +129,8 @@ export const Editor: Preact.FunctionComponent<{
         speed={speed}
         setSpeed={set_speed}
         status={status}
+        bits={bits}
+        setBits={set_bits}
       />
       <div className="row">
         <AudioPlayer data={data} />

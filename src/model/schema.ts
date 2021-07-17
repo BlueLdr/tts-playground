@@ -1,3 +1,5 @@
+import { DEFAULT_BITS_STRING } from "~/common";
+
 export type TypeString<T extends boolean | string | number> = T extends boolean
   ? "boolean"
   : T extends string
@@ -33,6 +35,7 @@ export const SETTINGS_SCHEMA: SchemaOf<TTS.EditorSettings> = {
   insert_at_cursor: { type: "boolean", default: false },
   trim_whitespace: { type: "boolean", default: false },
   voice: { type: "string", default: "Brian" },
+  bits_string: { type: "string", default: DEFAULT_BITS_STRING },
 };
 
 export const SNIPPET_OPTIONS_SCHEMA: SchemaOf<TTS.SnippetOptions> = {
@@ -60,6 +63,7 @@ export const SNIPPET_SECTION_SCHEMA: SchemaOf<TTS.SnippetsSection> = {
 export const MESSAGE_OPTIONS_SCHEMA: SchemaOf<TTS.MessageOptions> = {
   max_length: { type: "number", default: 255 },
   speed: { type: "boolean", default: false },
+  bits: { type: "string", default: "" },
 };
 
 export const MESSAGE_SCHEMA: SchemaOf<TTS.Message> = {
@@ -85,7 +89,7 @@ export const conform_to_schema = <T extends object, K extends object>(
     if (typeof type.type !== "string") {
       if (Array.isArray(data[key])) {
         const arr = [];
-        data[key].forEach((d) => {
+        data[key].forEach(d => {
           const conformed = conform_to_schema(d, type.type);
           if (conformed) {
             arr.push(conformed);

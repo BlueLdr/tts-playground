@@ -126,6 +126,9 @@
     span:first-child
       visibility hidden
       margin-inline-end 0.125rem
+    span&-over-limit
+      color transparent
+      background-color $RedD
     span:last-child
       word-break break-all
 
@@ -161,6 +164,12 @@
       display block
       width 100%
       padding 1rem
+
+  &-bits
+    &-checkbox
+      margin-right 0.25rem
+    &-string
+      width 8rem
 
 .tts-pause-modal-duration input
   max-width 4rem
