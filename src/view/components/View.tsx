@@ -46,7 +46,7 @@ const View: Preact.FunctionComponent = () => {
   const update_messages = useCallback(
     (index = -1, value) => {
       const same_name = messages_ref.current.findIndex(
-        (m) => m.name === value?.name
+        m => m.name === value?.name
       );
       if (same_name > -1 && same_name !== index) {
         alert("A message with this name already exists.");
@@ -54,7 +54,7 @@ const View: Preact.FunctionComponent = () => {
       }
       const data = messages_ref.current?.slice();
       data[index === -1 ? messages_ref.current.length : index] = value;
-      const new_messages = data.filter((r) => !!r);
+      const new_messages = data.filter(r => !!r);
       set_messages(new_messages);
       if (!value) {
         load_when_unsaved_reset.current = -1;
@@ -62,7 +62,7 @@ const View: Preact.FunctionComponent = () => {
         load_when_unsaved_reset.current = new_messages.length - 1;
       } else {
         load_when_unsaved_reset.current = new_messages.findIndex(
-          (m) => m.name === value?.name
+          m => m.name === value?.name
         );
       }
       set_unsaved(!value);
@@ -80,7 +80,7 @@ const View: Preact.FunctionComponent = () => {
   }, [is_unsaved]);
 
   useEffect(() => {
-    const listener = (e) => {
+    const listener = e => {
       e.preventDefault();
       e.stopPropagation();
     };
@@ -105,7 +105,7 @@ const View: Preact.FunctionComponent = () => {
     <Preact.Fragment>
       <div className="header">
         <div className="header-left">
-          <h1>TTS Simulator</h1>
+          <h1>TTS Playground</h1>
           <h4>By BlueLdr</h4>
         </div>
         <div className="header-right">
