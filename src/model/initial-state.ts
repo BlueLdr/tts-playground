@@ -9,11 +9,14 @@ const initial_state: TTS.AppState = {
     insert_at_cursor: stored_state?.settings?.insert_at_cursor ?? false,
     trim_whitespace: stored_state?.settings?.trim_whitespace ?? false,
     voice: stored_state?.settings?.voice ?? common.VOICE_NAMES[0],
+    bits_string:
+      stored_state?.settings?.bits_string ?? common.DEFAULT_BITS_STRING,
   },
   editor: {
     text: stored_state?.editor?.text ?? "",
     max_length: stored_state?.editor?.max_length ?? 255,
     speed: stored_state?.editor?.speed ?? false,
+    bits: stored_state?.editor?.bits ?? "",
   },
 };
 

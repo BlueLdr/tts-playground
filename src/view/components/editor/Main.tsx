@@ -1,7 +1,7 @@
 import * as Preact from "preact";
 import { useContext, useRef } from "preact/hooks";
 import { EDITOR_STATE } from "~/model";
-import { PauseAddControl } from "~/view/components";
+import { BitsInput, PauseAddControl } from "~/view/components";
 import { useDebounce, useTextOptimization } from "~/view/utils";
 
 export const EditorMain: Preact.FunctionComponent<{
@@ -11,9 +11,22 @@ export const EditorMain: Preact.FunctionComponent<{
   inputRef: Preact.RefObject<HTMLTextAreaElement>;
   speed: boolean;
   setSpeed: (speed: boolean) => void;
+  bits: string;
+  setBits: (bits: string) => void;
   status: TTS.RequestStatus;
-}> = ({ text, onChange, onSubmit, speed, setSpeed, status, inputRef }) => {
+}> = ({
+  text,
+  onChange,
+  onSubmit,
+  speed,
+  setSpeed,
+  bits,
+  setBits,
+  status,
+  inputRef,
+}) => {
   const { max_length } = useContext(EDITOR_STATE).value;
+  const bits_length = bits ? bits.length + 1 : 0;
   return (
     <p className="tts-textarea-container">
       <TTSTextArea
@@ -21,27 +34,29 @@ export const EditorMain: Preact.FunctionComponent<{
         id="tts-main-input"
         value={text}
         onChange={onChange}
-        maxLength={max_length}
+        bitsString={bits}
+        maxLength={max_length - bits_length}
         speed={speed}
       />
       <div className="tts-textarea-bottom">
         <div>
           Length:{" "}
           <span>
-            {text.length} / {max_length}
+            {text.length + bits_length} / {max_length}
           </span>
         </div>
         <div>
           <label>
-            Fill remainder with Speed Modifier (¡)
             <input
               type="checkbox"
               checked={speed}
-              onInput={(e) => setSpeed((e.target as HTMLInputElement).checked)}
+              onInput={e => setSpeed((e.target as HTMLInputElement).checked)}
             />
+            Speed Modifier
           </label>
         </div>
-        <PauseAddControl speedModified={speed} text={text} onAdd={onChange} />
+        <BitsInput bits={bits} setBits={setBits} />
+        <PauseAddControl speedModified={speed} text={text} />
       </div>
       <div className="row">
         <div className="tts-textarea-submit">
@@ -49,7 +64,7 @@ export const EditorMain: Preact.FunctionComponent<{
             className="btn btn-primary"
             disabled={status.pending || !text}
             type="submit"
-            onClick={(e) => {
+            onClick={e => {
               e.preventDefault();
               onSubmit(text);
             }}
@@ -69,7 +84,8 @@ export const TTSTextArea: Preact.FunctionComponent<{
   speed: boolean;
   id: string;
   maxLength: number;
-}> = ({ value, onChange, speed, id, maxLength, inputRef }) => {
+  bitsString: string;
+}> = ({ value, onChange, speed, id, maxLength, bitsString, inputRef }) => {
   const preview_ref = useRef<HTMLDivElement>();
   const optimize_text = useTextOptimization(value, onChange, inputRef);
   const [on_blur, cancel_optimize] = useDebounce(optimize_text, 300);
@@ -78,6 +94,9 @@ export const TTSTextArea: Preact.FunctionComponent<{
   const max_len = parseInt(`${maxLength}`);
   if (speed && max_len !== value.length) {
     end = "¡".repeat(Math.max(0, max_len - value.length - 1));
+  }
+  if (bitsString) {
+    end += ` ${bitsString}`;
   }
   return (
     <div className="tts-textarea">
@@ -89,7 +108,7 @@ export const TTSTextArea: Preact.FunctionComponent<{
         rows={12}
         cols={82}
         maxLength={maxLength}
-        onInput={(e) => onChange((e.target as HTMLTextAreaElement).value)}
+        onInput={e => onChange((e.target as HTMLTextAreaElement).value)}
         onBlur={() => on_blur(value)}
         onFocus={cancel_optimize}
         onSelect={() => {
@@ -118,7 +137,11 @@ export const TTSTextArea: Preact.FunctionComponent<{
         }}
       />
       <div className="tts-textarea-preview" ref={preview_ref}>
-        <span>{value}</span> <span>{end}</span>
+        <span>{value.slice(0, maxLength)}</span>
+        <span className="tts-textarea-preview-over-limit">
+          {value.slice(maxLength)}
+        </span>{" "}
+        <span>{end}</span>
       </div>
     </div>
   );

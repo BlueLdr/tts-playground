@@ -1,6 +1,6 @@
 import * as Preact from "preact";
 import { useCallback } from "preact/hooks";
-import { VOICE_NAMES } from "~/common";
+import { DEFAULT_BITS_STRING, VOICE_NAMES } from "~/common";
 import { EDITOR_SETTINGS } from "~/model";
 import {
   ensure_number,
@@ -68,7 +68,7 @@ export const EditorHeader: Preact.FunctionComponent<{
               type="range"
               min={255}
               max={500}
-              onInput={(e) => {
+              onInput={e => {
                 const new_value = ensure_number(
                   (e.target as HTMLInputElement).valueAsNumber,
                   255
@@ -79,6 +79,53 @@ export const EditorHeader: Preact.FunctionComponent<{
               value={value}
             />
           </div>
+          <div
+            className="tts-settings-item tts-settings-voice"
+            title="Select a TTS voice"
+          >
+            <div className="tts-settings-item-label">TTS Voice</div>
+            <div className="tts-settings-item-control">
+              <select
+                value={settings.voice}
+                onChange={e =>
+                  on_change_settings(
+                    "voice",
+                    (e.target as HTMLSelectElement).value
+                  )
+                }
+              >
+                {VOICE_NAMES.map(name => (
+                  <option value={name} key={name}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="tts-settings-item tts-settings-bits">
+            <div className="tts-settings-item-label">Default Bits String</div>
+            <div className="tts-settings-item-control">
+              <input
+                value={settings.bits_string}
+                onChange={e => {
+                  if (!(e.target as HTMLInputElement).value) {
+                    return;
+                  }
+                  on_change_settings(
+                    "bits_string",
+                    (e.target as HTMLInputElement).value.trim()
+                  );
+                }}
+                onBlur={e => {
+                  if (!(e.target as HTMLInputElement).value) {
+                    on_change_settings("bits_string", DEFAULT_BITS_STRING);
+                  }
+                }}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="row tts-settings-section">
           <div
             className="tts-settings-item tts-settings-insert"
             title="Insert a snippet from the snippets pad at either the cursor position or at the end of the message"
@@ -105,35 +152,10 @@ export const EditorHeader: Preact.FunctionComponent<{
               </label>
             </div>
           </div>
-          <div
-            className="tts-settings-item tts-settings-voice"
-            title="Select a TTS voice"
-          >
-            <div className="tts-settings-item-label">TTS Voice</div>
-            <div className="tts-settings-item-control">
-              <select
-                value={settings.voice}
-                onChange={(e) =>
-                  on_change_settings(
-                    "voice",
-                    (e.target as HTMLSelectElement).value
-                  )
-                }
-              >
-                {VOICE_NAMES.map((name) => (
-                  <option value={name} key={name}>
-                    {name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-        <div className="tts-settings-section-label">Message Optimization</div>
-        <div className="row tts-settings-section">
           <div className="tts-settings-item">
+            <div className="tts-settings-item-label">Message Optimization</div>
             <label
-              className="checkbox tts-settings-whitespace"
+              className="checkbox tts-settings-whitespace tts-settings-item-control"
               title="Automatically remove any duplicate, leading, or trailing whitespace"
             >
               <input

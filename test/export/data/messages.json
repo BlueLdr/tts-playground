@@ -4,7 +4,8 @@
     "name": "Extra Message 1",
     "options": {
       "max_length": 255,
-      "speed": true
+      "speed": true,
+      "bits": false
     }
   },
   {
@@ -12,7 +13,8 @@
     "name": "Extra Message 2",
     "options": {
       "max_length": 256,
-      "speed": true
+      "speed": true,
+      "bits": false
     }
   },
   {
@@ -20,7 +22,8 @@
     "name": "Extra Message 3",
     "options": {
       "max_length": 257,
-      "speed": true
+      "speed": true,
+      "bits": false
     }
   }
 ]

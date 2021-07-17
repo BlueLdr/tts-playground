@@ -105,7 +105,7 @@ export const MessageModalBase: Preact.FunctionComponent<{
 }> = ({ message, name, setName, dismiss, isNew, previewMessage, children }) => {
   const input_ref = useRef<HTMLInputElement>();
   const {
-    options: { max_length, speed },
+    options: { max_length, speed, bits },
   } = message || {};
   const text = useMessageFullText(message);
 
@@ -129,7 +129,7 @@ export const MessageModalBase: Preact.FunctionComponent<{
               <input
                 ref={input_ref}
                 value={name}
-                onInput={(e) => setName((e.target as HTMLInputElement).value)}
+                onInput={e => setName((e.target as HTMLInputElement).value)}
               />
             </label>
             {
@@ -154,6 +154,9 @@ export const MessageModalBase: Preact.FunctionComponent<{
               </span>
               <span>
                 Use Speed Modifier: <strong>{speed ? "Yes" : "No"}</strong>
+              </span>
+              <span>
+                Use Bits: <strong>{!!bits ? "Yes" : "No"}</strong>
               </span>
             </div>
           </div>

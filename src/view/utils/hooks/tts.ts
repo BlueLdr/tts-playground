@@ -14,20 +14,23 @@ export const usePlayMessage = (
   player_id?: string,
   request?: TTS.TTSRequest
 ) => {
-  const voice = hooks.useContext(EDITOR_SETTINGS).value?.voice;
+  const { voice, bits_string } = hooks.useContext(EDITOR_SETTINGS).value ?? {};
   const voice_ref = useValueRef(voice);
   const {
     text,
-    options: { speed, max_length },
+    options: { speed, max_length, bits },
   } = message;
 
   const [data, set_data, data_ref] = useStateRef("");
   const full_text = hooks.useMemo(() => {
+    const bits_length = bits && bits_string ? bits_string.length + 1 : 0;
     if (speed && max_length !== text.length) {
-      return `${text} ${"¡".repeat(max_length - text.length - 1)}`;
+      return `${text} ${"¡".repeat(
+        Math.max(max_length - text.length - 1 - bits_length, 0)
+      )}`;
     }
     return text;
-  }, [speed, text, max_length]);
+  }, [speed, text, max_length, bits, bits_string]);
 
   const [status, fetch_tts] = useRequestStatus(get_tts_data);
   const on_submit = hooks.useCallback(() => {
@@ -112,13 +115,14 @@ export const useAudioPlayer = (
 export const useMessageFullText = (message: TTS.Message) => {
   const {
     text,
-    options: { max_length, speed },
+    options: { max_length, speed, bits },
   } = message;
   return hooks.useMemo(() => {
-    if (!speed || text.length === max_length) {
-      return text;
+    let text_ = bits ? `${bits} ${text}` : text;
+    if (!speed || text_.length >= max_length - 1) {
+      return text_;
     }
-    return `${text} ${"¡".repeat(max_length - text.length - 1)}`;
+    return `${text_} ${"¡".repeat(max_length - text.length - 1)}`;
   }, [text, max_length, speed]);
 };
 

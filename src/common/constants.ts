@@ -10,3 +10,5 @@ export const VOICE_NAMES = [
   "Matthew",
   "Geraint",
 ];
+
+export const DEFAULT_BITS_STRING = "uni300";

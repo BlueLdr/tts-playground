@@ -9,6 +9,7 @@ declare global {
     interface MessageOptions {
       max_length: number;
       speed: boolean;
+      bits: string;
     }
 
     interface Snippet {
@@ -34,6 +35,7 @@ declare global {
       text: string;
       max_length: number;
       speed: boolean;
+      bits: string;
     }
 
     interface EditorSettings {
@@ -41,6 +43,7 @@ declare global {
       insert_at_cursor: boolean;
       trim_whitespace: boolean;
       voice: string;
+      bits_string: string;
     }
 
     interface AppState {

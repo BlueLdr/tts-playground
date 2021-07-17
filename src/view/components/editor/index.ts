@@ -1,3 +1,4 @@
+export * from "./BitsInput";
 export * from "./Editor";
 export * from "./Header";
 export * from "./Main";

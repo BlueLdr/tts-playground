@@ -6,6 +6,7 @@ export const MESSAGE_ONE: TTS.ExportedMessage = {
   options: {
     max_length: 255,
     speed: true,
+    bits: "",
   },
   __type: "message",
 };
@@ -15,6 +16,7 @@ export const MESSAGE_TWO: TTS.ExportedMessage = {
   options: {
     max_length: 256,
     speed: true,
+    bits: "",
   },
   __type: "message",
 };
@@ -24,6 +26,7 @@ export const MESSAGE_THREE: TTS.ExportedMessage = {
   options: {
     max_length: 257,
     speed: true,
+    bits: "",
   },
   __type: "message",
 };
@@ -34,6 +37,7 @@ export const MESSAGE_FOUR: TTS.ExportedMessage = {
   options: {
     max_length: 258,
     speed: true,
+    bits: "",
   },
   __type: "message",
 };
