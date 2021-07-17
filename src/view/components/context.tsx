@@ -103,7 +103,7 @@ export class WithGlobalContexts extends PureComponent {
   }
 
   createSetter = <K extends keyof Contexts>(key: K): ContextSetter<K> =>
-    ((s) => {
+    (s => {
       const cur_value = this._state[key];
       const new_value: ContextValue<K> =
         typeof s === "function" ? s(cur_value) : s;

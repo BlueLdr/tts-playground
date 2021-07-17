@@ -11,25 +11,25 @@ const settings = require("./data/settings.json");
 // @ts-expect-error:
 import { SNIPPET_ONE, SNIPPET_TWO, SNIPPET_THREE } from "./data/snippets.ts";
 
-test("validate one snippet", (t) => {
+test("validate one snippet", t => {
   const initial = SNIPPET_ONE;
   const validated = validate_import_data(initial) as TTS.ExportedSnippet;
   t.deepEqual(initial, validated);
 });
 
-test("validate one snippet in array", (t) => {
+test("validate one snippet in array", t => {
   const initial = [SNIPPET_ONE];
   const validated = validate_import_data(initial) as TTS.ExportData["snippets"];
   t.deepEqual(initial, validated);
 });
 
-test("validate many snippets", (t) => {
+test("validate many snippets", t => {
   const initial = [SNIPPET_ONE, SNIPPET_TWO, SNIPPET_THREE];
   const validated = validate_import_data(initial) as TTS.ExportData["snippets"];
   t.deepEqual(initial, validated);
 });
 
-test("import one snippet", (t) => {
+test("import one snippet", t => {
   const { __type, ...snippet_one } = SNIPPET_ONE;
   const [
     settings_result,
@@ -50,7 +50,7 @@ test("import one snippet", (t) => {
   t.deepEqual(dup_snippets, []);
 });
 
-test("import one snippet in array", (t) => {
+test("import one snippet in array", t => {
   const { __type, ...snippet_one } = SNIPPET_ONE;
   const [
     settings_result,
@@ -71,7 +71,7 @@ test("import one snippet in array", (t) => {
   t.deepEqual(dup_snippets, []);
 });
 
-test("import many snippets", (t) => {
+test("import many snippets", t => {
   const { __type: _1, ...snippet_one } = SNIPPET_ONE;
   const { __type: _2, ...snippet_two } = SNIPPET_TWO;
   const { __type: _3, ...snippet_three } = SNIPPET_THREE;

@@ -49,7 +49,7 @@ export const useHoldClick = (
     };
   }, [clicked]);
 
-  const onMouseDown = hooks.useCallback((e) => {
+  const onMouseDown = hooks.useCallback(e => {
     e.initialClick = true;
     on_click_ref.current?.(e);
     set_clicked(true);

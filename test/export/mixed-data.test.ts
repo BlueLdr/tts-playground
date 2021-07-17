@@ -41,7 +41,7 @@ const snippet_section_two = conform_to_schema(
   SNIPPET_SECTION_SCHEMA
 );
 
-test("successfully import array of mixed data", (t) => {
+test("successfully import array of mixed data", t => {
   const input = [MESSAGE_ONE, SNIPPET_TWO, SNIPPET_SECTION_TWO];
   const [
     settings_result,
@@ -62,7 +62,7 @@ test("successfully import array of mixed data", (t) => {
   t.deepEqual(uncategorized_snippets, [snippet_two]);
 });
 
-test("successfully import array of mixed data with duplicates", (t) => {
+test("successfully import array of mixed data with duplicates", t => {
   const duplicate_m_one = { ...MESSAGE_ONE, text: "duplicate name" };
   const duplicate_m_two = { ...MESSAGE_TWO, name: "duplicate text" };
   const duplicate_m_three = { ...MESSAGE_THREE };
@@ -130,7 +130,7 @@ test("successfully import array of mixed data with duplicates", (t) => {
   t.deepEqual(uncategorized_snippets, []);
 });
 
-test("successfully import ExportData object", (t) => {
+test("successfully import ExportData object", t => {
   const duplicate_m_one = { ...MESSAGE_ONE, text: "duplicate name" };
   const duplicate_m_two = { ...MESSAGE_TWO, name: "duplicate text" };
   const duplicate_m_three = { ...MESSAGE_THREE };

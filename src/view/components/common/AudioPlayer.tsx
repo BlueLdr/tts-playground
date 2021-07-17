@@ -11,7 +11,7 @@ export const AudioPlayer: Preact.FunctionComponent<{
   const [volume, onChangeVolume] = useContextState(VOLUME_CTX);
   const audio_ref = useRef<HTMLAudioElement>();
   const set_volume_cb = useCallback(
-    (e) => {
+    e => {
       if (e.target.volume !== volume) {
         onChangeVolume?.(e.target.volume);
       }

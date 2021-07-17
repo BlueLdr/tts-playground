@@ -16,25 +16,25 @@ import {
   // @ts-expect-error:
 } from "./data/messages.ts";
 
-test("validate one message", (t) => {
+test("validate one message", t => {
   const initial = MESSAGE_ONE;
   const validated = validate_import_data(initial) as TTS.ExportedMessage;
   t.deepEqual(initial, validated);
 });
 
-test("validate one message in array", (t) => {
+test("validate one message in array", t => {
   const initial = [MESSAGE_ONE];
   const validated = validate_import_data(initial) as TTS.ExportData["messages"];
   t.deepEqual(initial, validated);
 });
 
-test("validate many messages", (t) => {
+test("validate many messages", t => {
   const initial = [MESSAGE_ONE, MESSAGE_TWO, MESSAGE_THREE];
   const validated = validate_import_data(initial) as TTS.ExportData["messages"];
   t.deepEqual(initial, validated);
 });
 
-test("import one message", (t) => {
+test("import one message", t => {
   const { __type, ...message_one } = MESSAGE_ONE;
   const [
     settings_result,
@@ -55,7 +55,7 @@ test("import one message", (t) => {
   t.deepEqual(uncategorized_snippets, []);
 });
 
-test("import one message in array", (t) => {
+test("import one message in array", t => {
   const { __type, ...message_one } = MESSAGE_ONE;
   const [
     settings_result,
@@ -76,7 +76,7 @@ test("import one message in array", (t) => {
   t.deepEqual(uncategorized_snippets, []);
 });
 
-test("import many messages", (t) => {
+test("import many messages", t => {
   const { __type: _1, ...message_one } = MESSAGE_ONE;
   const { __type: _2, ...message_two } = MESSAGE_TWO;
   const { __type: _3, ...message_three } = MESSAGE_THREE;
@@ -109,7 +109,7 @@ test("import many messages", (t) => {
   t.deepEqual(uncategorized_snippets, []);
 });
 
-test("import message with duplicate text", (t) => {
+test("import message with duplicate text", t => {
   const { __type: _1, ...message_one } = MESSAGE_ONE;
   const duplicate: TTS.ExportedMessage = {
     ...MESSAGE_ONE,
@@ -136,7 +136,7 @@ test("import message with duplicate text", (t) => {
   t.deepEqual(uncategorized_snippets, []);
 });
 
-test("import message with duplicate name", (t) => {
+test("import message with duplicate name", t => {
   const { __type: _1, ...message_one } = MESSAGE_ONE;
   const duplicate: TTS.ExportedMessage = {
     ...MESSAGE_ONE,
@@ -163,7 +163,7 @@ test("import message with duplicate name", (t) => {
   t.deepEqual(uncategorized_snippets, []);
 });
 
-test("reject importing exact duplicate message", (t) => {
+test("reject importing exact duplicate message", t => {
   const { __type: _1, ...message_one } = MESSAGE_ONE;
   const [
     settings_result,
@@ -183,7 +183,7 @@ test("reject importing exact duplicate message", (t) => {
   t.deepEqual(dup_snippets, []);
   t.deepEqual(uncategorized_snippets, []);
 });
-test("import mix of duplicate messages", (t) => {
+test("import mix of duplicate messages", t => {
   const { __type: _1, ...message_one } = MESSAGE_ONE;
   const duplicate_1: TTS.ExportedMessage = {
     ...MESSAGE_ONE,

@@ -36,7 +36,7 @@ export const SnippetsSectionModal: Preact.FunctionComponent<{
             <input
               ref={input_ref}
               value={value}
-              onInput={(e) => set_value((e.target as HTMLInputElement).value)}
+              onInput={e => set_value((e.target as HTMLInputElement).value)}
             />
           </label>
           {name && (

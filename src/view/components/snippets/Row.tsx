@@ -17,7 +17,7 @@ export const SnippetsRow: Preact.FunctionComponent<{
   const options_ref = useValueRef(row?.options);
 
   const add_to_message = useCallback(
-    (e) => {
+    e => {
       const {
         text = "",
         options: { prefix, space_before, default_count },
@@ -60,7 +60,7 @@ export const SnippetsRow: Preact.FunctionComponent<{
           className="icon-button tts-snippets-row-control tts-snippets-row-control-add"
           title="Add to message"
           {...add_listeners}
-          onContextMenu={(e) => e.preventDefault()}
+          onContextMenu={e => e.preventDefault()}
         >
           <i className="fas fa-plus" />
         </button>

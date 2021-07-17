@@ -67,7 +67,7 @@ export const SnippetsRowControls: Preact.FunctionComponent<{
           onClick={copy_all}
           // @ts-expect-error:
           onAuxClick={copy_main}
-          onContextMenu={(e) => {
+          onContextMenu={e => {
             e.preventDefault();
             copy_main();
           }}

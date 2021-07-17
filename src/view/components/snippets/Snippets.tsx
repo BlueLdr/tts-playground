@@ -25,7 +25,7 @@ export const Snippets: Preact.FunctionComponent = () => {
     (index: number, value?: TTS.SnippetsSection) => {
       const data = snippets?.slice();
       data[index] = value;
-      set_snippets(data.filter((r) => !!r));
+      set_snippets(data.filter(r => !!r));
     },
     [snippets]
   );
@@ -78,7 +78,7 @@ export const Snippets: Preact.FunctionComponent = () => {
           <SnippetsSection
             key={i}
             section={s}
-            updateSection={(value) => update_snippets(i, value)}
+            updateSection={value => update_snippets(i, value)}
             onClickEdit={() => set_edit_target(i)}
             previewText={preview_tts}
           />

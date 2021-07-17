@@ -14,7 +14,7 @@ export const SnippetsSection: Preact.FunctionComponent<{
     (index: number, value?: TTS.Snippet) => {
       const data = section.data?.slice() ?? [];
       data[index] = value;
-      updateSection({ ...section, data: data.filter((r) => !!r) });
+      updateSection({ ...section, data: data.filter(r => !!r) });
     },
     [updateSection, section]
   );
@@ -55,7 +55,7 @@ export const SnippetsSection: Preact.FunctionComponent<{
           <SnippetsRow
             key={i}
             row={r}
-            updateRow={(value) => update_row(i, value)}
+            updateRow={value => update_row(i, value)}
             onClickDelete={() => update_row(i)}
             onClickEdit={() => set_edit_target(i)}
             previewText={previewText}
@@ -76,7 +76,7 @@ export const SnippetsSection: Preact.FunctionComponent<{
         useModal(
           <SnippetsRowEdit
             row={section.data[edit_target]}
-            updateRow={(value) => update_row(edit_target, value)}
+            updateRow={value => update_row(edit_target, value)}
             onClickDelete={() => update_row(edit_target)}
             dismiss={() => set_edit_target(undefined)}
           />

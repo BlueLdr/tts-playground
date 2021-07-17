@@ -16,7 +16,7 @@ export const useStateIfMounted = <T>(initial_value: T) => {
   const mounted = useMounted();
   const [value, setValue] = hooks.useState<T>(initial_value);
   const setter: hooks.StateUpdater<T> = hooks.useCallback(
-    (new_value) => {
+    new_value => {
       if (mounted.current) {
         setValue(new_value);
       }
@@ -35,7 +35,7 @@ export const useStateRef = <
   const value_ref = hooks.useRef<T>(initial_value);
   const [value, setValue] = hooks.useState<T>(initial_value);
   const setter: hooks.StateUpdater<T> = hooks.useCallback(
-    (new_value) => {
+    new_value => {
       if (mounted.current) {
         value_ref.current =
           typeof new_value === "function"
@@ -61,7 +61,7 @@ export const useStateWithRef = <
     value_ref.current = initial_value;
   }, []);
   const setter: hooks.StateUpdater<T> = hooks.useCallback(
-    (new_value) => {
+    new_value => {
       if (mounted.current) {
         value_ref.current =
           typeof new_value === "function"
@@ -93,11 +93,11 @@ export const useRequestStatus = <T extends any[], R>(
     (...args: T) => {
       set_state({ pending: true, success: false, error: null });
       return send_request(...args)
-        .then((res) => {
+        .then(res => {
           set_state({ pending: false, success: true, error: null });
           return res;
         })
-        .catch((err) => {
+        .catch(err => {
           set_state({ pending: false, success: false, error: err });
           return err;
         });
