@@ -49,6 +49,32 @@ export const useStateRef = <
   return [value, setter, value_ref] as const;
 };
 
+export const useStateWithRef = <
+  T extends string | number | boolean | object | null
+>(
+  initial_value: T,
+  value_ref: preact.RefObject<T>
+) => {
+  const mounted = useMounted();
+  const [value, setValue] = hooks.useState<T>(initial_value);
+  hooks.useEffect(() => {
+    value_ref.current = initial_value;
+  }, []);
+  const setter: hooks.StateUpdater<T> = hooks.useCallback(
+    (new_value) => {
+      if (mounted.current) {
+        value_ref.current =
+          typeof new_value === "function"
+            ? new_value(value_ref.current)
+            : new_value;
+        setValue(new_value);
+      }
+    },
+    [setValue, mounted]
+  );
+  return [value, setter] as const;
+};
+
 export const useValueRef = <T>(value: T) => {
   const ref = hooks.useRef<T>(value);
   ref.current = value;

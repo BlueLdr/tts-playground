@@ -13,7 +13,12 @@ import {
   LOADED_MESSAGE,
   MESSAGES,
 } from "~/model";
-import { Editor, MessagesList, Snippets } from "~/view/components";
+import {
+  Editor,
+  ImportExport,
+  MessagesList,
+  Snippets,
+} from "~/view/components";
 import { useContextState, useValueRef } from "~/view/utils";
 
 const View: Preact.FunctionComponent = () => {
@@ -74,20 +79,53 @@ const View: Preact.FunctionComponent = () => {
     }
   }, [is_unsaved]);
 
+  useEffect(() => {
+    const listener = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    document.addEventListener("dragover", listener);
+    document.addEventListener("dragenter", listener);
+    document.addEventListener("drop", listener);
+    document.addEventListener("dragleave", listener);
+    document.addEventListener("dragexit", listener);
+    document.addEventListener("dragend", listener);
+
+    return () => {
+      document.removeEventListener("dragover", listener);
+      document.removeEventListener("dragenter", listener);
+      document.removeEventListener("drop", listener);
+      document.removeEventListener("dragleave", listener);
+      document.removeEventListener("dragexit", listener);
+      document.removeEventListener("dragend", listener);
+    };
+  }, []);
+
   return (
-    <div className="tts-container">
-      <div className="tts-container">
-        <div className="tts-col tts-col-messages">
-          <MessagesList updateMessages={update_messages} />
+    <Preact.Fragment>
+      <div className="header">
+        <div className="header-left">
+          <h1>TTS Simulator</h1>
+          <h4>By BlueLdr</h4>
         </div>
-        <div className="tts-col tts-col-main">
-          <Editor message={loaded_message} updateMessages={update_messages} />
-        </div>
-        <div className="tts-col tts-col-snippets">
-          <Snippets />
+        <div className="header-right">
+          <ImportExport />
         </div>
       </div>
-    </div>
+      <div className="tts-container">
+        <div className="tts-container">
+          <div className="tts-col tts-col-messages">
+            <MessagesList updateMessages={update_messages} />
+          </div>
+          <div className="tts-col tts-col-main">
+            <Editor message={loaded_message} updateMessages={update_messages} />
+          </div>
+          <div className="tts-col tts-col-snippets">
+            <Snippets />
+          </div>
+        </div>
+      </div>
+    </Preact.Fragment>
   );
 };
 

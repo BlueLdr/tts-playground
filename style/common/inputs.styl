@@ -1,3 +1,5 @@
+$InputHeight = 2.25rem
+
 textarea, input
   font-family 'Helvetica Neue', arial, sans-serif
   font-size 1rem
@@ -20,15 +22,23 @@ input
   background-color $Gray96
   border 1px solid $Gray128
   padding 0.5rem
+  height $InputHeight
   &:focus
     background-color $Gray72
     border-color $Gray160
+
+  &[data-invalid="true"]
+    border-color $RedD
+    outline-color $RedD
 
 label.checkbox
 label.radio-button
   display flex
   justify-content flex-start
   align-items center
+input[type="checkbox"],
+input[type="radio"]
+  height auto
 input[type="checkbox"] + .checkbox-label
 input[type="radio"] + .radio-label
   font-size 0.875rem

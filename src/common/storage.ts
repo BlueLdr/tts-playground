@@ -1,5 +1,10 @@
 export const get_stored_snippets = (): TTS.SnippetsSection[] =>
-  (JSON.parse(localStorage.getItem("tts-snippets")) || []).map((section) => ({
+  (
+    JSON.parse(
+      localStorage.getItem("tts-snippets") ||
+        localStorage.getItem("tts-scratch")
+    ) || []
+  ).map((section) => ({
     ...section,
     data: section.data.map((row) => {
       const { defaultCount, ...options } = row.options ?? {};
