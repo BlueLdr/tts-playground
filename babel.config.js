@@ -1,4 +1,4 @@
-module.exports = (api) => ({
+module.exports = api => ({
   plugins: [
     [
       "module-resolver",

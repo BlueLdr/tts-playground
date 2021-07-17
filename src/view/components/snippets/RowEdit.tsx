@@ -64,9 +64,7 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
               <input
                 ref={input_ref}
                 value={prefix}
-                onInput={(e) =>
-                  set_prefix((e.target as HTMLInputElement).value)
-                }
+                onInput={e => set_prefix((e.target as HTMLInputElement).value)}
               />
             </label>
             <label className="tts-snippets-modal-input">
@@ -74,7 +72,7 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
               <input
                 ref={input_ref}
                 value={value}
-                onInput={(e) => set_value((e.target as HTMLInputElement).value)}
+                onInput={e => set_value((e.target as HTMLInputElement).value)}
               />
             </label>
             <label
@@ -85,9 +83,7 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
               <input
                 ref={input_ref}
                 value={suffix}
-                onInput={(e) =>
-                  set_suffix((e.target as HTMLInputElement).value)
-                }
+                onInput={e => set_suffix((e.target as HTMLInputElement).value)}
               />
             </label>
             <button
@@ -122,7 +118,7 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
               <input
                 type="checkbox"
                 checked={space_before}
-                onInput={(e) =>
+                onInput={e =>
                   set_space_before((e.target as HTMLInputElement).checked)
                 }
               />
@@ -135,7 +131,7 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
               <input
                 type="checkbox"
                 checked={space_after}
-                onInput={(e) =>
+                onInput={e =>
                   set_space_after((e.target as HTMLInputElement).checked)
                 }
               />
@@ -151,7 +147,7 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
                 min={1}
                 max={20}
                 step={1}
-                onInput={(e) => {
+                onInput={e => {
                   const value = (e.target as HTMLInputElement).valueAsNumber;
                   if (!isNaN(value)) {
                     set_count(value);

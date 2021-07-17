@@ -33,13 +33,13 @@ export const ImportDuplicateMessages: Preact.FunctionComponent<{
   const items = useMemo<DuplicateMessageRow[]>(
     () =>
       duplicates
-        .map((d) => {
-          const orig = messages?.find((m) => is_duplicate_message(m, d));
+        .map(d => {
+          const orig = messages?.find(m => is_duplicate_message(m, d));
           if (!orig) {
             return null;
           }
           const existing_row = result_ref.current?.find(
-            (r) =>
+            r =>
               r.new_message.name === d.name && r.old_message.name === orig.name
           );
           return {
@@ -48,7 +48,7 @@ export const ImportDuplicateMessages: Preact.FunctionComponent<{
             selected: select_all_ref.current ?? existing_row?.selected,
           };
         })
-        .filter((a) => !!a),
+        .filter(a => !!a),
     [messages, duplicates]
   );
 
@@ -58,7 +58,7 @@ export const ImportDuplicateMessages: Preact.FunctionComponent<{
     if (!select_all) {
       return;
     }
-    set_result(result.map((r) => ({ ...r, selected: select_all })));
+    set_result(result.map(r => ({ ...r, selected: select_all })));
   }, [select_all]);
 
   const on_select = useCallback(
@@ -67,7 +67,7 @@ export const ImportDuplicateMessages: Preact.FunctionComponent<{
       set_result(
         replace_item_in(
           result_ref.current,
-          (r) =>
+          r =>
             r.new_message.name === row.new_message.name &&
             r.old_message.name === row.old_message.name,
           {
@@ -80,9 +80,9 @@ export const ImportDuplicateMessages: Preact.FunctionComponent<{
     []
   );
 
-  const finished = useMemo(() => result.every((r) => !!r.selected), [result]);
+  const finished = useMemo(() => result.every(r => !!r.selected), [result]);
   const on_submit = useCallback(
-    (e) => {
+    e => {
       e.preventDefault();
       if (!finished) {
         return;
@@ -92,7 +92,7 @@ export const ImportDuplicateMessages: Preact.FunctionComponent<{
         if (row.selected === "new") {
           output = replace_item_in(
             output,
-            (m) => m.name === row.old_message.name,
+            m => m.name === row.old_message.name,
             row.new_message
           );
         }

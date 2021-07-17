@@ -45,7 +45,7 @@ export const MessagesList: Preact.FunctionComponent<{
           <MessageModal
             message={messages[edit_target]}
             loadMessage={() => set_loaded_index(edit_target)}
-            updateMessage={(value) => updateMessages(edit_target, value)}
+            updateMessage={value => updateMessages(edit_target, value)}
             deleteMessage={() => updateMessages(edit_target)}
             dismiss={() => set_edit_target(undefined)}
             previewMessage={preview_tts}

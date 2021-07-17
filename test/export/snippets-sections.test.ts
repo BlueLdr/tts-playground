@@ -15,7 +15,7 @@ import {
   // @ts-expect-error:
 } from "./data/snippets.ts";
 
-test("validate one snippet section", (t) => {
+test("validate one snippet section", t => {
   const initial = SNIPPET_SECTION_ONE;
   const validated = validate_import_data(
     initial
@@ -23,7 +23,7 @@ test("validate one snippet section", (t) => {
   t.deepEqual(initial, validated);
 });
 
-test("validate one snippet section in array", (t) => {
+test("validate one snippet section in array", t => {
   const initial = [SNIPPET_SECTION_ONE];
   const validated = validate_import_data(
     initial
@@ -31,7 +31,7 @@ test("validate one snippet section in array", (t) => {
   t.deepEqual(initial, validated);
 });
 
-test("validate many snippet sections", (t) => {
+test("validate many snippet sections", t => {
   const initial = [
     SNIPPET_SECTION_ONE,
     SNIPPET_SECTION_TWO,
@@ -43,7 +43,7 @@ test("validate many snippet sections", (t) => {
   t.deepEqual(initial, validated);
 });
 
-test("import one snippet section", (t) => {
+test("import one snippet section", t => {
   const { __type, ...section_one } = SNIPPET_SECTION_ONE;
   const [
     settings_result,
@@ -67,7 +67,7 @@ test("import one snippet section", (t) => {
   t.deepEqual(uncategorized_snippets, []);
 });
 
-test("import one snippet section in array", (t) => {
+test("import one snippet section in array", t => {
   const { __type, ...section_one } = SNIPPET_SECTION_ONE;
   const [
     settings_result,
@@ -91,7 +91,7 @@ test("import one snippet section in array", (t) => {
   t.deepEqual(uncategorized_snippets, []);
 });
 
-test("import many snippet sections", (t) => {
+test("import many snippet sections", t => {
   const { __type, ...section_one } = SNIPPET_SECTION_ONE;
   const { __type: _1, ...section_two } = SNIPPET_SECTION_TWO;
   const { __type: _2, ...section_three } = SNIPPET_SECTION_THREE;

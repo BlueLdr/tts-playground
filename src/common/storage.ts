@@ -4,9 +4,9 @@ export const get_stored_snippets = (): TTS.SnippetsSection[] =>
       localStorage.getItem("tts-snippets") ||
         localStorage.getItem("tts-scratch")
     ) || []
-  ).map((section) => ({
+  ).map(section => ({
     ...section,
-    data: section.data.map((row) => {
+    data: section.data.map(row => {
       const { defaultCount, ...options } = row.options ?? {};
       const mapped = { ...row, options };
       if (!isNaN(parseInt(defaultCount))) {

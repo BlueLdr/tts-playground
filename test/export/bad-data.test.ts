@@ -5,19 +5,19 @@ import { MESSAGE_ONE, MESSAGE_TWO } from "./data/messages.ts";
 // @ts-expect-error:
 import { SNIPPET_ONE, SNIPPET_SECTION_ONE } from "./data/snippets.ts";
 
-test("return null when validating data without a `__type`", (t) => {
+test("return null when validating data without a `__type`", t => {
   const { __type, ...data } = MESSAGE_ONE;
   const result = validate_import_data(data);
   t.is(result, null);
 });
 
-test("return null when validating data without a `__type` in an array", (t) => {
+test("return null when validating data without a `__type` in an array", t => {
   const { __type, ...data } = MESSAGE_ONE;
   const result = validate_import_data([data, MESSAGE_TWO]);
   t.deepEqual(result, [MESSAGE_TWO]);
 });
 
-test("return null when validating snippet without a `__type` in a snippet section", (t) => {
+test("return null when validating snippet without a `__type` in a snippet section", t => {
   const { __type, ...s_one } = SNIPPET_ONE;
   const result = validate_import_data({
     ...SNIPPET_SECTION_ONE,
