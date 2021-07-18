@@ -47,6 +47,12 @@ export const PauseAddControl: Preact.FunctionComponent<{
     }
   }, [open]);
 
+  useEffect(() => {
+    if (speedModified !== preserve) {
+      set_preserve(speedModified);
+    }
+  }, [speedModified]);
+
   const modal = (
     <div className="modal-backdrop">
       <div className="modal tts-pause-modal">
