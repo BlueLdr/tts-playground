@@ -5,6 +5,7 @@ import {
   export_messages,
   export_snippets,
   generate_file,
+  ResetStorage,
 } from "~/view/components";
 import { useStateIfMounted } from "~/view/utils";
 
@@ -64,9 +65,13 @@ export const ExportForm: Preact.FunctionComponent<{ dismiss: () => void }> = ({
     }
   }, [exp_data]);
 
+  const [reset_page, set_page] = useStateIfMounted(false);
+
   const disabled = !(exp_messages || exp_snippets || exp_settings);
 
-  return (
+  return reset_page ? (
+    <ResetStorage onCancel={() => set_page(false)} />
+  ) : (
     <Preact.Fragment>
       <div className="modal-body tts-export-export">
         <div className="tts-export-export-form">
@@ -128,7 +133,9 @@ export const ExportForm: Preact.FunctionComponent<{ dismiss: () => void }> = ({
         </div>
       </div>
       <div className="modal-footer tts-export-footer">
-        <div />
+        <button className="btn btn-negative" onClick={() => set_page(true)}>
+          Reset Storage
+        </button>
         <button className="btn btn-primary" onClick={dismiss}>
           Done
         </button>
