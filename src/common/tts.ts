@@ -22,8 +22,6 @@ export const get_tts_data = async (
     return Promise.reject();
   }
   let speak;
-  console.log(`voice: `, voice);
-  console.log(`previous voice`, request.text.split(":")[0]);
   if (`${voice}:${text}` === request.text && request.promise) {
     speak = await request.promise;
   } else {

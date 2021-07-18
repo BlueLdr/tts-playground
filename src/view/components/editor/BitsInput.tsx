@@ -15,6 +15,8 @@ export const BitsInput: Preact.FunctionComponent<{
   useEffect(() => {
     if (enabled && bits && bits !== value) {
       set_value(bits);
+    } else if (enabled && !bits) {
+      set_enabled(false);
     }
   }, [bits]);
 

@@ -22,7 +22,6 @@ export const AudioPlayer: Preact.FunctionComponent<{
   useEffect(() => {
     window.addEventListener("set-volume", (e: CustomEvent) => {
       if (audio_ref.current && e.detail != null) {
-        console.log("setting volume in event", e.detail, e.target);
         setTimeout(() => {
           audio_ref.current.volume = e.detail;
         }, 150);
@@ -36,7 +35,6 @@ export const AudioPlayer: Preact.FunctionComponent<{
       volume != null &&
       volume !== audio_ref.current?.volume
     ) {
-      console.log("setting volume", volume, audio_ref);
       const ev = new CustomEvent("set-volume", {
         detail: volume,
         bubbles: true,

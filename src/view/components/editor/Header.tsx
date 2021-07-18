@@ -1,5 +1,5 @@
 import * as Preact from "preact";
-import { useCallback } from "preact/hooks";
+import { useCallback, useEffect } from "preact/hooks";
 import { DEFAULT_BITS_STRING, VOICE_NAMES } from "~/common";
 import { EDITOR_SETTINGS } from "~/model";
 import {
@@ -31,6 +31,11 @@ export const EditorHeader: Preact.FunctionComponent<{
 
   const [value, set_value] = useStateIfMounted(maxLength);
   const [set_max_length] = useDebounce(setMaxLength, 75);
+  useEffect(() => {
+    if (maxLength !== value) {
+      set_value(maxLength);
+    }
+  }, [maxLength]);
   return (
     <div className="tts-header">
       <div className="tts-header-top">
