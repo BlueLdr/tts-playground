@@ -1,10 +1,15 @@
+import { DEFAULT_BITS_STRING } from "~/common/constants";
+
+const load_storage_or = (key, def) => {
+  const stored = localStorage.getItem(key);
+  if (stored) {
+    return JSON.parse(stored) || def;
+  }
+  return def;
+};
+
 export const get_stored_snippets = (): TTS.SnippetsSection[] =>
-  (
-    JSON.parse(
-      localStorage.getItem("tts-snippets") ||
-        localStorage.getItem("tts-scratch")
-    ) || sample_snippets
-  ).map(section => ({
+  load_storage_or("tts-snippets", sample_snippets).map(section => ({
     ...section,
     data: section.data.map(row => {
       const { defaultCount, ...options } = row.options ?? {};
@@ -19,14 +24,41 @@ export const set_stored_snippets = (value: TTS.SnippetsSection[]) =>
   localStorage.setItem("tts-snippets", JSON.stringify(value));
 
 export const get_stored_messages = (): TTS.Message[] =>
-  JSON.parse(localStorage.getItem("tts-messages")) || sample_messages;
+  load_storage_or("tts-messages", sample_messages);
 export const set_stored_messages = (value: TTS.Message[]) =>
   localStorage.setItem("tts-messages", JSON.stringify(value));
 
 export const get_stored_state = (): TTS.AppState =>
-  JSON.parse(localStorage.getItem("tts-state"));
+  load_storage_or("tts-state", sample_state);
 export const set_stored_state = (value: TTS.AppState) =>
   localStorage.setItem("tts-state", JSON.stringify(value));
+
+export const reset_all_storage = () => {
+  if (confirm("Are you REALLY sure you wanna do this?")) {
+    localStorage.setItem("tts-state", "");
+    localStorage.setItem("tts-messages", "");
+    localStorage.setItem("tts-snippets", "");
+    window.location.reload();
+  }
+};
+
+const sample_state: TTS.AppState = {
+  settings: {
+    bits_string: DEFAULT_BITS_STRING,
+    insert_at_cursor: true,
+    trim_whitespace: true,
+    voice: "Brian",
+    open: false,
+  },
+  message: -1,
+  volume: 0.5,
+  editor: {
+    max_length: 255,
+    speed: false,
+    bits: "",
+    text: "",
+  },
+};
 
 const sample_snippets: TTS.SnippetsSection[] = [
   {

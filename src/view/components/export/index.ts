@@ -7,3 +7,4 @@ export * from "./ImportExportModal";
 export * from "./ImportRenameMessages";
 export * from "./ImportUncategorizedSnippets";
 export * from "./utils";
+export * from "./Reset";
