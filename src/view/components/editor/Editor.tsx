@@ -25,7 +25,7 @@ import {
   useContextState,
   useInsertSnippet,
   usePlayMessage,
-  useStateIfMounted,
+  useStateObject,
 } from "~/view/utils";
 
 export const Editor: Preact.FunctionComponent<{
@@ -38,12 +38,8 @@ export const Editor: Preact.FunctionComponent<{
   const set_add_snippet_callback = useContext(ADD_SNIPPET_CALLBACK).setValue;
 
   const input_ref = useRef<HTMLTextAreaElement>();
-  const [text, set_text] = useStateIfMounted(editor_state?.text ?? "");
-  const [speed, set_speed] = useStateIfMounted(editor_state?.speed ?? false);
-  const [max_len, set_max_length] = useStateIfMounted(
-    editor_state?.max_length ?? 255
-  );
-  const [bits, set_bits] = useStateIfMounted(editor_state?.bits ?? "");
+  const [{ text, speed, max_length: max_len, bits }, set_state] =
+    useStateObject(editor_state);
   const max_length = useMemo(() => ensure_number(max_len, 255), [max_len]);
 
   useEffect(() => {
@@ -85,10 +81,12 @@ export const Editor: Preact.FunctionComponent<{
       return;
     }
     if (message) {
-      set_text(message.text);
-      set_speed(message.options?.speed);
-      set_max_length(message.options?.max_length);
-      set_bits(message.options?.bits ?? "");
+      set_state({
+        text: message.text,
+        speed: message.options?.speed,
+        max_length: message.options?.max_length,
+        bits: message.options?.bits ?? "",
+      });
     }
   }, [message]);
 
@@ -99,20 +97,27 @@ export const Editor: Preact.FunctionComponent<{
     ) {
       return;
     }
-    set_text("");
-    set_speed(false);
+    set_loaded_message(-1, true);
+    set_state({
+      text: "",
+      bits: "",
+      speed: false,
+    });
     set_unsaved(false);
-    set_bits("");
-    set_loaded_message(-1);
   }, [is_unsaved]);
 
   const insert_snippet = useInsertSnippet(text, max_length, input_ref);
   useEffect(() => {
     set_add_snippet_callback(() => (value: string, flag?: "start" | "end") => {
       const new_text = insert_snippet(value, flag);
-      set_text(new_text);
+      set_state({ text: new_text });
     });
   }, []);
+
+  const set_max_length = useCallback(
+    (len: number) => set_state({ max_length: len }),
+    [set_state]
+  );
 
   return (
     <Preact.Fragment>
@@ -124,13 +129,11 @@ export const Editor: Preact.FunctionComponent<{
       <EditorMain
         inputRef={input_ref}
         text={text}
-        onChange={set_text}
         onSubmit={on_submit}
         speed={speed}
-        setSpeed={set_speed}
         status={status}
         bits={bits}
-        setBits={set_bits}
+        setState={set_state}
       />
       <div className="row">
         <AudioPlayer data={data} />

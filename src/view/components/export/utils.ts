@@ -221,9 +221,7 @@ export const import_data = (
       snip =>
         !(snippets_result ?? snippets ?? []).find(
           (sect: TTS.SnippetsSection) => {
-            if (!sect.data) {
-              console.log(`what is this doing in here: `, sect);
-            } else {
+            if (sect.data) {
               return !!sect.data.find(s => is_duplicate_snippet(s, snip));
             }
           }

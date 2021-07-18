@@ -1,39 +1,41 @@
 import * as Preact from "preact";
-import { useContext, useRef } from "preact/hooks";
+import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 import { EDITOR_STATE } from "~/model";
 import { BitsInput, PauseAddControl } from "~/view/components";
 import { useDebounce, useTextOptimization } from "~/view/utils";
 
 export const EditorMain: Preact.FunctionComponent<{
   text: string;
-  onChange: (text: string) => void;
+  setState: <T extends TTS.EditorState>(
+    new_state: Partial<T> | ((prev_state: T) => T)
+  ) => void;
   onSubmit: (text?: string) => void;
   inputRef: Preact.RefObject<HTMLTextAreaElement>;
   speed: boolean;
-  setSpeed: (speed: boolean) => void;
   bits: string;
-  setBits: (bits: string) => void;
   status: TTS.RequestStatus;
-}> = ({
-  text,
-  onChange,
-  onSubmit,
-  speed,
-  setSpeed,
-  bits,
-  setBits,
-  status,
-  inputRef,
-}) => {
+}> = ({ text, setState, onSubmit, speed, bits, status, inputRef }) => {
   const { max_length } = useContext(EDITOR_STATE).value;
   const bits_length = bits ? bits.length + 1 : 0;
+  const on_change_text = useCallback(
+    (text: string) => setState({ text }),
+    [setState]
+  );
+  const on_change_bits = useCallback(
+    (bits: string) => setState({ bits }),
+    [setState]
+  );
+  const on_change_speed = useCallback(
+    (speed: boolean) => setState({ speed }),
+    [setState]
+  );
   return (
     <p className="tts-textarea-container">
       <TTSTextArea
         inputRef={inputRef}
         id="tts-main-input"
         value={text}
-        onChange={onChange}
+        onChange={on_change_text}
         bitsString={bits}
         maxLength={max_length - bits_length}
         speed={speed}
@@ -50,12 +52,14 @@ export const EditorMain: Preact.FunctionComponent<{
             <input
               type="checkbox"
               checked={speed}
-              onInput={e => setSpeed((e.target as HTMLInputElement).checked)}
+              onInput={e =>
+                on_change_speed((e.target as HTMLInputElement).checked)
+              }
             />
             Speed Modifier
           </label>
         </div>
-        <BitsInput bits={bits} setBits={setBits} />
+        <BitsInput bits={bits} setBits={on_change_bits} />
         <PauseAddControl speedModified={speed} text={text} />
       </div>
       <div className="row">
@@ -89,6 +93,9 @@ export const TTSTextArea: Preact.FunctionComponent<{
   const preview_ref = useRef<HTMLDivElement>();
   const optimize_text = useTextOptimization(value, onChange, inputRef);
   const [on_blur, cancel_optimize] = useDebounce(optimize_text, 300);
+  useEffect(() => {
+    cancel_optimize();
+  }, [value]);
 
   let end = "";
   const max_len = parseInt(`${maxLength}`);

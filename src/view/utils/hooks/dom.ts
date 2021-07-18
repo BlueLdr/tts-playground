@@ -17,7 +17,6 @@ export const useHoldClick = (
   const timer = hooks.useRef<any>();
 
   const repeat_click = hooks.useCallback(() => {
-    console.log("repeat click fired", clicked_ref.current);
     if (!clicked_ref.current) {
       return;
     }
@@ -28,7 +27,6 @@ export const useHoldClick = (
     timer.current = setTimeout(repeat_click, delay.current);
   }, []);
   const cancel = hooks.useCallback(() => {
-    console.log("ending hold click");
     set_clicked(false);
     clearTimeout(timer.current);
     timer.current = null;
@@ -53,7 +51,6 @@ export const useHoldClick = (
     e.initialClick = true;
     on_click_ref.current?.(e);
     set_clicked(true);
-    console.log("initial hold click");
   }, []);
 
   return hooks.useMemo(() => {

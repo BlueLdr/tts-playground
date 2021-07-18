@@ -26,6 +26,30 @@ export const useStateIfMounted = <T>(initial_value: T) => {
   return [value, setter] as const;
 };
 
+// useState, but emulates the functionality of state/setState in a class component
+export const useStateObject = <T extends object>(initial_value: T) => {
+  const mounted = useMounted();
+  const [value, setValue] = hooks.useState<T>(initial_value);
+  const setter = hooks.useCallback(
+    (new_state: Partial<T> | ((prev_state: T) => T)) => {
+      if (!mounted.current) {
+        return;
+      }
+      console.error("new_state", new_state);
+      if (typeof new_state === "function") {
+        setValue(new_state);
+      } else {
+        setValue(prev_state => ({
+          ...prev_state,
+          ...new_state,
+        }));
+      }
+    },
+    [setValue, mounted]
+  );
+  return [value, setter] as const;
+};
+
 export const useStateRef = <
   T extends string | number | boolean | object | null
 >(

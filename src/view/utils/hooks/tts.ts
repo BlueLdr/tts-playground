@@ -47,7 +47,12 @@ export const usePlayMessage = (
     if (data) play_audio(player_id);
   }, [data]);
 
-  return [data, status, on_submit, full_text] as const;
+  return [
+    data,
+    status,
+    on_submit,
+    bits ? `${bits} ${full_text}` : full_text,
+  ] as const;
 };
 
 export const usePlaySnippet = (
