@@ -1,4 +1,4 @@
-import { OptimizeTrigger } from "~/model/types";
+import { OptimizeLevel, OptimizeTrigger } from "~/model/types";
 
 interface TextTransform {
   match: (value: string) => boolean;
@@ -6,80 +6,89 @@ interface TextTransform {
 }
 
 const PLAIN_TRANSFORMS = {
-  too: "2",
-  one: "1",
-  two: "2",
-  three: "3",
-  four: "4",
-  five: "5",
-  six: "6",
-  seven: "7",
-  eight: "8",
-  nine: "9",
-  ten: "10",
-  and: "&",
+  [OptimizeLevel.safe]: {
+    too: "2",
+    one: "1",
+    two: "2",
+    three: "3",
+    four: "4",
+    five: "5",
+    six: "6",
+    seven: "7",
+    eight: "8",
+    nine: "9",
+    ten: "10",
+    and: "&",
+  },
+  [OptimizeLevel.normal]: {
+    are: "r",
+    you: "u",
+  },
+  [OptimizeLevel.max]: {
+    for: "4",
+    fore: "4",
+    to: "2",
+  },
+} as const;
+
+const TRANSFORMS: { [K in OptimizeLevel]: TextTransform[] } = {
+  [OptimizeLevel.safe]: [
+    {
+      match: v => /^\w*ight$/i.test(v),
+      transform: v => v.replace(/ight$/i, "ite"),
+    },
+    {
+      // replace any sequence of 3 or more of the same vowel with 2 of that vowel
+      match: v => new RegExp("([aeiouy])(\\1){2,}", "i").test(v),
+      transform: v =>
+        v.replace(new RegExp("([aeiouy])(\\1){2,}", "gi"), "$1$1"),
+    },
+  ],
+  [OptimizeLevel.normal]: [],
+  [OptimizeLevel.max]: [
+    {
+      match: v => /fore?$/i.test(v),
+      transform: v => v.replace(/fore?$/i, "4"),
+    },
+    {
+      match: v => /^fore?/i.test(v),
+      transform: v => v.replace(/^fore?/i, "4"),
+    },
+    {
+      match: v => /^fou?r\w*/i.test(v),
+      transform: v => v.replace(/^fou?r/i, "4"),
+    },
+    {
+      match: v => /'ve\b/i.test(v),
+      transform: v => v.replace(/'ve\b/i, "ve"),
+    },
+  ],
 };
 
-const PLAIN_TRANSFORMS_IMPERFECT = {
-  for: "4",
-  fore: "4",
-  to: "2",
-  are: "r",
-  you: "u",
-};
-
-const TRANSFORMS: TextTransform[] = [
-  {
-    match: v => /^\w*ight$/i.test(v),
-    transform: v => v.replace(/ight$/i, "ite"),
-  },
-  {
-    match: v => /^too?$/i.test(v),
-    transform: "2",
-  },
-  {
-    match: v => /^\w*fore?$/i.test(v),
-    transform: v => v.replace(/fore?(?![a-z0-9])$/i, "4"),
-  },
-  {
-    match: v => /^fou?r\w*/i.test(v),
-    transform: v => v.replace(/^fou?r/i, "4"),
-  },
-  {
-    // replace any sequence of 3 or more of the same vowel with 2 of that vowel
-    match: v => new RegExp("([aeiouy])(\\1){2,}", "i").test(v),
-    transform: v => v.replace(new RegExp("([aeiouy])(\\1){2,}", "gi"), "$1$1"),
-  },
-];
-
-const GLOBAL_TRANSFORMS: [RegExp, string][] = [
-  // [/n't\b/g, "nt"],
-  [/'ve\b/g, "ve"],
-  // [/,\s+/g, ","],
-];
-
-const optimize_word = (word: string, safe_only?: boolean) => {
-  if (word in PLAIN_TRANSFORMS) {
-    return PLAIN_TRANSFORMS[word];
-  }
-  if (safe_only) {
-    return word;
-  }
-  if (word in PLAIN_TRANSFORMS_IMPERFECT) {
-    return PLAIN_TRANSFORMS_IMPERFECT[word];
-  }
-  let output = word;
-  TRANSFORMS.forEach(t => {
-    if (t.match(output)) {
-      output =
-        typeof t.transform === "string"
-          ? t.transform
-          : t.transform?.(word) ?? word;
+const optimize_word = (
+  word: string,
+  level: OptimizeLevel = OptimizeLevel.normal
+) => {
+  for (let i = OptimizeLevel.safe; i <= level; i++) {
+    const transforms = PLAIN_TRANSFORMS[i];
+    if (word in transforms) {
+      return transforms[word];
     }
-  });
-  GLOBAL_TRANSFORMS.forEach(([reg, repl]) => {
-    output = output.replace(reg, repl);
-  });
+  }
+
+  let output = word;
+  for (let i = OptimizeLevel.safe; i <= level; i++) {
+    const transforms = TRANSFORMS[i];
+    transforms.forEach(t => {
+      if (t.match(output)) {
+        output =
+          typeof t.transform === "string"
+            ? t.transform
+            : t.transform?.(word) ?? word;
+      }
+    });
+  }
+
   return output;
 };
 
@@ -197,7 +206,7 @@ export const optimize_message_words = (
   trigger: OptimizeTrigger,
   settings: TTS.EditorSettings
 ) => {
-  const { optimize_words, optimize_safe } = settings;
+  const { optimize_words, optimize_level } = settings;
   let { selectionStart = -1, selectionEnd = -1 } = input_ref.current || {};
   const ignore_cursor = trigger <= OptimizeTrigger.blur;
   const should_optimize_words = trigger <= optimize_words;
@@ -255,7 +264,7 @@ export const optimize_message_words = (
             cursor_index_in_this_word === 0 ||
             ignore_cursor
           ) {
-            new_part = optimize_word(part, optimize_safe);
+            new_part = optimize_word(part, optimize_level);
           }
           if (cursor_in_this_word && cursor_index_in_this_word <= part.length) {
             cursor_final =
@@ -292,7 +301,7 @@ export const optimize_message_words = (
         add_word(word, word);
         cursor_final = o + cursor_index_in_word;
       } else {
-        const new_word = optimize_word(word, optimize_safe);
+        const new_word = optimize_word(word, optimize_level);
         if (cursor_word_start === i) {
           cursor_final = o + Math.min(new_word.length, cursor_index_in_word);
         }
@@ -323,6 +332,7 @@ export const optimize_message = (
   const should_optimize_words = trigger <= optimize_words;
   if (
     (!trim_whitespace && should_optimize_words) ||
+    !text ||
     selectionStart !== selectionEnd
   ) {
     return [text, selectionStart, selectionEnd] as const;

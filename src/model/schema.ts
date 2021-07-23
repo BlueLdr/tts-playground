@@ -1,4 +1,5 @@
 import { DEFAULT_BITS_STRING } from "~/common";
+import { OptimizeLevel, OptimizeTrigger } from "~/model/types";
 
 export type TypeString<T extends boolean | string | number> = T extends boolean
   ? "boolean"
@@ -34,6 +35,8 @@ export const SETTINGS_SCHEMA: SchemaOf<TTS.EditorSettings> = {
   open: { type: "boolean", default: false },
   insert_at_cursor: { type: "boolean", default: false },
   trim_whitespace: { type: "boolean", default: false },
+  optimize_words: { type: "number", default: OptimizeTrigger.manual },
+  optimize_level: { type: "number", default: OptimizeLevel.normal },
   voice: { type: "string", default: "Brian" },
   bits_string: { type: "string", default: DEFAULT_BITS_STRING },
 };

@@ -308,7 +308,8 @@ export const useOptimizeMessage = (
         callback(
           state_ref.current.text,
           input.current?.selectionStart,
-          input.current?.selectionEnd
+          input.current?.selectionEnd,
+          trigger
         );
         return;
       }
@@ -317,7 +318,8 @@ export const useOptimizeMessage = (
         callback(
           state_ref.current.text,
           input.current?.selectionStart,
-          input.current?.selectionEnd
+          input.current?.selectionEnd,
+          trigger
         );
         return;
       }
@@ -331,7 +333,7 @@ export const useOptimizeMessage = (
       if (state_ref.current.text !== new_text && callback) {
         callback_ref.current = () => {
           callback_ref.current = () => {};
-          callback(new_text, cursor_start, cursor_end);
+          callback(new_text, cursor_start, cursor_end, trigger);
         };
       }
 
@@ -343,7 +345,7 @@ export const useOptimizeMessage = (
       });
 
       if (state_ref.current.text === new_text && callback) {
-        callback(new_text, cursor_start, cursor_end);
+        callback(new_text, cursor_start, cursor_end, trigger);
       }
     }, []),
     callback_ref,
@@ -359,13 +361,11 @@ export const useOptimizeMessage = (
 
 export const useOptimizeMessageTrigger = (
   input_ref: preact.RefObject<HTMLTextAreaElement>,
-  callback?: (
-    new_text: string,
-    cursor_start: number,
-    cursor_end: number
-  ) => void
+  callback?: TTS.OptimizeCallback
 ) => {
   const settings_ref = useValueRef(hooks.useContext(EDITOR_SETTINGS).value);
+  const editor_state = hooks.useContext(EDITOR_STATE).value;
+  const state_ref = useValueRef(editor_state);
   const [ctx_callback, set_callback] = useContextState(
     OPTIMIZE_MESSAGE_CALLBACK
   );
@@ -373,6 +373,12 @@ export const useOptimizeMessageTrigger = (
   const cb = hooks.useCallback(
     (trigger: OptimizeTrigger) => {
       if (trigger > settings_ref.current.optimize_words) {
+        callback(
+          state_ref.current.text,
+          input_ref.current?.selectionStart,
+          input_ref.current?.selectionEnd,
+          trigger
+        );
         return;
       }
       const evt: TTS.OptimizeEvent = new CustomEvent("optimize-message", {

@@ -14,63 +14,6 @@
     > *:not(:last-child)
       margin-right 0.75rem
 
-.tts-settings
-  background-color rgba($Gray64, 0.5)
-  border 1px solid $Gray72
-  border-radius 4px
-  padding 1rem
-  display none
-  &[data-open="true"]
-    display block
-  &-reset,
-  &-button
-    font-size 1.25rem
-    display flex
-    justify-content center
-    align-items center
-    padding 0.5rem
-  &-reset
-    border 2px solid transparent
-  &-button
-    color $Gray232
-    background-color $Gray72
-    border 2px solid transparent
-    border-radius 4px
-    transition background-color 150ms
-    &:hover
-      background-color $Gray96
-    &:active
-      background-color $Gray64
-    &[data-open="true"]
-      border-color $Gray112
-
-  &-item
-    display flex
-    justify-content flex-start
-    align-items flex-start
-    flex-direction column
-    &:not(:last-child)
-      margin-right 1rem
-
-    &-label
-      display flex
-      justify-content flex-start
-      align-items center
-      padding 0.125rem 0
-
-    &-control
-      display flex
-      justify-content flex-start
-      align-items center
-      height 2.25rem
-
-  &-item&-insert
-    label:first-child
-      margin-right 1rem
-
-  &-section-tall &-item
-    height 4rem
-
 .tts-textarea
   position relative
   &,
