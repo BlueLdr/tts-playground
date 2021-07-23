@@ -45,10 +45,10 @@ export const get_tts_data = async (
   return request.data;
 };
 
-/**
- * @param audioElemId {string} id of the HTMLAudioElement to use
- */
-export const play_audio = (audioElemId?: string) => {
+export const play_audio = (
+  audioElemId?: string,
+  should_load: boolean = true
+) => {
   const audio = document.getElementById(
     audioElemId ? `${audioElemId}-audio` : "audio"
   );
@@ -56,6 +56,10 @@ export const play_audio = (audioElemId?: string) => {
     return;
   }
   audio.pause();
-  audio.load();
+  if (should_load) {
+    audio.load();
+  } else {
+    audio.currentTime = 0;
+  }
   audio.play();
 };

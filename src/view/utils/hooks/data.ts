@@ -35,7 +35,6 @@ export const useStateObject = <T extends object>(initial_value: T) => {
       if (!mounted.current) {
         return;
       }
-      console.error("new_state", new_state);
       if (typeof new_state === "function") {
         setValue(new_state);
       } else {
@@ -105,6 +104,11 @@ export const useValueRef = <T>(value: T) => {
   return ref;
 };
 
+export const useMemoRef = <T>(factory: () => T, inputs: any[]) => {
+  const value = hooks.useMemo(factory, inputs);
+  return useValueRef(value);
+};
+
 export const useRequestStatus = <T extends any[], R>(
   send_request: (...args: T) => Promise<R>
 ) => {
@@ -137,4 +141,31 @@ export const useContextState = <V, S>(
 ) => {
   const { value, setValue } = hooks.useContext(ctx);
   return [value, setValue] as const;
+};
+
+export const useCallbackAfterUpdate = <Args extends any[]>(
+  do_update: (...args: Args) => void,
+  callback: preact.RefObject<() => void>,
+  inputs: any[]
+) => {
+  const invoke_callback = hooks.useRef(false);
+  hooks.useEffect(() => {
+    if (invoke_callback.current && callback.current) {
+      callback.current?.();
+      invoke_callback.current = false;
+    }
+  }, inputs);
+  const call_do_update = hooks.useCallback(
+    (...args: Args) => {
+      invoke_callback.current = true;
+      do_update(...args);
+    },
+    [do_update]
+  );
+  const call_manual_callback = hooks.useCallback(() => {
+    invoke_callback.current = false;
+    callback.current?.();
+  }, []);
+
+  return [call_do_update, call_manual_callback];
 };

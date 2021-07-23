@@ -11,21 +11,25 @@ import {
   EDITOR_STATE,
   EDITOR_UNSAVED,
   LOADED_MESSAGE,
+  OptimizeTrigger,
 } from "~/model";
 import {
-  StatusIndicator,
-  EditorHeader,
-  ClipboardButton,
-  EditorMain,
   AudioPlayer,
+  ClipboardButton,
+  EditorHeader,
+  EditorMain,
   SaveMessage,
+  StatusIndicator,
 } from "~/view/components";
 import {
   ensure_number,
+  useCallbackAfterUpdate,
   useContextState,
   useInsertSnippet,
+  useOptimizeMessageTrigger,
   usePlayMessage,
   useStateObject,
+  useValueRef,
 } from "~/view/utils";
 
 export const Editor: Preact.FunctionComponent<{
@@ -72,7 +76,53 @@ export const Editor: Preact.FunctionComponent<{
     [max_length, speed, text, message?.name, bits]
   );
 
-  const [data, status, on_submit, message_text] = usePlayMessage(new_message);
+  const [data, status, submit_message, message_text] =
+    usePlayMessage(new_message);
+
+  const submit_ref = useValueRef(submit_message);
+  const manual_submit_ref = useRef<() => void>(() => {});
+
+  const text_ref = useValueRef(text);
+  const last_update = useRef<string>();
+  const new_cursor_start = useRef(-1);
+  const new_cursor_end = useRef(-1);
+  const after_optimize = useCallback(
+    (new_text: string, cursor_start: number, cursor_end: number) => {
+      if (new_text !== text_ref.current) {
+        new_cursor_start.current = cursor_start;
+        new_cursor_end.current = cursor_end;
+        last_update.current = new_text;
+      }
+      set_state({ text: new_text });
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (text === last_update.current) {
+      if (new_cursor_start.current !== -1 && new_cursor_end.current !== -1) {
+        if (input_ref.current) {
+          input_ref.current.selectionStart = new_cursor_start.current;
+          input_ref.current.selectionEnd = new_cursor_end.current;
+        }
+        new_cursor_start.current = -1;
+        new_cursor_end.current = -1;
+      }
+      last_update.current = "";
+    }
+  }, [text]);
+
+  const optimize_message = useOptimizeMessageTrigger(input_ref, after_optimize);
+
+  const [on_submit, manual_submit] = useCallbackAfterUpdate(
+    useCallback(
+      () => optimize_message(OptimizeTrigger.submit),
+      [optimize_message]
+    ),
+    submit_ref,
+    [text]
+  );
+  manual_submit_ref.current = manual_submit;
 
   const first_render = useRef(true);
   useEffect(() => {

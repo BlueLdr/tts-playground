@@ -1,13 +1,17 @@
 import * as common from "~/common";
+import { OptimizeTrigger } from "./types";
 
 const stored_state = common.get_stored_state();
 const initial_state: TTS.AppState = {
   volume: stored_state?.volume ?? 1,
   message: stored_state?.message ?? -1,
-  settings: stored_state?.settings ?? {
+  settings: {
     open: stored_state?.settings?.open ?? false,
     insert_at_cursor: stored_state?.settings?.insert_at_cursor ?? false,
     trim_whitespace: stored_state?.settings?.trim_whitespace ?? false,
+    optimize_words:
+      stored_state?.settings?.optimize_words ?? OptimizeTrigger.never,
+    optimize_safe: stored_state?.settings?.optimize_safe ?? false,
     voice: stored_state?.settings?.voice ?? common.VOICE_NAMES[0],
     bits_string:
       stored_state?.settings?.bits_string ?? common.DEFAULT_BITS_STRING,

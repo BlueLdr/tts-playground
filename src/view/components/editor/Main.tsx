@@ -1,8 +1,13 @@
 import * as Preact from "preact";
 import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
-import { EDITOR_STATE } from "~/model";
+import {
+  EDITOR_SETTINGS,
+  EDITOR_STATE,
+  OPTIMIZE_MESSAGE_CALLBACK,
+  OptimizeTrigger,
+} from "~/model";
 import { BitsInput, PauseAddControl } from "~/view/components";
-import { useDebounce, useTextOptimization } from "~/view/utils";
+import { useDebounce } from "~/view/utils";
 
 export const EditorMain: Preact.FunctionComponent<{
   text: string;
@@ -90,11 +95,24 @@ export const TTSTextArea: Preact.FunctionComponent<{
   maxLength: number;
   bitsString: string;
 }> = ({ value, onChange, speed, id, maxLength, bitsString, inputRef }) => {
+  const settings = useContext(EDITOR_SETTINGS).value;
+  const optimize_text = useContext(OPTIMIZE_MESSAGE_CALLBACK).value;
   const preview_ref = useRef<HTMLDivElement>();
-  const optimize_text = useTextOptimization(value, onChange, inputRef);
-  const [on_blur, cancel_optimize] = useDebounce(optimize_text, 300);
+  const [optimize, cancel_optimize] = useDebounce(optimize_text, 300);
+  const [optimize_delayed, cancel_delayed_optimize] = useDebounce(
+    optimize_text,
+    5000
+  );
   useEffect(() => {
-    cancel_optimize();
+    if (settings.optimize_words === OptimizeTrigger.stop) {
+      optimize_delayed(OptimizeTrigger.stop);
+    } else if (settings.optimize_words >= OptimizeTrigger.edit) {
+      optimize(OptimizeTrigger.edit);
+    }
+    return () => {
+      cancel_optimize();
+      cancel_delayed_optimize();
+    };
   }, [value]);
 
   let end = "";
@@ -116,7 +134,7 @@ export const TTSTextArea: Preact.FunctionComponent<{
         cols={82}
         maxLength={maxLength}
         onInput={e => onChange((e.target as HTMLTextAreaElement).value)}
-        onBlur={() => on_blur(value)}
+        onBlur={() => optimize(OptimizeTrigger.blur)}
         onFocus={cancel_optimize}
         onSelect={() => {
           preview_ref.current?.setAttribute(

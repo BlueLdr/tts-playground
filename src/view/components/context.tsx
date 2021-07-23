@@ -1,7 +1,7 @@
 import * as Preact from "preact";
 import { PureComponent } from "preact/compat";
-import { useEffect } from "preact/hooks";
 import * as hooks from "preact/hooks";
+import { useEffect } from "preact/hooks";
 import * as storage from "~/common";
 import {
   ADD_SNIPPET_CALLBACK,
@@ -10,13 +10,19 @@ import {
   EDITOR_STATE,
   EDITOR_UNSAVED,
   ImmutableContextValue,
+  INITIAL_STATE,
+  IS_OPTIMIZED,
   LOADED_MESSAGE,
   MESSAGES,
+  OPTIMIZE_MESSAGE_CALLBACK,
   SNIPPETS,
   VOLUME_CTX,
-  INITIAL_STATE,
 } from "~/model";
-import { useStateIfMounted, useValueRef } from "~/view/utils";
+import {
+  useOptimizeMessage,
+  useStateIfMounted,
+  useValueRef,
+} from "~/view/utils";
 
 const CONTEXTS = {
   VOLUME_CTX: {
@@ -41,6 +47,10 @@ const CONTEXTS = {
   },
   ADD_SNIPPET_CALLBACK: {
     context: ADD_SNIPPET_CALLBACK,
+    initialValue: () => {},
+  },
+  OPTIMIZE_MESSAGE_CALLBACK: {
+    context: OPTIMIZE_MESSAGE_CALLBACK,
     initialValue: () => {},
   },
   MESSAGES: {
@@ -151,6 +161,7 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
     INITIAL_STATE?.message ?? -1
   );
   const editor_unsaved_ref = useValueRef(editor_unsaved);
+  const should_optimize = hooks.useRef<boolean>(false);
   const load_message = hooks.useCallback((index: number, force?: boolean) => {
     if (index == null) {
       return false;
@@ -160,6 +171,7 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
       discard = confirm("Are you sure you want to discard your changes?");
     }
     if (discard) {
+      should_optimize.current = false;
       set_loaded_message(index);
       return true;
     }
@@ -187,9 +199,20 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
     storage.set_stored_snippets(snippets);
   }, [snippets]);
 
+  const is_optimized = hooks.useRef(false);
+  const get_is_optimized = hooks.useCallback(() => is_optimized.current, []);
+  useEffect(() => {
+    if (editor_unsaved) {
+      should_optimize.current = true;
+    }
+  }, [editor_unsaved]);
+  useOptimizeMessage(editor_settings, is_optimized, should_optimize);
+
   return (
-    <LOADED_MESSAGE.Provider value={ctx_value}>
-      {children}
-    </LOADED_MESSAGE.Provider>
+    <IS_OPTIMIZED.Provider value={get_is_optimized}>
+      <LOADED_MESSAGE.Provider value={ctx_value}>
+        {children}
+      </LOADED_MESSAGE.Provider>
+    </IS_OPTIMIZED.Provider>
   );
 };

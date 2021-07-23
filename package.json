@@ -9,7 +9,7 @@
     "build": "parcel build src/index.html",
     "format": "./scripts/format.sh",
     "format:validate": "./scripts/format.sh list-different",
-    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' ava"
+    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' ava"
   },
   "devDependencies": {
     "@babel/core": "7.12.16",
