@@ -1,3 +1,11 @@
+export enum OptimizeTrigger {
+  never = 0,
+  submit = 1,
+  blur = 2,
+  stop = 3,
+  edit = 4,
+}
+
 declare global {
   namespace TTS {
     interface Message {
@@ -42,9 +50,23 @@ declare global {
       open: boolean;
       insert_at_cursor: boolean;
       trim_whitespace: boolean;
+      optimize_words: OptimizeTrigger;
+      optimize_safe: boolean;
       voice: string;
       bits_string: string;
     }
+
+    type OptimizeTriggerName = Exclude<keyof typeof OptimizeTrigger, "blur">;
+
+    type OptimizeEvent = CustomEvent<{
+      trigger: OptimizeTrigger;
+      input: preact.RefObject<HTMLTextAreaElement>;
+      callback?: (
+        new_text: string,
+        cursor_start: number,
+        cursor_end: number
+      ) => void;
+    }>;
 
     interface AppState {
       volume: number;

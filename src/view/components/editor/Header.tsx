@@ -1,7 +1,7 @@
 import * as Preact from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { DEFAULT_BITS_STRING, VOICE_NAMES } from "~/common";
-import { EDITOR_SETTINGS } from "~/model";
+import { VOICE_NAMES, DEFAULT_BITS_STRING } from "~/common";
+import { EDITOR_SETTINGS, OptimizeTrigger } from "~/model";
 import {
   ensure_number,
   useContextState,
@@ -9,6 +9,13 @@ import {
   useStateIfMounted,
   useValueRef,
 } from "~/view/utils";
+
+const trigger_options: { [K in TTS.OptimizeTriggerName]: string } = {
+  never: "Never",
+  submit: "When you click submit",
+  stop: "When you stop typing",
+  edit: "As you're typing",
+};
 
 export const EditorHeader: Preact.FunctionComponent<{
   reset: () => void;
@@ -175,6 +182,30 @@ export const EditorHeader: Preact.FunctionComponent<{
               />
               <span className="checkbox-label">Automatically Trim Spaces</span>
             </label>
+            <div />
+          </div>
+          <div
+            className="tts-settings-item tts-settings-trigger"
+            title="Choose when message optimization is triggered. Optimization will eliminate unneeded characters (such as replacing 'you' with 'u') to maximize the amount of text you can fit within the character limit."
+          >
+            <div className="tts-settings-item-label">Optimize Words:</div>
+            <div className="tts-settings-item-control">
+              <select
+                value={settings.optimize_words}
+                onChange={e =>
+                  on_change_settings(
+                    "optimize_words",
+                    parseInt((e.target as HTMLSelectElement).value)
+                  )
+                }
+              >
+                {Object.entries(trigger_options).map(([key, label]) => (
+                  <option value={OptimizeTrigger[key]} key={key}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </div>

@@ -1,9 +1,18 @@
 import * as hooks from "preact/hooks";
 import { get_tts_data, play_audio } from "~/common";
-import { EDITOR_SETTINGS } from "~/model";
+import {
+  EDITOR_SETTINGS,
+  EDITOR_STATE,
+  OPTIMIZE_MESSAGE_CALLBACK,
+  OptimizeTrigger,
+} from "~/model";
 import {
   insert_text_at_selection,
+  optimize_message,
   trim_whitespace,
+  useCallbackAfterUpdate,
+  useContextState,
+  useMemoRef,
   useRequestStatus,
   useStateRef,
   useValueRef,
@@ -22,7 +31,7 @@ export const usePlayMessage = (
   } = message;
 
   const [data, set_data, data_ref] = useStateRef("");
-  const full_text = hooks.useMemo(() => {
+  const full_text = useMemoRef(() => {
     const bits_length = bits && bits_string ? bits_string.length + 1 : 0;
     if (speed && max_length !== text.length) {
       return `${text} ${"¡".repeat(
@@ -34,14 +43,14 @@ export const usePlayMessage = (
 
   const [status, fetch_tts] = useRequestStatus(get_tts_data);
   const on_submit = hooks.useCallback(() => {
-    fetch_tts(full_text, request, voice_ref.current).then(d => {
+    fetch_tts(full_text.current, request, voice_ref.current).then(d => {
       if (d === data_ref.current) {
-        if (data_ref.current) play_audio(player_id);
+        if (data_ref.current) play_audio(player_id, false);
       } else {
         set_data(d);
       }
     });
-  }, [full_text]);
+  }, [request, player_id]);
 
   hooks.useEffect(() => {
     if (data) play_audio(player_id);
@@ -51,7 +60,7 @@ export const usePlayMessage = (
     data,
     status,
     on_submit,
-    bits ? `${bits} ${full_text}` : full_text,
+    bits ? `${bits} ${full_text.current}` : full_text.current,
   ] as const;
 };
 
@@ -75,7 +84,7 @@ export const usePlaySnippet = (
       )}${suffix}`;
       return fetch_tts(full_text, request, voice_ref.current).then(d => {
         if (d === data_ref.current) {
-          if (data_ref.current) play_audio(player_id);
+          if (data_ref.current) play_audio(player_id, false);
         } else {
           set_data(d);
         }
@@ -107,7 +116,7 @@ export const useAudioPlayer = (
     }
     return get_tts_data(text, request, voice_ref.current).then(d => {
       if (d === data_ref.current) {
-        play_audio(player_id);
+        play_audio(player_id, false);
       } else {
         set_data(d);
       }
@@ -208,29 +217,40 @@ export const useTextOptimization = (
   const settings = hooks.useContext(EDITOR_SETTINGS).value;
   const settings_ref = useValueRef(settings);
   const last_update = hooks.useRef<string>();
-  const new_cursor_pos = hooks.useRef<number>(-1);
+  const new_cursor_start = hooks.useRef(-1);
+  const new_cursor_end = hooks.useRef(-1);
 
   hooks.useEffect(() => {
     if (value === last_update.current) {
-      if (new_cursor_pos.current !== -1) {
+      if (new_cursor_start.current !== -1 && new_cursor_end.current !== -1) {
         if (input_ref.current) {
-          input_ref.current.selectionStart = new_cursor_pos.current;
-          input_ref.current.selectionEnd = new_cursor_pos.current;
+          input_ref.current.selectionStart = new_cursor_start.current;
+          input_ref.current.selectionEnd = new_cursor_end.current;
         }
-        new_cursor_pos.current = -1;
+        new_cursor_start.current = -1;
+        new_cursor_end.current = -1;
       }
       last_update.current = "";
+      return;
+    }
+  }, [value]);
+
+  hooks.useEffect(() => {
+    if (value === last_update.current) {
       return;
     }
     if (!settings_ref.current?.trim_whitespace) {
       return;
     }
 
-    const { selectionStart = -9 } = input_ref.current ?? {};
+    const { selectionStart = -9, selectionEnd = -9 } = input_ref.current ?? {};
     let new_text = "";
     for (let i = 0; i < value.length; i++) {
       if (i === selectionStart) {
-        new_cursor_pos.current = new_text.length;
+        new_cursor_start.current = new_text.length;
+      }
+      if (i === selectionEnd) {
+        new_cursor_end.current = new_text.length;
       }
 
       if (
@@ -261,4 +281,115 @@ export const useTextOptimization = (
     },
     [set_value]
   );
+};
+
+export const useOptimizeMessage = (
+  editor_settings: TTS.EditorSettings,
+  is_optimized: preact.RefObject<boolean>,
+  enabled: preact.RefObject<boolean>
+) => {
+  const [editor_state, set_editor_state] = useContextState(EDITOR_STATE);
+  const state_ref = useValueRef(editor_state);
+  const settings_ref = useValueRef(editor_settings);
+  const last_trigger = hooks.useRef<OptimizeTrigger>(Infinity);
+
+  hooks.useEffect(() => {
+    is_optimized.current = false;
+  }, [editor_state.text]);
+
+  const callback_ref = hooks.useRef<() => void>(() => {});
+  const [optimize_message_listener] = useCallbackAfterUpdate(
+    hooks.useCallback((e: TTS.OptimizeEvent) => {
+      const { trigger, input, callback } = e.detail;
+      if (
+        (is_optimized.current && last_trigger.current <= trigger) ||
+        !enabled.current
+      ) {
+        callback(
+          state_ref.current.text,
+          input.current?.selectionStart,
+          input.current?.selectionEnd
+        );
+        return;
+      }
+      const { trim_whitespace, optimize_words } = settings_ref.current;
+      if (!trim_whitespace && trigger > optimize_words) {
+        callback(
+          state_ref.current.text,
+          input.current?.selectionStart,
+          input.current?.selectionEnd
+        );
+        return;
+      }
+      const [new_text, cursor_start, cursor_end] = optimize_message(
+        state_ref.current.text,
+        input,
+        trigger,
+        settings_ref.current
+      );
+
+      if (state_ref.current.text !== new_text && callback) {
+        callback_ref.current = () => {
+          callback_ref.current = () => {};
+          callback(new_text, cursor_start, cursor_end);
+        };
+      }
+
+      last_trigger.current = trigger;
+      is_optimized.current = true;
+      set_editor_state({
+        ...state_ref.current,
+        text: new_text,
+      });
+
+      if (state_ref.current.text === new_text && callback) {
+        callback(new_text, cursor_start, cursor_end);
+      }
+    }, []),
+    callback_ref,
+    [editor_state.text]
+  );
+
+  hooks.useEffect(() => {
+    window.addEventListener("optimize-message", optimize_message_listener);
+    return () =>
+      window.removeEventListener("optimize-message", optimize_message_listener);
+  }, []);
+};
+
+export const useOptimizeMessageTrigger = (
+  input_ref: preact.RefObject<HTMLTextAreaElement>,
+  callback?: (
+    new_text: string,
+    cursor_start: number,
+    cursor_end: number
+  ) => void
+) => {
+  const settings_ref = useValueRef(hooks.useContext(EDITOR_SETTINGS).value);
+  const [ctx_callback, set_callback] = useContextState(
+    OPTIMIZE_MESSAGE_CALLBACK
+  );
+
+  const cb = hooks.useCallback(
+    (trigger: OptimizeTrigger) => {
+      if (trigger > settings_ref.current.optimize_words) {
+        return;
+      }
+      const evt: TTS.OptimizeEvent = new CustomEvent("optimize-message", {
+        bubbles: true,
+        detail: {
+          trigger,
+          input: input_ref,
+          callback,
+        },
+      });
+      input_ref.current?.dispatchEvent(evt);
+    },
+    [input_ref, callback]
+  );
+  hooks.useEffect(() => {
+    set_callback(() => cb);
+  }, [cb]);
+
+  return ctx_callback;
 };

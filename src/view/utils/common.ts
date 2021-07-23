@@ -42,8 +42,5 @@ export const insert_text_at_selection = (
 };
 
 export const trim_whitespace = (text: string) => {
-  return text
-    .trim()
-    .replace(/[ ]+/g, " ")
-    .replace(/(\s)\s+/g, "$1");
+  return text.trim().replace(/(\s)\s+/g, "$1");
 };
