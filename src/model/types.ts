@@ -1,9 +1,15 @@
 export enum OptimizeTrigger {
-  never = 0,
+  manual = 0,
   submit = 1,
   blur = 2,
   stop = 3,
   edit = 4,
+}
+
+export enum OptimizeLevel {
+  safe = 0,
+  normal = 1,
+  max = 2,
 }
 
 declare global {
@@ -51,21 +57,25 @@ declare global {
       insert_at_cursor: boolean;
       trim_whitespace: boolean;
       optimize_words: OptimizeTrigger;
-      optimize_safe: boolean;
+      optimize_level: OptimizeLevel;
       voice: string;
       bits_string: string;
     }
 
     type OptimizeTriggerName = Exclude<keyof typeof OptimizeTrigger, "blur">;
+    type OptimizeLevelName = keyof typeof OptimizeLevel;
+
+    type OptimizeCallback = (
+      new_text: string,
+      cursor_start: number,
+      cursor_end: number,
+      trigger: OptimizeTrigger
+    ) => void;
 
     type OptimizeEvent = CustomEvent<{
       trigger: OptimizeTrigger;
       input: preact.RefObject<HTMLTextAreaElement>;
-      callback?: (
-        new_text: string,
-        cursor_start: number,
-        cursor_end: number
-      ) => void;
+      callback?: OptimizeCallback;
     }>;
 
     interface AppState {

@@ -36,6 +36,9 @@ input
     border-color $RedD
     outline-color $RedD
 
+select
+  cursor pointer
+
 label.checkbox
 label.radio-button
   display flex
@@ -48,3 +51,43 @@ input[type="checkbox"] + .checkbox-label
 input[type="radio"] + .radio-label
   font-size 0.875rem
   margin-left 0.5rem;
+
+.checkbox.toggle
+  .toggle-switch
+    position relative
+    cursor pointer
+    &:before,
+    &:after
+      content " "
+      display block
+      transition 200ms ease-in-out
+
+    &:before
+      background-color $Gray96
+      border-radius (1.75 / 2)rem
+      width 3rem
+      height 1.75rem
+      z-index 2
+
+    &:after
+      background-color $Gray216
+      background-clip padding-box
+      border-radius (1.75 / 2)rem
+      position absolute
+      top calc(50%)
+      left 0
+      transform translate(3px, -50%)
+      width calc(1.75rem - 6px)
+      height @width
+      z-index 3
+
+  input:checked + .toggle-switch
+    &:before
+      background-color $Green
+    &:after
+      transform translate(calc(3rem - 3px - 100%), -50%)
+
+  input:active + .toggle-switch
+    &:after
+      background-color $Gray160
+

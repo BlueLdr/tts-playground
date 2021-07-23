@@ -23,7 +23,6 @@ import {
 } from "~/view/components";
 import {
   ensure_number,
-  useCallbackAfterUpdate,
   useContextState,
   useInsertSnippet,
   useOptimizeMessageTrigger,
@@ -78,27 +77,38 @@ export const Editor: Preact.FunctionComponent<{
 
   const [data, status, submit_message, message_text] =
     usePlayMessage(new_message);
-
-  const submit_ref = useValueRef(submit_message);
-  const manual_submit_ref = useRef<() => void>(() => {});
+  const should_submit = useRef<boolean>(false);
 
   const text_ref = useValueRef(text);
   const last_update = useRef<string>();
   const new_cursor_start = useRef(-1);
   const new_cursor_end = useRef(-1);
   const after_optimize = useCallback(
-    (new_text: string, cursor_start: number, cursor_end: number) => {
+    (
+      new_text: string,
+      cursor_start: number,
+      cursor_end: number,
+      trigger: OptimizeTrigger
+    ) => {
       if (new_text !== text_ref.current) {
         new_cursor_start.current = cursor_start;
         new_cursor_end.current = cursor_end;
         last_update.current = new_text;
+        should_submit.current = trigger === OptimizeTrigger.submit;
+        set_state({ text: new_text });
+      } else if (trigger === OptimizeTrigger.submit) {
+        should_submit.current = false;
+        submit_message();
       }
-      set_state({ text: new_text });
     },
     []
   );
 
   useEffect(() => {
+    if (should_submit.current) {
+      should_submit.current = false;
+      submit_message();
+    }
     if (text === last_update.current) {
       if (new_cursor_start.current !== -1 && new_cursor_end.current !== -1) {
         if (input_ref.current) {
@@ -114,15 +124,10 @@ export const Editor: Preact.FunctionComponent<{
 
   const optimize_message = useOptimizeMessageTrigger(input_ref, after_optimize);
 
-  const [on_submit, manual_submit] = useCallbackAfterUpdate(
-    useCallback(
-      () => optimize_message(OptimizeTrigger.submit),
-      [optimize_message]
-    ),
-    submit_ref,
-    [text]
+  const on_submit = useCallback(
+    () => optimize_message(OptimizeTrigger.submit),
+    [optimize_message]
   );
-  manual_submit_ref.current = manual_submit;
 
   const first_render = useRef(true);
   useEffect(() => {
