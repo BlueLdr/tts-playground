@@ -1,3 +1,4 @@
+import preact from "preact";
 import * as hooks from "preact/hooks";
 import { get_tts_data, play_audio } from "~/common";
 import {
@@ -9,7 +10,6 @@ import {
 import {
   insert_text_at_selection,
   optimize_message,
-  trim_whitespace,
   useCallbackAfterUpdate,
   useContextState,
   useMemoRef,
@@ -209,80 +209,6 @@ export const useInsertSnippet = (
   return insert_snippet;
 };
 
-export const useTextOptimization = (
-  value: string,
-  set_value: hooks.StateUpdater<string>,
-  input_ref: preact.RefObject<HTMLTextAreaElement>
-) => {
-  const settings = hooks.useContext(EDITOR_SETTINGS).value;
-  const settings_ref = useValueRef(settings);
-  const last_update = hooks.useRef<string>();
-  const new_cursor_start = hooks.useRef(-1);
-  const new_cursor_end = hooks.useRef(-1);
-
-  hooks.useEffect(() => {
-    if (value === last_update.current) {
-      if (new_cursor_start.current !== -1 && new_cursor_end.current !== -1) {
-        if (input_ref.current) {
-          input_ref.current.selectionStart = new_cursor_start.current;
-          input_ref.current.selectionEnd = new_cursor_end.current;
-        }
-        new_cursor_start.current = -1;
-        new_cursor_end.current = -1;
-      }
-      last_update.current = "";
-      return;
-    }
-  }, [value]);
-
-  hooks.useEffect(() => {
-    if (value === last_update.current) {
-      return;
-    }
-    if (!settings_ref.current?.trim_whitespace) {
-      return;
-    }
-
-    const { selectionStart = -9, selectionEnd = -9 } = input_ref.current ?? {};
-    let new_text = "";
-    for (let i = 0; i < value.length; i++) {
-      if (i === selectionStart) {
-        new_cursor_start.current = new_text.length;
-      }
-      if (i === selectionEnd) {
-        new_cursor_end.current = new_text.length;
-      }
-
-      if (
-        /\s/.test(value[i]) &&
-        (/\s/.test(new_text.slice(-1)) ||
-          i === 0 ||
-          (i === value.length - 1 && i !== selectionStart - 1)) &&
-        i !== selectionStart
-      ) {
-        continue;
-      }
-      new_text += value[i];
-    }
-
-    last_update.current = new_text;
-    if (new_text !== value) {
-      set_value(new_text);
-    }
-  }, [value]);
-
-  return hooks.useCallback(
-    (text: string) => {
-      if (settings_ref.current?.trim_whitespace) {
-        text = trim_whitespace(text);
-      }
-      set_value(text);
-      return text;
-    },
-    [set_value]
-  );
-};
-
 export const useOptimizeMessage = (
   editor_settings: TTS.EditorSettings,
   is_optimized: preact.RefObject<boolean>,
@@ -361,7 +287,8 @@ export const useOptimizeMessage = (
 
 export const useOptimizeMessageTrigger = (
   input_ref: preact.RefObject<HTMLTextAreaElement>,
-  callback?: TTS.OptimizeCallback
+  callback_pre?: TTS.OptimizeCallback,
+  callback_post?: TTS.OptimizeCallback
 ) => {
   const settings_ref = useValueRef(hooks.useContext(EDITOR_SETTINGS).value);
   const editor_state = hooks.useContext(EDITOR_STATE).value;
@@ -372,8 +299,14 @@ export const useOptimizeMessageTrigger = (
 
   const cb = hooks.useCallback(
     (trigger: OptimizeTrigger) => {
+      callback_pre?.(
+        state_ref.current.text,
+        input_ref.current?.selectionStart,
+        input_ref.current?.selectionEnd,
+        trigger
+      );
       if (trigger > settings_ref.current.optimize_words) {
-        callback(
+        callback_post?.(
           state_ref.current.text,
           input_ref.current?.selectionStart,
           input_ref.current?.selectionEnd,
@@ -386,12 +319,12 @@ export const useOptimizeMessageTrigger = (
         detail: {
           trigger,
           input: input_ref,
-          callback,
+          callback: callback_post,
         },
       });
       input_ref.current?.dispatchEvent(evt);
     },
-    [input_ref, callback]
+    [input_ref, callback_post]
   );
   hooks.useEffect(() => {
     set_callback(() => cb);

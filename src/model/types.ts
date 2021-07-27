@@ -52,6 +52,24 @@ declare global {
       bits: string;
     }
 
+    interface EditorHistory {
+      keep?: boolean;
+      state: TTS.EditorState;
+      cursor: {
+        start: number;
+        end: number;
+      };
+      cursor_before?: {
+        start: number;
+        end: number;
+      };
+    }
+
+    interface EditorHistoryStorage {
+      data: EditorHistory[];
+      index: number;
+    }
+
     interface EditorSettings {
       open: boolean;
       insert_at_cursor: boolean;
@@ -60,6 +78,7 @@ declare global {
       optimize_level: OptimizeLevel;
       voice: string;
       bits_string: string;
+      history_steps: number;
     }
 
     type OptimizeTriggerName = Exclude<keyof typeof OptimizeTrigger, "blur">;

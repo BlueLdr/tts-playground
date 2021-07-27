@@ -1,6 +1,14 @@
 import * as Preact from "preact";
-import { WithContextHooks, WithGlobalContexts, View } from "~/view/components";
+import { useRef } from "preact/hooks";
+import {
+  WithContextHooks,
+  WithGlobalContexts,
+  View,
+  useCtrlZListener,
+} from "~/view/components";
 export const App: Preact.FunctionComponent = () => {
+  const modal_container = useRef<HTMLDivElement>();
+  useCtrlZListener(modal_container);
   return (
     <WithGlobalContexts>
       <WithContextHooks>
@@ -10,7 +18,11 @@ export const App: Preact.FunctionComponent = () => {
           className="clipboard-input invisible"
           tabIndex={-1}
         />
-        <div id="modal-container" className="modal-container" />
+        <div
+          ref={modal_container}
+          id="modal-container"
+          className="modal-container"
+        />
       </WithContextHooks>
     </WithGlobalContexts>
   );

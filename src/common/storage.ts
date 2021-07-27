@@ -1,4 +1,5 @@
-import { DEFAULT_BITS_STRING } from "~/common/constants";
+import { DEFAULT_BITS_STRING, DEFAULT_HISTORY_STEPS_LIMIT } from "~/common";
+import { OptimizeLevel, OptimizeTrigger } from "~/model/types";
 
 const load_storage_or = (key, def) => {
   const stored = localStorage.getItem(key);
@@ -47,8 +48,11 @@ const sample_state: TTS.AppState = {
     bits_string: DEFAULT_BITS_STRING,
     insert_at_cursor: true,
     trim_whitespace: true,
+    optimize_words: OptimizeTrigger.manual,
+    optimize_level: OptimizeLevel.normal,
     voice: "Brian",
     open: false,
+    history_steps: DEFAULT_HISTORY_STEPS_LIMIT,
   },
   message: -1,
   volume: 0.5,

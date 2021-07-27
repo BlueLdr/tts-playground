@@ -8,5 +8,6 @@ export const SETTINGS = {
   optimize_level: OptimizeLevel.normal,
   voice: "Brian",
   bits_string: "uni300",
+  history_steps: 256,
   __type: "settings",
 };
