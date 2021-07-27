@@ -18,8 +18,8 @@ import {
   ImportExport,
   MessagesList,
   Snippets,
+  SettingsModal,
 } from "~/view/components";
-import { SettingsModal } from "~/view/components/settings/Modal";
 import {
   useContextState,
   useModal,
@@ -31,7 +31,7 @@ const View: Preact.FunctionComponent = () => {
   const [messages, set_messages] = useContextState(MESSAGES);
   const [loaded_index, set_loaded_index] = useContextState(LOADED_MESSAGE);
   const {
-    value: { text, speed, max_length },
+    value: { text, speed, max_length, bits },
   } = useContext(EDITOR_STATE);
   const [is_unsaved, set_unsaved] = useContextState(EDITOR_UNSAVED);
   const loaded_message = messages[loaded_index];
@@ -43,8 +43,9 @@ const View: Preact.FunctionComponent = () => {
       ? !!text
       : loaded_message.text !== text ||
           loaded_message.options?.speed !== speed ||
+          loaded_message.options?.bits !== bits ||
           loaded_message.options?.max_length !== max_length;
-  }, [loaded_message, text, speed, max_length]);
+  }, [loaded_message, text, speed, max_length, bits]);
   useEffect(() => {
     set_unsaved(new_is_unsaved);
   }, [new_is_unsaved]);

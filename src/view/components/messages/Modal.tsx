@@ -1,6 +1,6 @@
 import * as Preact from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
-import { ClipboardButton } from "~/view/components";
+import { ClipboardButton, Modal, ModalHeader } from "~/view/components";
 import { useMessageFullText, useStateIfMounted } from "~/view/utils";
 
 export const MessageModal: Preact.FunctionComponent<{
@@ -114,27 +114,23 @@ export const MessageModalBase: Preact.FunctionComponent<{
   }, []);
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal tts-message-modal">
-        <div className="modal-header">
-          <h3>{isNew ? "Create New" : "Edit"} Saved Message</h3>
-          <button className="icon-button modal-close" onClick={dismiss}>
-            <i className="fas fa-times" />
-          </button>
-        </div>
-        <div className="modal-body">
-          <div className="row tts-message-modal-name">
-            <label className="tts-message-modal-input">
-              <p>Message Name</p>
-              <input
-                ref={input_ref}
-                value={name}
-                onInput={e => setName((e.target as HTMLInputElement).value)}
-              />
-            </label>
-            {
-              // TODO: move full player here
-              /*{previewMessage && (
+    <Modal className="tts-message-modal" dismiss={dismiss}>
+      <ModalHeader dismiss={dismiss}>
+        <h3>{isNew ? "Create New" : "Edit"} Saved Message</h3>
+      </ModalHeader>
+      <div className="modal-body">
+        <div className="row tts-message-modal-name">
+          <label className="tts-message-modal-input">
+            <p>Message Name</p>
+            <input
+              ref={input_ref}
+              value={name}
+              onInput={e => setName((e.target as HTMLInputElement).value)}
+            />
+          </label>
+          {
+            // TODO: move full player here
+            /*{previewMessage && (
               <button
                 className="btn btn-with-icon"
                 onClick={() => previewMessage(text)}
@@ -143,26 +139,25 @@ export const MessageModalBase: Preact.FunctionComponent<{
                 Preview Message
               </button>
             )}*/
-            }
-          </div>
-          <div className="tts-message-modal-preview">{text}</div>
-          <div className="tts-message-modal-details">
-            <h4>Options</h4>
-            <div className="row">
-              <span>
-                Character Limit: <strong>{max_length}</strong>
-              </span>
-              <span>
-                Use Speed Modifier: <strong>{speed ? "Yes" : "No"}</strong>
-              </span>
-              <span>
-                Use Bits: <strong>{!!bits ? "Yes" : "No"}</strong>
-              </span>
-            </div>
+          }
+        </div>
+        <div className="tts-message-modal-preview">{text}</div>
+        <div className="tts-message-modal-details">
+          <h4>Options</h4>
+          <div className="row">
+            <span>
+              Character Limit: <strong>{max_length}</strong>
+            </span>
+            <span>
+              Use Speed Modifier: <strong>{speed ? "Yes" : "No"}</strong>
+            </span>
+            <span>
+              Use Bits: <strong>{!!bits ? "Yes" : "No"}</strong>
+            </span>
           </div>
         </div>
-        <div className="modal-footer">{children}</div>
       </div>
-    </div>
+      <div className="modal-footer">{children}</div>
+    </Modal>
   );
 };

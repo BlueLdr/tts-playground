@@ -136,7 +136,7 @@ export const useMessageFullText = (message: TTS.Message) => {
     if (!speed || text_.length >= max_length - 1) {
       return text_;
     }
-    return `${text_} ${"¡".repeat(max_length - text.length - 1)}`;
+    return `${text_}${"¡".repeat(max_length - text.length)}`;
   }, [text, max_length, speed]);
 };
 

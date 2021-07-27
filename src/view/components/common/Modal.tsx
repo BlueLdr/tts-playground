@@ -33,7 +33,6 @@ export const Modal: Preact.FunctionComponent<{
         id={id}
         className={`modal${maybeClassName(className)}`}
         onClick={e => {
-          e.preventDefault();
           e.stopPropagation();
           e.stopImmediatePropagation();
         }}

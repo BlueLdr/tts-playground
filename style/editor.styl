@@ -7,6 +7,7 @@
     display flex
     justify-content space-between
     align-items center
+    position static
   &-controls
     display flex
     justify-content flex-end
@@ -136,6 +137,21 @@
     justify-content space-between
     align-items center
     padding 0.375rem
+
+    label.checkbox
+      display inline-flex
+      input
+        margin-right 0.375rem
+
+  &-length
+    display flex
+    justify-content flex-start
+    align-items center
+    span
+      display block
+      min-width 1.75rem
+      margin 0 0.25rem
+      text-align right
 
   &-submit
     display flex

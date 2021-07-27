@@ -28,18 +28,15 @@ export const OptimizationSettings: Preact.FunctionComponent<{
         <label
           className="checkbox toggle tts-settings-item tts-settings-whitespace"
           title="Automatically remove any duplicate, leading, or trailing whitespace"
-          htmlFor="trim-whitespace"
-          onClick={() =>
-            onChangeSettings("trim_whitespace", !form.trim_whitespace)
-          }
         >
           <span className="checkbox-label">Automatically Trim Spaces</span>
           <input
-            id="trim-whitespace"
-            name="trim-whitespace"
             type="checkbox"
             className="invisible"
             checked={form.trim_whitespace}
+            onChange={() =>
+              onChangeSettings("trim_whitespace", !form.trim_whitespace)
+            }
           />
           <div className="toggle-switch" />
         </label>

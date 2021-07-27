@@ -1,9 +1,12 @@
 import * as Preact from "preact";
 import { useCallback } from "preact/hooks";
 import { EDITOR_SETTINGS } from "~/model";
-import { Modal, ModalHeader } from "~/view/components";
-import { GeneralSettings } from "~/view/components/settings/General";
-import { OptimizationSettings } from "~/view/components/settings/Optimization";
+import {
+  Modal,
+  ModalHeader,
+  GeneralSettings,
+  OptimizationSettings,
+} from "~/view/components";
 import { useContextState, useStateObject } from "~/view/utils";
 
 export const SettingsModal: Preact.FunctionComponent<{ dismiss }> = ({
