@@ -4,6 +4,7 @@ export * from "./common";
 export * from "./editor";
 export * from "./export";
 export * from "./messages";
+export * from "./settings";
 export * from "./snippets";
 import View from "./View";
 export { View };

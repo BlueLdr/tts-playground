@@ -252,6 +252,7 @@ export const Editor: Preact.FunctionComponent<{
       state: new_state,
       cursor: get_current_cursor(),
     });
+    window.dispatchEvent(new CustomEvent("reset-message"));
   }, [is_unsaved]);
 
   const [listeners, on_add_snippet] = useHistoryListeners(input_ref);

@@ -1,5 +1,6 @@
 import * as Preact from "preact";
 import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
+import { Modal, ModalHeader } from "~/view/components";
 import { ensure_number, useModal, useStateIfMounted } from "~/view/utils";
 import { ADD_SNIPPET_CALLBACK } from "~/model";
 
@@ -63,64 +64,62 @@ export const PauseAddControl: Preact.FunctionComponent<{
   }, [speedModified]);
 
   const modal = (
-    <div className="modal-backdrop">
-      <div className="modal tts-pause-modal">
-        <div className="modal-header">
-          <h3>Add a Pause</h3>
-        </div>
+    <Modal className="modal tts-pause-modal" dismiss={dismiss}>
+      <ModalHeader dismiss={dismiss}>
+        <h3>Add a Pause</h3>
+      </ModalHeader>
 
-        <div className="modal-body">
-          <div className="row">
-            <label className="tts-pause-modal-duration">
-              <span>Pause Duration</span>
-              <span>
-                <input
-                  type="number"
-                  value={duration}
-                  min={0.1}
-                  max={10}
-                  step={0.1}
-                  onInput={e =>
-                    onChangeDuration(
-                      ensure_number(
-                        (e.target as HTMLInputElement).valueAsNumber,
-                        duration
-                      )
-                    )
-                  }
-                />
-                seconds
-              </span>
-            </label>
-
-            <label className="tts-pause-modal-checkbox">
+      <div className="modal-body">
+        <div className="row">
+          <label className="tts-pause-modal-duration">
+            <span>Pause Duration</span>
+            <span>
               <input
-                type="checkbox"
-                checked={preserve}
+                type="number"
+                value={duration}
+                min={0.1}
+                max={10}
+                step={0.1}
                 onInput={e =>
-                  set_preserve((e.target as HTMLInputElement).checked)
+                  onChangeDuration(
+                    ensure_number(
+                      (e.target as HTMLInputElement).valueAsNumber,
+                      1
+                    )
+                  )
                 }
               />
-              Preserve Speed Modifiers
-            </label>
-          </div>
-        </div>
-        <div className="modal-footer">
-          <button className="btn" onClick={dismiss}>
-            Cancel
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              on_add_pause(add_pause(), "end");
-              dismiss();
-            }}
-          >
-            Add
-          </button>
+              seconds
+            </span>
+          </label>
+
+          <label className="tts-pause-modal-checkbox">
+            <input
+              type="checkbox"
+              checked={preserve}
+              onInput={e =>
+                set_preserve((e.target as HTMLInputElement).checked)
+              }
+            />
+            Preserve Speed Modifiers
+          </label>
         </div>
       </div>
-    </div>
+      <div className="modal-footer">
+        <button className="btn" onClick={dismiss}>
+          Cancel
+        </button>
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            on_add_pause(add_pause(), "end");
+            dismiss();
+          }}
+        >
+          Add
+        </button>
+      </div>
+    </Modal>
   );
 
   return (

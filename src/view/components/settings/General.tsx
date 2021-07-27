@@ -18,25 +18,21 @@ export const GeneralSettings: Preact.FunctionComponent<{
       >
         <div className="tts-settings-item-label">Insert Snippets At:</div>
         <div className="tts-settings-item-control">
-          <label
-            className="radio-button tts-settings-insert-input"
-            onClick={() => onChangeSettings("insert_at_cursor", true)}
-          >
+          <label className="radio-button tts-settings-insert-input">
             <input
               type="radio"
               value="true"
               checked={form.insert_at_cursor === true}
+              onChange={() => onChangeSettings("insert_at_cursor", true)}
             />
             <span className="radio-label">Cursor</span>
           </label>
-          <label
-            className="radio-button tts-settings-insert-input"
-            onClick={() => onChangeSettings("insert_at_cursor", false)}
-          >
+          <label className="radio-button tts-settings-insert-input">
             <input
               type="radio"
               value="true"
               checked={form.insert_at_cursor === false}
+              onChange={() => onChangeSettings("insert_at_cursor", false)}
             />
             <span className="radio-label">End</span>
           </label>

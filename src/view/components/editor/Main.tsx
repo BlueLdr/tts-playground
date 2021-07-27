@@ -61,14 +61,13 @@ export const EditorMain: Preact.FunctionComponent<{
         {...listeners}
       />
       <div className="tts-textarea-bottom">
-        <div>
-          Length:{" "}
-          <span>
-            {text.length + bits_length} / {max_length}
-          </span>
+        <div className="tts-textarea-length">
+          Length: <span>{text.length + bits_length}</span>
+          {" / "}
+          <span>{max_length}</span>
         </div>
         <div>
-          <label>
+          <label className="checkbox">
             <input
               type="checkbox"
               checked={speed}

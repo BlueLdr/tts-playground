@@ -44,7 +44,7 @@ export const EditorHeader: Preact.FunctionComponent<{
   return (
     <Preact.Fragment>
       <div className="tts-header">
-        <div className="tts-header-top">
+        <div className="tts-header-top tts-col-header">
           <h4>TTS Message</h4>
           <div className="tts-header-controls">
             <button
@@ -106,7 +106,7 @@ export const EditorHeader: Preact.FunctionComponent<{
           </div>
           <div
             className="tts-options-item tts-options-trigger"
-            title="Choose when message optimization is triggered. Optimization will eliminate unneeded characters (such as replacing 'you' with 'u') to maximize the amount of text you can fit within the character limit."
+            title="Manually trigger message optimization. This will eliminate unneeded characters (such as replacing 'you' with 'u') to maximize the amount of text you can fit within the character limit."
           >
             <button
               className="btn btn-large"

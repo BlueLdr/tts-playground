@@ -1,5 +1,6 @@
 import * as Preact from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
+import { Modal, ModalHeader } from "~/view/components";
 import { useStateIfMounted } from "~/view/utils";
 
 export const SnippetsSectionModal: Preact.FunctionComponent<{
@@ -22,50 +23,45 @@ export const SnippetsSectionModal: Preact.FunctionComponent<{
   useEffect(() => input_ref.current?.focus(), []);
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal tts-snippets-section-modal">
-        <div className="modal-header">
-          <h3>{!name ? "Create New" : "Edit"} Snippet Group</h3>
-          <button className="icon-button modal-close" onClick={dismiss}>
-            <i className="fas fa-times" />
-          </button>
-        </div>
-        <div className="modal-body">
-          <label className="tts-snippets-section-modal-input">
-            <span>Group Name</span>
-            <input
-              ref={input_ref}
-              value={value}
-              onInput={e => set_value((e.target as HTMLInputElement).value)}
-            />
-          </label>
-          {name && (
-            <button
-              className="btn btn-negative btn-with-icon"
-              onClick={on_click_delete}
-            >
-              <i className="fas fa-trash" />
-              Delete Group
-            </button>
-          )}
-        </div>
-
-        <div className="modal-footer">
-          <button className="btn" onClick={dismiss}>
-            Cancel
-          </button>
+    <Modal className="tts-snippets-section-modal" dismiss={dismiss}>
+      <ModalHeader dismiss={dismiss}>
+        <h3>{!name ? "Create New" : "Edit"} Snippet Group</h3>
+      </ModalHeader>
+      <div className="modal-body">
+        <label className="tts-snippets-section-modal-input">
+          <span>Group Name</span>
+          <input
+            ref={input_ref}
+            value={value}
+            onInput={e => set_value((e.target as HTMLInputElement).value)}
+          />
+        </label>
+        {name && (
           <button
-            className="btn btn-primary"
-            onClick={() => {
-              setName(value);
-              dismiss();
-            }}
-            disabled={!value}
+            className="btn btn-negative btn-with-icon"
+            onClick={on_click_delete}
           >
-            Save
+            <i className="fas fa-trash" />
+            Delete Group
           </button>
-        </div>
+        )}
       </div>
-    </div>
+
+      <div className="modal-footer">
+        <button className="btn" onClick={dismiss}>
+          Cancel
+        </button>
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            setName(value);
+            dismiss();
+          }}
+          disabled={!value}
+        >
+          Save
+        </button>
+      </div>
+    </Modal>
   );
 };

@@ -12,6 +12,13 @@ export const BitsInput: Preact.FunctionComponent<{
     useContext(EDITOR_SETTINGS).value?.bits_string ?? DEFAULT_BITS_STRING;
   const [enabled, set_enabled] = useStateIfMounted(!!bits);
   const [value, set_value] = useStateIfMounted(bits || default_str);
+
+  useEffect(() => {
+    const on_reset = () => set_value(DEFAULT_BITS_STRING);
+    window.addEventListener("reset-message", on_reset);
+    return () => window.removeEventListener("reset-message", on_reset);
+  }, []);
+
   useEffect(() => {
     if (enabled && bits && bits !== value) {
       set_value(bits);
@@ -36,7 +43,7 @@ export const BitsInput: Preact.FunctionComponent<{
 
   return (
     <div className="tts-textarea-bits">
-      <label className="tts-textarea-bits-checkbox">
+      <label className="tts-textarea-bits-checkbox checkbox">
         <input
           type="checkbox"
           checked={enabled}
