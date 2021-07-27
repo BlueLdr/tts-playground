@@ -15,6 +15,7 @@
     "@babel/core": "7.12.16",
     "@babel/plugin-transform-react-jsx": "7.12.13",
     "@babel/preset-env": "7.12.16",
+    "ava": "3.15.0",
     "babel-plugin-module-resolver": "4.1.0",
     "babel-plugin-transform-hook-names": "1.0.1",
     "browser-env": "3.3.0",
@@ -31,7 +32,6 @@
     "react-dom": "preact/compat"
   },
   "dependencies": {
-    "ava": "^3.15.0",
     "preact": "10.5.12"
   },
   "ava": {
