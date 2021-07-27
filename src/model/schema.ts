@@ -1,4 +1,4 @@
-import { DEFAULT_BITS_STRING } from "~/common";
+import { DEFAULT_BITS_STRING, DEFAULT_HISTORY_STEPS_LIMIT } from "~/common";
 import { OptimizeLevel, OptimizeTrigger } from "~/model/types";
 
 export type TypeString<T extends boolean | string | number> = T extends boolean
@@ -39,6 +39,7 @@ export const SETTINGS_SCHEMA: SchemaOf<TTS.EditorSettings> = {
   optimize_level: { type: "number", default: OptimizeLevel.normal },
   voice: { type: "string", default: "Brian" },
   bits_string: { type: "string", default: DEFAULT_BITS_STRING },
+  history_steps: { type: "number", default: DEFAULT_HISTORY_STEPS_LIMIT },
 };
 
 export const SNIPPET_OPTIONS_SCHEMA: SchemaOf<TTS.SnippetOptions> = {
@@ -75,6 +76,42 @@ export const MESSAGE_SCHEMA: SchemaOf<TTS.Message> = {
   options: {
     type: MESSAGE_OPTIONS_SCHEMA,
     default: {},
+  },
+};
+
+export const HISTORY_CURSOR_SCHEMA: SchemaOf<TTS.EditorHistory["cursor"]> = {
+  start: { type: "number" },
+  end: { type: "number" },
+};
+export const HISTORY_SCHEMA: SchemaOf<TTS.EditorHistory> = {
+  keep: {
+    type: "boolean",
+    default: false,
+  },
+  state: {
+    type: {
+      ...MESSAGE_OPTIONS_SCHEMA,
+      text: { type: "string" },
+    },
+    default: null,
+  },
+  cursor: {
+    type: HISTORY_CURSOR_SCHEMA,
+    default: null,
+  },
+  cursor_before: {
+    type: HISTORY_CURSOR_SCHEMA,
+    default: {},
+  },
+};
+
+export const HISTORY_STORAGE_SCHEMA: SchemaOf<TTS.EditorHistoryStorage> = {
+  data: {
+    type: HISTORY_SCHEMA,
+    default: null,
+  },
+  index: {
+    type: "number",
   },
 };
 

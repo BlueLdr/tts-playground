@@ -19,7 +19,17 @@ export const EditorMain: Preact.FunctionComponent<{
   speed: boolean;
   bits: string;
   status: TTS.RequestStatus;
-}> = ({ text, setState, onSubmit, speed, bits, status, inputRef }) => {
+  listeners: EventListenersOf<HTMLTextAreaElement>;
+}> = ({
+  text,
+  setState,
+  onSubmit,
+  speed,
+  bits,
+  status,
+  inputRef,
+  listeners,
+}) => {
   const { max_length } = useContext(EDITOR_STATE).value;
   const bits_length = bits ? bits.length + 1 : 0;
   const on_change_text = useCallback(
@@ -40,10 +50,11 @@ export const EditorMain: Preact.FunctionComponent<{
         inputRef={inputRef}
         id="tts-main-input"
         value={text}
-        onChange={on_change_text}
+        onChangeText={on_change_text}
         bitsString={bits}
         maxLength={max_length - bits_length}
         speed={speed}
+        {...listeners}
       />
       <div className="tts-textarea-bottom">
         <div>
@@ -86,15 +97,27 @@ export const EditorMain: Preact.FunctionComponent<{
   );
 };
 
-export const TTSTextArea: Preact.FunctionComponent<{
-  value: string;
-  onChange: (text: string) => void;
-  inputRef: Preact.RefObject<HTMLTextAreaElement>;
-  speed: boolean;
-  id: string;
-  maxLength: number;
-  bitsString: string;
-}> = ({ value, onChange, speed, id, maxLength, bitsString, inputRef }) => {
+export const TTSTextArea: Preact.FunctionComponent<
+  {
+    value: string;
+    onChangeText: (text: string) => void;
+    inputRef: Preact.RefObject<HTMLTextAreaElement>;
+    speed: boolean;
+    maxLength: number;
+    bitsString: string;
+  } & Omit<HTMLTextAreaProps, "value">
+> = ({
+  value,
+  onChangeText,
+  speed,
+  id,
+  maxLength,
+  bitsString,
+  inputRef,
+  onMouseUp,
+  onKeyUp,
+  onChange,
+}) => {
   const settings = useContext(EDITOR_SETTINGS).value;
   const optimize_text = useContext(OPTIMIZE_MESSAGE_CALLBACK).value;
   const preview_ref = useRef<HTMLDivElement>();
@@ -115,6 +138,13 @@ export const TTSTextArea: Preact.FunctionComponent<{
     };
   }, [value]);
 
+  const update_cursor_pos = useCallback(() => {
+    preview_ref.current?.setAttribute(
+      "data-cursor",
+      `${inputRef?.current?.selectionStart}`
+    );
+  }, []);
+
   let end = "";
   const max_len = parseInt(`${maxLength}`);
   if (speed && max_len !== value.length) {
@@ -133,33 +163,29 @@ export const TTSTextArea: Preact.FunctionComponent<{
         rows={12}
         cols={82}
         maxLength={maxLength}
-        onInput={e => onChange((e.target as HTMLTextAreaElement).value)}
+        onInput={e => {
+          onChange?.bind(e.target)?.(e);
+          onChangeText((e.target as HTMLTextAreaElement).value);
+        }}
         onBlur={() => optimize(OptimizeTrigger.blur)}
         onFocus={cancel_optimize}
-        onSelect={() => {
-          preview_ref.current?.setAttribute(
-            "data-cursor",
-            `${inputRef?.current?.selectionStart}`
-          );
+        onKeyDown={e => {
+          if (
+            (e.key === "z" || e.key === "Z") &&
+            (e.ctrlKey || e.metaKey) &&
+            !e.altKey
+          ) {
+            e.preventDefault();
+          }
+          update_cursor_pos();
         }}
-        onKeyDown={() => {
-          preview_ref.current?.setAttribute(
-            "data-cursor",
-            `${inputRef?.current?.selectionStart}`
-          );
+        onKeyUp={function (e) {
+          onKeyUp?.bind(e.target)?.(e);
+          update_cursor_pos();
         }}
-        onKeyUp={() => {
-          preview_ref.current?.setAttribute(
-            "data-cursor",
-            `${inputRef?.current?.selectionStart}`
-          );
-        }}
-        onClick={() => {
-          preview_ref.current?.setAttribute(
-            "data-cursor",
-            `${inputRef?.current?.selectionStart}`
-          );
-        }}
+        onClick={update_cursor_pos}
+        onSelect={update_cursor_pos}
+        onMouseUp={onMouseUp}
       />
       <div className="tts-textarea-preview" ref={preview_ref}>
         <span>{value.slice(0, maxLength)}</span>

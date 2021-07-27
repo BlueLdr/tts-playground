@@ -12,6 +12,7 @@ import {
   EDITOR_UNSAVED,
   LOADED_MESSAGE,
   OptimizeTrigger,
+  EditorHistory,
 } from "~/model";
 import {
   AudioPlayer,
@@ -20,6 +21,7 @@ import {
   EditorMain,
   SaveMessage,
   StatusIndicator,
+  useHistoryListeners,
 } from "~/view/components";
 import {
   ensure_number,
@@ -41,9 +43,57 @@ export const Editor: Preact.FunctionComponent<{
   const set_add_snippet_callback = useContext(ADD_SNIPPET_CALLBACK).setValue;
 
   const input_ref = useRef<HTMLTextAreaElement>();
-  const [{ text, speed, max_length: max_len, bits }, set_state] =
-    useStateObject(editor_state);
+  const [state, set_state] = useStateObject(editor_state);
+  const state_ref = useValueRef(state);
+  const { text, speed, max_length: max_len, bits } = state;
   const max_length = useMemo(() => ensure_number(max_len, 255), [max_len]);
+
+  const get_current_cursor = useCallback(
+    () => ({
+      start: input_ref.current.selectionStart,
+      end: input_ref.current.selectionEnd,
+    }),
+    []
+  );
+  const push_current_state = useCallback((keep?: boolean) => {
+    EditorHistory.push({
+      keep,
+      state: state_ref.current,
+      cursor: get_current_cursor(),
+    });
+  }, []);
+  const cursor_from_history = useRef<TTS.EditorHistory["cursor"] | null>(null);
+  useEffect(() => {
+    EditorHistory.initialize(
+      {
+        state: editor_state,
+        cursor: {
+          start: input_ref.current.selectionStart,
+          end: input_ref.current.selectionEnd,
+        },
+      },
+      (new_state: TTS.EditorHistory, use_cursor_before: boolean) => {
+        const next_cursor = use_cursor_before
+          ? new_state.cursor_before ?? new_state.cursor
+          : new_state.cursor;
+        if (new_state.state !== state_ref.current) {
+          set_state(new_state.state);
+          cursor_from_history.current = next_cursor;
+        } else {
+          input_ref.current.selectionStart = next_cursor.start;
+          input_ref.current.selectionEnd = next_cursor.end;
+        }
+      }
+    );
+  }, []);
+
+  useEffect(() => {
+    if (cursor_from_history.current) {
+      input_ref.current.selectionStart = cursor_from_history.current.start;
+      input_ref.current.selectionEnd = cursor_from_history.current.end;
+      cursor_from_history.current = null;
+    }
+  }, [state]);
 
   useEffect(() => {
     const trimmed_text =
@@ -83,6 +133,21 @@ export const Editor: Preact.FunctionComponent<{
   const last_update = useRef<string>();
   const new_cursor_start = useRef(-1);
   const new_cursor_end = useRef(-1);
+  const before_optimize = useCallback(
+    (
+      new_text: string,
+      cursor_start: number,
+      cursor_end: number,
+      trigger: OptimizeTrigger
+    ) => {
+      if (new_text !== text_ref.current) {
+        push_current_state(trigger <= OptimizeTrigger.submit);
+      } else {
+        EditorHistory.keep();
+      }
+    },
+    []
+  );
   const after_optimize = useCallback(
     (
       new_text: string,
@@ -98,6 +163,7 @@ export const Editor: Preact.FunctionComponent<{
         set_state({ text: new_text });
       } else if (trigger === OptimizeTrigger.submit) {
         should_submit.current = false;
+        EditorHistory.keep();
         submit_message();
       }
     },
@@ -107,6 +173,7 @@ export const Editor: Preact.FunctionComponent<{
   useEffect(() => {
     if (should_submit.current) {
       should_submit.current = false;
+      EditorHistory.keep();
       submit_message();
     }
     if (text === last_update.current) {
@@ -118,11 +185,16 @@ export const Editor: Preact.FunctionComponent<{
         new_cursor_start.current = -1;
         new_cursor_end.current = -1;
       }
+      push_current_state();
       last_update.current = "";
     }
   }, [text]);
 
-  const optimize_message = useOptimizeMessageTrigger(input_ref, after_optimize);
+  const optimize_message = useOptimizeMessageTrigger(
+    input_ref,
+    before_optimize,
+    after_optimize
+  );
 
   const on_submit = useCallback(
     () => optimize_message(OptimizeTrigger.submit),
@@ -142,9 +214,19 @@ export const Editor: Preact.FunctionComponent<{
         max_length: message.options?.max_length,
         bits: message.options?.bits ?? "",
       });
+      EditorHistory.reset({
+        state: {
+          text: message.text,
+          speed: message.options?.speed ?? false,
+          max_length: message.options?.max_length ?? 255,
+          bits: message.options?.bits ?? "",
+        },
+        cursor: get_current_cursor(),
+      });
     }
   }, [message]);
 
+  const length_ref = useValueRef(max_length);
   const reset = useCallback(() => {
     if (
       is_unsaved &&
@@ -153,18 +235,27 @@ export const Editor: Preact.FunctionComponent<{
       return;
     }
     set_loaded_message(-1, true);
-    set_state({
+    const new_state = {
       text: "",
       bits: "",
       speed: false,
-    });
+      max_length: length_ref.current,
+    };
+    set_state(new_state);
     set_unsaved(false);
+    EditorHistory.reset({
+      state: new_state,
+      cursor: get_current_cursor(),
+    });
   }, [is_unsaved]);
+
+  const [listeners, on_add_snippet] = useHistoryListeners(input_ref);
 
   const insert_snippet = useInsertSnippet(text, max_length, input_ref);
   useEffect(() => {
     set_add_snippet_callback(() => (value: string, flag?: "start" | "end") => {
       const new_text = insert_snippet(value, flag);
+      on_add_snippet(new_text, flag);
       set_state({ text: new_text });
     });
   }, []);
@@ -189,6 +280,7 @@ export const Editor: Preact.FunctionComponent<{
         status={status}
         bits={bits}
         setState={set_state}
+        listeners={listeners}
       />
       <div className="row">
         <AudioPlayer data={data} />

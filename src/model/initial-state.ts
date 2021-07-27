@@ -16,6 +16,9 @@ const initial_state: TTS.AppState = {
     voice: stored_state?.settings?.voice ?? common.VOICE_NAMES[0],
     bits_string:
       stored_state?.settings?.bits_string ?? common.DEFAULT_BITS_STRING,
+    history_steps:
+      stored_state?.settings?.history_steps ??
+      common.DEFAULT_HISTORY_STEPS_LIMIT,
   },
   editor: {
     text: stored_state?.editor?.text ?? "",
