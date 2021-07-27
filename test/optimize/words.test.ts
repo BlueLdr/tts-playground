@@ -10,7 +10,7 @@ const settings = {
   bits_string: "uni300",
   optimize_level: OptimizeLevel.max,
   optimize_words: OptimizeTrigger.edit,
-  open: false,
+  history_steps: 256,
 };
 
 OPTIMIZE_LEVEL_TESTS.forEach(({ input, level, output }) => {

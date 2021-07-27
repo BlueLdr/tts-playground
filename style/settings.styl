@@ -1,26 +1,16 @@
 .tts-settings
-  background-color rgba($Gray64, 0.5)
-  border 1px solid $Gray72
-  border-radius 4px
-  padding 1rem
-  display none
-  &[data-open="true"]
-    display block
-  &-reset,
   &-button
     font-size 1.25rem
-    display flex
-    justify-content center
-    align-items center
-    padding 0.5rem
-  &-reset
-    border 2px solid transparent
-  &-button
     color $Gray232
     background-color $Gray72
     border 2px solid transparent
     border-radius 4px
     transition background-color 150ms
+    display flex
+    justify-content center
+    align-items center
+    padding 0.5rem
+    margin-left 0.5rem
     &:hover
       background-color $Gray96
     &:active
@@ -28,46 +18,57 @@
     &[data-open="true"]
       border-color $Gray112
 
+  &-section
+    width 100%
+    margin-bottom 1rem
+    > *
+      padding-left 1rem
+      padding-right 1rem
+    &:not(:last-child)
+      margin-bottom 3rem
+    &-header
+      background-color $Gray64
+      font-size 1.125rem
+      font-weight 600
+      border-bottom 1px solid $Gray96
+      padding 1rem
+      margin-bottom 1rem
+
   &-item
     display flex
-    justify-content flex-start
-    align-items flex-start
-    flex-direction column
+    align-items center
+    width 100%
     &:not(:last-child)
-      margin-right 1rem
+      margin-bottom 1rem
 
-    &-label
-      display flex
-      justify-content flex-start
-      align-items center
-      padding 0.125rem 0
+    label&
+      cursor pointer
 
-    &-control
-      display flex
-      justify-content flex-start
-      align-items center
-      height 2.25rem
+    &, label&.checkbox
+      justify-content space-between
 
-  &-item&-insert
-    label:first-child
-      margin-right 1rem
+    &, &-control select
+      height $InputHeight
 
-  &-section
-    justify-content space-between
+  &-history &-item-control
+    display flex
+    justify-content flex-end
+    align-items center
+    input
+      border none
+      width 10rem
+      margin 0
+      margin-left 0.75rem
+      padding 0
 
-  &-section-tall &-item
-    height 4rem
+  &-insert &-item-control
+    display flex
+    justify-content flex-end
+    align-items center
+    .radio-button
+      margin-left 1rem
 
   &-modal
-    &-item
-      display flex
-      align-items center
-      width 100%
-      &:not(:last-child)
-        margin-bottom 1rem
+    .modal-body
+      padding 0
 
-      label&
-        cursor pointer
-
-      &, label&.checkbox
-        justify-content space-between

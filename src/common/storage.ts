@@ -51,7 +51,6 @@ const sample_state: TTS.AppState = {
     optimize_words: OptimizeTrigger.manual,
     optimize_level: OptimizeLevel.normal,
     voice: "Brian",
-    open: false,
     history_steps: DEFAULT_HISTORY_STEPS_LIMIT,
   },
   message: -1,
@@ -60,7 +59,7 @@ const sample_state: TTS.AppState = {
     max_length: 255,
     speed: false,
     bits: "",
-    text: "",
+    text: "Sample text",
   },
 };
 
