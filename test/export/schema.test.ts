@@ -231,7 +231,10 @@ test("conform settings with extra property", t => {
 });
 
 test("conform settings with missing property", t => {
-  const { __type, open, ...settings } = SETTINGS;
+  const { __type, history_steps, ...settings } = SETTINGS;
   const conformed = conform_to_schema(settings, SETTINGS_SCHEMA);
-  t.deepEqual(conformed, { ...settings, open: SETTINGS_SCHEMA.open.default });
+  t.deepEqual(conformed, {
+    ...settings,
+    history_steps: SETTINGS_SCHEMA.history_steps.default,
+  });
 });

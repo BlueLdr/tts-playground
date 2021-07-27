@@ -1,7 +1,6 @@
 import { OptimizeLevel, OptimizeTrigger } from "~/model";
 
 export const SETTINGS = {
-  open: true,
   insert_at_cursor: true,
   trim_whitespace: true,
   optimize_words: OptimizeTrigger.manual,

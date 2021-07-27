@@ -19,7 +19,13 @@ import {
   MessagesList,
   Snippets,
 } from "~/view/components";
-import { useContextState, useValueRef } from "~/view/utils";
+import { SettingsModal } from "~/view/components/settings/Modal";
+import {
+  useContextState,
+  useModal,
+  useStateIfMounted,
+  useValueRef,
+} from "~/view/utils";
 
 const View: Preact.FunctionComponent = () => {
   const [messages, set_messages] = useContextState(MESSAGES);
@@ -29,6 +35,8 @@ const View: Preact.FunctionComponent = () => {
   } = useContext(EDITOR_STATE);
   const [is_unsaved, set_unsaved] = useContextState(EDITOR_UNSAVED);
   const loaded_message = messages[loaded_index];
+  const [settings_open, set_settings_open] = useStateIfMounted(false);
+  const dismiss = useCallback(() => set_settings_open(false), []);
 
   const new_is_unsaved = useMemo(() => {
     return !loaded_message
@@ -109,6 +117,13 @@ const View: Preact.FunctionComponent = () => {
           <h4>By BlueLdr</h4>
         </div>
         <div className="header-right">
+          <button
+            className="tts-settings-button"
+            type="button"
+            onClick={() => set_settings_open(true)}
+          >
+            <i className="fas fa-cog" />
+          </button>
           <ImportExport />
         </div>
       </div>
@@ -125,6 +140,7 @@ const View: Preact.FunctionComponent = () => {
           </div>
         </div>
       </div>
+      {settings_open && useModal(<SettingsModal dismiss={dismiss} />)}
     </Preact.Fragment>
   );
 };
