@@ -51,6 +51,7 @@ export const EditorHeader: Preact.FunctionComponent<{
               className="btn btn-with-icon icon-only btn-negative tts-options-reset"
               title="Clear the editor and start a new message"
               onClick={reset}
+              data-help="reset-editor"
             >
               <i className="fas fa-undo" />
             </button>
@@ -107,6 +108,7 @@ export const EditorHeader: Preact.FunctionComponent<{
           <div
             className="tts-options-item tts-options-trigger"
             title="Manually trigger message optimization. This will eliminate unneeded characters (such as replacing 'you' with 'u') to maximize the amount of text you can fit within the character limit."
+            data-help="optimize-manual"
           >
             <button
               className="btn btn-large"

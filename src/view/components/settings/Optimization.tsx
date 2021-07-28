@@ -22,7 +22,7 @@ export const OptimizationSettings: Preact.FunctionComponent<{
   form: Partial<TTS.EditorSettings>;
 }> = ({ form, onChangeSettings }) => {
   return (
-    <div className="tts-settings-section">
+    <div className="tts-settings-section" data-help="optimize-full">
       <div className="tts-settings-section-header">Optimization Settings</div>
       <div className="tts-settings-item">
         <label

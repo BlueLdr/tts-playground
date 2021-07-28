@@ -2,6 +2,7 @@
   "name": "tts-playground",
   "version": "1.0.0",
   "author": "Eric Gottlieb",
+  "repository": "https://www.github.com/BlueLdr/tts-playground",
   "main": "src",
   "scripts": {
     "start": "parcel -p 8080 src/index.html",

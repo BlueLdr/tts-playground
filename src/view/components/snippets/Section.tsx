@@ -1,5 +1,6 @@
 import * as Preact from "preact";
-import { useCallback, useEffect } from "preact/hooks";
+import { useCallback, useContext, useEffect } from "preact/hooks";
+import { ADD_SNIPPET_CALLBACK } from "~/model";
 import { SnippetsRow, SnippetsRowEdit } from "~/view/components";
 import { useModal, useStateIfMounted } from "~/view/utils";
 
@@ -9,6 +10,7 @@ export const SnippetsSection: Preact.FunctionComponent<{
   onClickEdit: () => void;
   previewText: (snippet: TTS.Snippet, count?: number) => Promise<void>;
 }> = ({ section, updateSection, onClickEdit, previewText }) => {
+  const addToMessage = useContext(ADD_SNIPPET_CALLBACK).value;
   const [open, set_open] = useStateIfMounted(section.open ?? false);
   const update_row = useCallback(
     (index: number, value?: TTS.Snippet) => {
@@ -27,7 +29,7 @@ export const SnippetsSection: Preact.FunctionComponent<{
 
   return (
     <div className="tts-snippets-section" data-open={`${open}`}>
-      <div className="tts-snippets-section-header">
+      <div className="tts-snippets-section-header" data-help="snippets-group">
         <div
           className="tts-snippets-section-title"
           onClick={() => set_open(!open)}
@@ -59,6 +61,7 @@ export const SnippetsSection: Preact.FunctionComponent<{
             onClickDelete={() => update_row(i)}
             onClickEdit={() => set_edit_target(i)}
             previewText={previewText}
+            addToMessage={addToMessage}
           />
         ))}
         <li className="tts-snippets-row tts-snippets-section-add-row-item">

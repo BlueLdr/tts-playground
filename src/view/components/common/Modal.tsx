@@ -6,16 +6,27 @@ export const Modal: Preact.FunctionComponent<{
   className?: string;
   id?: string;
   dismiss: () => void;
-}> = ({ className, id, dismiss, children }) => {
+  closeOnClickBackdrop?: boolean;
+}> = ({ className, id, dismiss, closeOnClickBackdrop = true, children }) => {
   const listener = useCallback(e => {
     if (e.key === "Escape") {
+      e.stopPropagation();
+      e.preventDefault();
       dismiss();
     }
   }, []);
   useEffect(() => {
-    window.addEventListener("keydown", listener);
+    const root = document.getElementById("app");
+    root?.setAttribute("data-modal-open", "true");
+    const capture = document.querySelectorAll(".modal-backdrop").length > 1;
+    if (closeOnClickBackdrop) {
+      window.addEventListener("keydown", listener, { capture });
+    }
     return () => {
-      window.removeEventListener("keydown", listener);
+      window.removeEventListener("keydown", listener, { capture });
+      if (document.querySelectorAll(".modal-backdrop").length === 1) {
+        root?.removeAttribute("data-modal-open");
+      }
     };
   }, [listener]);
 
@@ -26,7 +37,9 @@ export const Modal: Preact.FunctionComponent<{
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        dismiss();
+        if (closeOnClickBackdrop) {
+          dismiss();
+        }
       }}
     >
       <div

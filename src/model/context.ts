@@ -81,3 +81,8 @@ export const SNIPPETS = createNamedContext<TTS.SnippetsSection[]>(
 
 export const IS_OPTIMIZED = Preact.createContext<() => boolean>(() => false);
 IS_OPTIMIZED.displayName = "IS_OPTIMIZED";
+
+export const HELP_ITEM = createNamedContext<TTS.HelpItem | null>(
+  null,
+  "HELP_ITEM"
+);

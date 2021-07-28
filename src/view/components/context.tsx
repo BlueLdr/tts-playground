@@ -9,6 +9,7 @@ import {
   EDITOR_SETTINGS,
   EDITOR_STATE,
   EDITOR_UNSAVED,
+  HELP_ITEM,
   ImmutableContextValue,
   INITIAL_STATE,
   IS_OPTIMIZED,
@@ -60,6 +61,10 @@ const CONTEXTS = {
   SNIPPETS: {
     context: SNIPPETS,
     initialValue: INITIAL_STATE.snippets,
+  },
+  HELP_ITEM: {
+    context: HELP_ITEM,
+    initialValue: null,
   },
 } as const;
 
