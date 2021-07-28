@@ -42,7 +42,7 @@ export const BitsInput: Preact.FunctionComponent<{
   }, [enabled]);
 
   return (
-    <div className="tts-textarea-bits">
+    <div className="tts-textarea-bits" data-help="use-bits">
       <label className="tts-textarea-bits-checkbox checkbox">
         <input
           type="checkbox"

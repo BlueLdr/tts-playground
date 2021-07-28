@@ -93,7 +93,7 @@ export const PauseAddControl: Preact.FunctionComponent<{
             </span>
           </label>
 
-          <label className="tts-pause-modal-checkbox">
+          <label className="tts-pause-modal-checkbox" data-help="pause-speed">
             <input
               type="checkbox"
               checked={preserve}

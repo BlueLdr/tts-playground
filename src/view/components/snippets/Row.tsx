@@ -1,7 +1,6 @@
 import * as Preact from "preact";
-import { useCallback, useContext, useRef } from "preact/hooks";
-import { ADD_SNIPPET_CALLBACK } from "~/model";
-import { SnippetsRowControls } from "~/view/components";
+import { useCallback, useRef } from "preact/hooks";
+import { Snippet, SnippetsRowControls } from "~/view/components";
 import { useHoldClick, useStateIfMounted, useValueRef } from "~/view/utils";
 
 export const SnippetsRow: Preact.FunctionComponent<{
@@ -10,8 +9,15 @@ export const SnippetsRow: Preact.FunctionComponent<{
   onClickDelete: () => void;
   onClickEdit: () => void;
   previewText: (snippet: TTS.Snippet, count?: number) => Promise<void>;
-}> = ({ row, updateRow, onClickDelete, onClickEdit, previewText }) => {
-  const addToMessage = useContext(ADD_SNIPPET_CALLBACK).value;
+  addToMessage: (text: string, flag?: "start" | "end") => void;
+}> = ({
+  row,
+  updateRow,
+  onClickDelete,
+  onClickEdit,
+  previewText,
+  addToMessage,
+}) => {
   const [edit, set_edit] = useStateIfMounted(!row.text);
   const is_right_click = useRef(false);
   const options_ref = useValueRef(row?.options);
@@ -61,21 +67,12 @@ export const SnippetsRow: Preact.FunctionComponent<{
           title="Add to message"
           {...add_listeners}
           onContextMenu={e => e.preventDefault()}
+          data-help="snippet-insert"
         >
           <i className="fas fa-plus" />
         </button>
-        <div className="tts-snippets-row-text">
-          {row.options?.prefix ? (
-            <span className="tts-snippets-row-text-prefix">
-              {row.options.prefix}
-            </span>
-          ) : null}
-          {row.text ?? " "}
-          {row.options?.suffix ? (
-            <span className="tts-snippets-row-text-suffix">
-              {row.options.suffix}
-            </span>
-          ) : null}
+        <div className="tts-snippets-row-text" data-help="snippet-text">
+          <Snippet data={row} />
         </div>
       </div>
       <SnippetsRowControls

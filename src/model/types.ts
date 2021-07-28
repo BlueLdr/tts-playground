@@ -1,3 +1,5 @@
+import { HelpDataKey } from "~/view/components/help/help-data";
+
 export enum OptimizeTrigger {
   manual = 0,
   submit = 1,
@@ -142,6 +144,14 @@ declare global {
     interface ExportFile {
       name: string;
       data: string;
+    }
+
+    interface HelpItem {
+      key: string;
+      name: string;
+      content:
+        | string
+        | preact.ComponentType<{ goToHelp: (key: HelpDataKey) => void }>;
     }
   }
 }

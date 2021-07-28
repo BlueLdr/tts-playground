@@ -71,8 +71,8 @@ const optimize_word = (
 ) => {
   for (let i = OptimizeLevel.safe; i <= level; i++) {
     const transforms = PLAIN_TRANSFORMS[i];
-    if (word in transforms) {
-      return transforms[word];
+    if (word.toLowerCase() in transforms) {
+      return transforms[word.toLowerCase()];
     }
   }
 

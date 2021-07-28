@@ -49,6 +49,7 @@ export const SnippetsRowControls: Preact.FunctionComponent<{
       <button
         className="tts-snippets-row-control icon-button tts-snippets-row-controls-button"
         onClick={() => setOpen(!open)}
+        data-help="snippet-actions"
       >
         <i className="fas fa-cog" />
       </button>

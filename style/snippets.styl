@@ -137,14 +137,11 @@
       line-height 1.75rem
       width 12rem
       padding 0.125rem 0.5rem
-    &-text-prefix,
-    &-text-suffix
-      opacity 0.6
-    &-text-prefix
-      margin-right 0.125rem
-    &-text-suffix
-      margin-left 0.125rem
-
+    &-text
+      .snippet-space-before,
+      .snippet-space-after
+        opacity 0.25
+        transition-property opacity
     &-controls
       height 100%
 
@@ -182,7 +179,9 @@
     &:focus-within &-control-add,
     &:focus-within &-controls-button,
     &:hover &-control-add,
-    &:hover &-controls-button
+    &:hover &-controls-button,
+    &:hover &-text .snippet-space-before,
+    &:hover &-text .snippet-space-after
       opacity 1
 
     &-controls-button

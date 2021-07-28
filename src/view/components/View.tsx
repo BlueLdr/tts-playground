@@ -10,6 +10,7 @@ import {
 import {
   EDITOR_STATE,
   EDITOR_UNSAVED,
+  HELP_ITEM,
   LOADED_MESSAGE,
   MESSAGES,
 } from "~/model";
@@ -19,6 +20,8 @@ import {
   MessagesList,
   Snippets,
   SettingsModal,
+  HelpModal,
+  HelpButton,
 } from "~/view/components";
 import {
   useContextState,
@@ -34,6 +37,7 @@ const View: Preact.FunctionComponent = () => {
     value: { text, speed, max_length, bits },
   } = useContext(EDITOR_STATE);
   const [is_unsaved, set_unsaved] = useContextState(EDITOR_UNSAVED);
+  const help_item = useContext(HELP_ITEM).value;
   const loaded_message = messages[loaded_index];
   const [settings_open, set_settings_open] = useStateIfMounted(false);
   const dismiss = useCallback(() => set_settings_open(false), []);
@@ -118,6 +122,7 @@ const View: Preact.FunctionComponent = () => {
           <h4>By BlueLdr</h4>
         </div>
         <div className="header-right">
+          <HelpButton />
           <button
             className="tts-settings-button"
             type="button"
@@ -142,6 +147,7 @@ const View: Preact.FunctionComponent = () => {
         </div>
       </div>
       {settings_open && useModal(<SettingsModal dismiss={dismiss} />)}
+      {help_item && useModal(<HelpModal />)}
     </Preact.Fragment>
   );
 };

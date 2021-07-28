@@ -30,7 +30,7 @@ export const set_stored_messages = (value: TTS.Message[]) =>
   localStorage.setItem("tts-messages", JSON.stringify(value));
 
 export const get_stored_state = (): TTS.AppState =>
-  load_storage_or("tts-state", sample_state);
+  load_storage_or("tts-state", DEFAULT_STATE);
 export const set_stored_state = (value: TTS.AppState) =>
   localStorage.setItem("tts-state", JSON.stringify(value));
 
@@ -43,7 +43,7 @@ export const reset_all_storage = () => {
   }
 };
 
-const sample_state: TTS.AppState = {
+export const DEFAULT_STATE: TTS.AppState = {
   settings: {
     bits_string: DEFAULT_BITS_STRING,
     insert_at_cursor: true,
