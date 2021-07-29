@@ -134,6 +134,7 @@ export const PauseAddControl: Preact.FunctionComponent<{
           }
         }}
         onContextMenu={on_right_click}
+        data-help="pause-add"
       >
         Add Pause
       </button>

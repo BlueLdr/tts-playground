@@ -11,6 +11,7 @@ const settings = {
   optimize_level: OptimizeLevel.max,
   optimize_words: OptimizeTrigger.edit,
   history_steps: 256,
+  skip_tutorials: false,
 };
 
 OPTIMIZE_LEVEL_TESTS.forEach(({ input, level, output }) => {

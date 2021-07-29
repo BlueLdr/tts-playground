@@ -61,7 +61,7 @@ export const ModalHeader: Preact.FunctionComponent<{ dismiss: () => void }> = ({
   dismiss,
 }) => (
   <div className="modal-header">
-    <h3>{children}</h3>
+    <div className="modal-title">{children}</div>
     <button className="icon-button modal-close" onClick={dismiss}>
       <i className="fas fa-times" />
     </button>

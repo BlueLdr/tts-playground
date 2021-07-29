@@ -6,6 +6,7 @@ import {
   ModalHeader,
   GeneralSettings,
   OptimizationSettings,
+  HelpSettings,
 } from "~/view/components";
 import { useContextState, useStateObject } from "~/view/utils";
 
@@ -27,27 +28,30 @@ export const SettingsModal: Preact.FunctionComponent<{ dismiss }> = ({
 
   return (
     <Modal className="tts-settings-modal" dismiss={dismiss}>
-      <ModalHeader dismiss={dismiss}>Settings</ModalHeader>
-      <div className="modal-body">
+      <ModalHeader dismiss={dismiss}>
+        <h3>Settings</h3>
+      </ModalHeader>
+      <div className="modal-body modal-scroll-content">
         <GeneralSettings onChangeSettings={on_change_settings} form={form} />
         <OptimizationSettings
           onChangeSettings={on_change_settings}
           form={form}
         />
-      </div>
-      <div className="modal-footer">
-        <button className="btn btn-large" onClick={dismiss}>
-          Cancel
-        </button>
-        <button
-          className="btn btn-large btn-primary"
-          onClick={() => {
-            set_settings(form);
-            dismiss();
-          }}
-        >
-          Save
-        </button>
+        <HelpSettings onChangeSettings={on_change_settings} form={form} />
+        <div className="modal-footer">
+          <button className="btn btn-large" onClick={dismiss}>
+            Cancel
+          </button>
+          <button
+            className="btn btn-large btn-primary"
+            onClick={() => {
+              set_settings(form);
+              dismiss();
+            }}
+          >
+            Save
+          </button>
+        </div>
       </div>
     </Modal>
   );
