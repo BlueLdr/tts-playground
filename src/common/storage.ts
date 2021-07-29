@@ -34,6 +34,11 @@ export const get_stored_state = (): TTS.AppState =>
 export const set_stored_state = (value: TTS.AppState) =>
   localStorage.setItem("tts-state", JSON.stringify(value));
 
+export const get_stored_help = (): TTS.HelpCompletedMap =>
+  load_storage_or("tts-help", {});
+export const set_stored_help = (value: TTS.HelpCompletedMap) =>
+  localStorage.setItem("tts-help", JSON.stringify(value));
+
 export const reset_all_storage = () => {
   if (confirm("Are you REALLY sure you wanna do this?")) {
     localStorage.setItem("tts-state", "");
@@ -52,6 +57,7 @@ export const DEFAULT_STATE: TTS.AppState = {
     optimize_level: OptimizeLevel.normal,
     voice: "Brian",
     history_steps: DEFAULT_HISTORY_STEPS_LIMIT,
+    skip_tutorials: false,
   },
   message: -1,
   volume: 0.5,
@@ -75,7 +81,7 @@ const sample_snippets: TTS.SnippetsSection[] = [
           prefix: "a",
           suffix: "",
           default_count: 5,
-          space_after: true,
+          space_after: false,
           space_before: true,
         },
       },
@@ -101,7 +107,7 @@ const sample_snippets: TTS.SnippetsSection[] = [
           prefix: "y",
           suffix: "",
           default_count: 5,
-          space_after: true,
+          space_after: false,
           space_before: true,
         },
       },
@@ -111,7 +117,7 @@ const sample_snippets: TTS.SnippetsSection[] = [
           prefix: "a",
           suffix: "",
           default_count: 5,
-          space_after: true,
+          space_after: false,
           space_before: true,
         },
       },
@@ -121,7 +127,7 @@ const sample_snippets: TTS.SnippetsSection[] = [
           prefix: "",
           suffix: "",
           default_count: 5,
-          space_after: true,
+          space_after: false,
           space_before: true,
         },
       },

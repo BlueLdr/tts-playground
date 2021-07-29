@@ -42,6 +42,9 @@
     &:hover::after
       border-color rgba($statusBlue, 1)
 
+button[data-help] *
+button[data-tutorial] *
+  pointer-events none
 
 .help-button
   padding 0
@@ -57,11 +60,32 @@
     z-index 0
 
 .help-modal
+  .modal-title
+    position relative
+    h3
+      font-size 1.25rem
+  &-back
+    width 2rem
+    height 2rem
+    position absolute
+    display flex
+    justify-content center
+    align-items center
+    top 50%
+    left 0
+    transform translateY(-50%)
+    & + h3
+      margin-left 3rem
   .modal-body
+    line-height 1.4375em
     > :first-child
       margin-top 0
     > :last-child
       margin-bottom 0
+
+
+    hr
+      margin 1.25rem 0
 
     dt i
       display inline-block
@@ -83,9 +107,23 @@
       margin-top 0.25rem
       margin-bottom 0.25rem
 
+    code
+      font inherit
+      font-family monospace
+      font-size-adjust 0.4375
+      letter-spacing -0.03rem
+      background-color $codeBg
+      border 1px solid rgba($BlueD, 0.4)
+      border-radius 3px
+      display inline
+      padding 0.125rem 0.25rem
+
     &[data-item="optimize-full"],
     &[data-item="optimize-settings"]
       width 50rem
+
+  &-skip:not(:hover)
+    color $LinkG
 
 .help-demo
   margin-top 2rem

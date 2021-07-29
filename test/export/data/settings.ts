@@ -8,5 +8,6 @@ export const SETTINGS = {
   voice: "Brian",
   bits_string: "uni300",
   history_steps: 256,
+  skip_tutorials: false,
   __type: "settings",
 };

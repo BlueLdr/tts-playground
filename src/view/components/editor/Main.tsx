@@ -1,5 +1,6 @@
 import * as Preact from "preact";
 import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
+import { SPEED_CHAR } from "~/common";
 import {
   EDITOR_SETTINGS,
   EDITOR_STATE,
@@ -67,7 +68,11 @@ export const EditorMain: Preact.FunctionComponent<{
           <span>{max_length}</span>
         </div>
         <div>
-          <label className="checkbox">
+          <label
+            className="checkbox"
+            data-tutorial="speed-tutorial"
+            data-help="speed-overview"
+          >
             <input
               type="checkbox"
               checked={speed}
@@ -156,7 +161,7 @@ export const TTSTextArea: Preact.FunctionComponent<
   let end = "";
   const max_len = parseInt(`${maxLength}`);
   if (speed && max_len !== value.length) {
-    end = "¡".repeat(Math.max(0, max_len - value.length - 1));
+    end = SPEED_CHAR.repeat(Math.max(0, max_len - value.length - 1));
   }
   if (bitsString) {
     end += ` ${bitsString}`;

@@ -9,6 +9,7 @@ import {
   EDITOR_SETTINGS,
   EDITOR_STATE,
   EDITOR_UNSAVED,
+  HELP_COMPLETED,
   HELP_ITEM,
   ImmutableContextValue,
   INITIAL_STATE,
@@ -65,6 +66,10 @@ const CONTEXTS = {
   HELP_ITEM: {
     context: HELP_ITEM,
     initialValue: null,
+  },
+  HELP_COMPLETED: {
+    context: HELP_COMPLETED,
+    initialValue: INITIAL_STATE.help,
   },
 } as const;
 
@@ -160,6 +165,7 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
   const volume = hooks.useContext(VOLUME_CTX).value;
   const editor_state = hooks.useContext(EDITOR_STATE).value;
   const editor_settings = hooks.useContext(EDITOR_SETTINGS).value;
+  const help_completed = hooks.useContext(HELP_COMPLETED).value;
 
   const editor_unsaved = hooks.useContext(EDITOR_UNSAVED).value;
   const [loaded_message, set_loaded_message] = useStateIfMounted(
@@ -203,6 +209,10 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
   useEffect(() => {
     storage.set_stored_snippets(snippets);
   }, [snippets]);
+
+  useEffect(() => {
+    storage.set_stored_help(help_completed);
+  }, [help_completed]);
 
   const is_optimized = hooks.useRef(false);
   const get_is_optimized = hooks.useCallback(() => is_optimized.current, []);

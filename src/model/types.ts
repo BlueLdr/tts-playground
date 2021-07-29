@@ -81,6 +81,7 @@ declare global {
       voice: string;
       bits_string: string;
       history_steps: number;
+      skip_tutorials: boolean;
     }
 
     type OptimizeTriggerName = Exclude<keyof typeof OptimizeTrigger, "blur">;
@@ -152,7 +153,14 @@ declare global {
       content:
         | string
         | preact.ComponentType<{ goToHelp: (key: HelpDataKey) => void }>;
+      tutorial?: boolean;
     }
+
+    type HelpKey = HelpDataKey;
+
+    type HelpCompletedMap = {
+      [K in HelpDataKey]?: boolean;
+    };
   }
 }
 

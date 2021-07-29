@@ -89,6 +89,7 @@ export const EditorHeader: Preact.FunctionComponent<{
             <div className="tts-options-item-label">TTS Voice</div>
             <div className="tts-options-item-control">
               <select
+                data-help="editor-voice"
                 value={settings.voice}
                 onChange={e =>
                   on_change_settings(
@@ -108,11 +109,11 @@ export const EditorHeader: Preact.FunctionComponent<{
           <div
             className="tts-options-item tts-options-trigger"
             title="Manually trigger message optimization. This will eliminate unneeded characters (such as replacing 'you' with 'u') to maximize the amount of text you can fit within the character limit."
-            data-help="optimize-manual"
           >
             <button
               className="btn btn-large"
               onClick={() => optimize_message(OptimizeTrigger.manual)}
+              data-help="optimize-manual"
             >
               Optimize Message
             </button>

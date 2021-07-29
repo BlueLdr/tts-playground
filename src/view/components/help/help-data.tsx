@@ -1,4 +1,5 @@
 import * as Preact from "preact";
+import { SPEED_CHAR } from "~/common";
 import { OptimizeSampleDemo, SnippetAddDemo } from "./demos";
 
 /* for easy copy/paste
@@ -16,6 +17,11 @@ const help_data_type = <T extends { [key: string]: TTS.HelpItem }>(
 const HELP_COMMON = {
   optimize:
     "Message optimization will remove unneeded characters, without altering the speech, to maximize the amount of text you can fit within the character limit.",
+  speed:
+    "The Speed Modifier causes the speech to become higher-pitched and faster, as if the speaker is excited or panicking.",
+  speed_enable: `Enabling "Speed Modifier" will fill the rest of the message up to the character limit with the speed modifier character.`,
+  speed_brian:
+    "Brian is the only voice that works well with the speed modifier. Most other voices will have little to no change in pitch or speed.",
 };
 
 export const HELP_DATA = help_data_type({
@@ -29,10 +35,31 @@ export const HELP_DATA = help_data_type({
       "Clicking the Reset button will clear the text in the editor and start a new message. Changes to the current message will not be saved.",
   },
 
+  "pause-add": {
+    key: "pause-add",
+    name: "Add Pause",
+    content: "",
+  },
+
   "pause-speed": {
     key: "pause-speed",
     name: "Pause: Preserve Speed Modifiers",
     content: "",
+  },
+
+  "editor-voice": {
+    key: "tts-voice",
+    name: "Text-to-Speech Voice",
+    tutorial: true,
+    content: () => (
+      <Preact.Fragment>
+        <p>Choose the TTS voice to use for the current message.</p>
+        <h3>Important Tips</h3>
+        <ul>
+          <li>{HELP_COMMON.speed_brian}</li>
+        </ul>
+      </Preact.Fragment>
+    ),
   },
 
   "use-bits": {
@@ -68,6 +95,7 @@ export const HELP_DATA = help_data_type({
   "snippet-insert": {
     key: "snippet-insert",
     name: "Insert Snippet",
+    tutorial: true,
     content: () => (
       <Preact.Fragment>
         <p>
@@ -210,6 +238,7 @@ export const HELP_DATA = help_data_type({
   "optimize-manual": {
     key: "optimize-manual",
     name: "Manually Trigger Optimization",
+    tutorial: true,
     content: ({ goToHelp }) => (
       <Preact.Fragment>
         <p>
@@ -236,9 +265,63 @@ export const HELP_DATA = help_data_type({
     content: "",
   },
 
+  "speed-tutorial": {
+    key: "speed-tutorial",
+    name: "Speed Modifier",
+    tutorial: true,
+    content: () => (
+      <Preact.Fragment>
+        <p>{HELP_COMMON.speed}</p>
+        <p>
+          {HELP_COMMON.speed_enable.slice(0, -1)} (<code>{SPEED_CHAR}</code>).
+        </p>
+        <h3>Important Tips</h3>
+        <ul>
+          <li>
+            The speed modifier will not affect any text that follows
+            punctuation. For example, in the message{" "}
+            <code>Hey you, get off my lawn{SPEED_CHAR.repeat(10)}</code>,{" "}
+            <code>Hey you</code> will be spoken normally, and{" "}
+            <code>get off my lawn</code> will be sped up.
+          </li>
+          <li>{HELP_COMMON.speed_brian}</li>
+        </ul>
+      </Preact.Fragment>
+    ),
+  },
+
+  /* ======================================
+   * ============== SETTINGS ==============
+     ====================================== */
+  "tutorials-help": {
+    key: "tutorials-help",
+    name: "Feature Tutorials",
+    content: () => (
+      <p>
+        These tutorials will appear the first time you use certain features.
+        They're meant to give you a brief explanation along with any important
+        tips about how the feature works. After you see them once, they won't
+        appear again unless you use the help button in the top right corner of
+        the page.
+      </p>
+    ),
+  },
+
   /* ======================================
    * =============== OTHER ================
      ====================================== */
+
+  "skip-tutorials": {
+    key: "skip-tutorials",
+    name: "Skip All Tutorials",
+    content: () => (
+      <Preact.Fragment>
+        {HELP_DATA["tutorials-help"].content()}
+        <p>Are you sure you want to turn off these tutorials?</p>
+      </Preact.Fragment>
+    ),
+  },
+
   "not-found": {
     key: "not-found",
     name: "Not Found",

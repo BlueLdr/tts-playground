@@ -39,6 +39,7 @@ export const SETTINGS_SCHEMA: SchemaOf<TTS.EditorSettings> = {
   voice: { type: "string", default: "Brian" },
   bits_string: { type: "string", default: DEFAULT_BITS_STRING },
   history_steps: { type: "number", default: DEFAULT_HISTORY_STEPS_LIMIT },
+  skip_tutorials: { type: "boolean", default: false },
 };
 
 export const SNIPPET_OPTIONS_SCHEMA: SchemaOf<TTS.SnippetOptions> = {

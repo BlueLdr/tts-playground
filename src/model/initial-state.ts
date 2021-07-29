@@ -18,6 +18,7 @@ const initial_state: TTS.AppState = {
     history_steps:
       stored_state?.settings?.history_steps ??
       common.DEFAULT_HISTORY_STEPS_LIMIT,
+    skip_tutorials: stored_state?.settings?.skip_tutorials ?? false,
   },
   editor: {
     text: stored_state?.editor?.text ?? "",
@@ -30,9 +31,11 @@ const initial_state: TTS.AppState = {
 
 const messages: TTS.Message[] = common.get_stored_messages() ?? [];
 const snippets: TTS.SnippetsSection[] = common.get_stored_snippets() ?? [];
+const help: TTS.HelpCompletedMap = common.get_stored_help() ?? {};
 
 export const INITIAL_STATE = {
   ...initial_state,
   messages,
   snippets,
+  help,
 } as const;
