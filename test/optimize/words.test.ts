@@ -4,7 +4,6 @@ import { optimize_message } from "~/view/utils";
 import { OPTIMIZE_LEVEL_TESTS, OPTIMIZE_TESTS } from "./data/tests";
 
 const settings = {
-  insert_at_cursor: true,
   voice: "Brian",
   trim_whitespace: true,
   bits_string: "uni300",

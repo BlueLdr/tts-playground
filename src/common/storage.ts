@@ -51,7 +51,6 @@ export const reset_all_storage = () => {
 export const DEFAULT_STATE: TTS.AppState = {
   settings: {
     bits_string: DEFAULT_BITS_STRING,
-    insert_at_cursor: true,
     trim_whitespace: true,
     optimize_words: OptimizeTrigger.manual,
     optimize_level: OptimizeLevel.normal,

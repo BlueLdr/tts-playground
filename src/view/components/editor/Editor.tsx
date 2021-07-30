@@ -13,6 +13,7 @@ import {
   LOADED_MESSAGE,
   OptimizeTrigger,
   EditorHistory,
+  HELP_ITEM,
 } from "~/model";
 import {
   AudioPlayer,
@@ -27,6 +28,7 @@ import {
   ensure_number,
   useContextState,
   useInsertSnippet,
+  useModal,
   useOptimizeMessageTrigger,
   usePlayMessage,
   useStateObject,
@@ -41,6 +43,7 @@ export const Editor: Preact.FunctionComponent<{
   const [is_unsaved, set_unsaved] = useContextState(EDITOR_UNSAVED);
   const set_loaded_message = useContext(LOADED_MESSAGE).setValue;
   const set_add_snippet_callback = useContext(ADD_SNIPPET_CALLBACK).setValue;
+  const help_item = useContext(HELP_ITEM).value;
 
   const input_ref = useRef<HTMLTextAreaElement>();
   const [state, set_state] = useStateObject(editor_state);
@@ -271,8 +274,10 @@ export const Editor: Preact.FunctionComponent<{
     [set_state]
   );
 
-  return (
-    <Preact.Fragment>
+  const is_intro = help_item === "intro-editor";
+
+  const content = (
+    <div className="tts-editor" data-help-intro-highlight={is_intro}>
       <EditorHeader
         maxLength={max_length}
         setMaxLength={set_max_length}
@@ -303,6 +308,15 @@ export const Editor: Preact.FunctionComponent<{
         />
         <ClipboardButton text={message_text} disabled={!text} />
       </div>
+    </div>
+  );
+
+  return (
+    <Preact.Fragment>
+      {content}
+      {is_intro
+        ? useModal(content, "#modal-container .modal-backdrop[data-intro-key]")
+        : null}
     </Preact.Fragment>
   );
 };

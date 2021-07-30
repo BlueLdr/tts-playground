@@ -12,6 +12,7 @@ export const VOICE_NAMES = [
 ];
 
 export const SPEED_CHAR = "¡";
+export const PAUSE_CHAR_SPEED_MODIFIED = "ᴾ";
 
 export const DEFAULT_BITS_STRING = "uni300";
 

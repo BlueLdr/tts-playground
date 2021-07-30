@@ -1,10 +1,9 @@
 import * as Preact from "preact";
 import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
+import { PAUSE_CHAR_SPEED_MODIFIED } from "~/common";
 import { Modal, ModalHeader } from "~/view/components";
 import { ensure_number, useModal, useStateIfMounted } from "~/view/utils";
 import { ADD_SNIPPET_CALLBACK } from "~/model";
-
-export const PAUSE_CHAR_SPEED_MODIFIED = "ᴾ";
 
 export const SLASH_DURATION = 2.5 / 14; // seconds
 export const MOD_PAUSE_CHAR_DURATION = 1.067 / 14; // seconds

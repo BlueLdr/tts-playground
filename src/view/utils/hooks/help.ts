@@ -34,6 +34,12 @@ export const useHelpItem = (enabled: boolean) => {
   const key_ref = useValueRef(key);
 
   hooks.useEffect(() => {
+    if (!comp["intro-help"]) {
+      set_key("intro-start");
+    }
+  }, []);
+
+  hooks.useEffect(() => {
     if (!key || !HELP_DATA[key]) {
       set_is_tutorial(false);
     }

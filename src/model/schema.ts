@@ -32,7 +32,6 @@ export type SchemaOf<T extends object> = {
 };
 
 export const SETTINGS_SCHEMA: SchemaOf<TTS.EditorSettings> = {
-  insert_at_cursor: { type: "boolean", default: false },
   trim_whitespace: { type: "boolean", default: false },
   optimize_words: { type: "number", default: OptimizeTrigger.manual },
   optimize_level: { type: "number", default: OptimizeLevel.normal },

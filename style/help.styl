@@ -3,7 +3,7 @@
   &::after,
   &[data-modal-open="true"] .modal::after
     content " "
-    background-color rgba($Gray48, 0.8)
+    background-color rgba(16, 16, 16, 0.7)
     width 100vw
     height 100vh
     position fixed
@@ -42,6 +42,49 @@
     &:hover::after
       border-color rgba($statusBlue, 1)
 
+[data-help-intro-highlight="true"]
+  position relative !important
+  opacity 1 !important
+  z-index 999 !important
+  &, & *
+    pointer-events none !important
+  &::before
+    content " "
+    border-radius 4px
+    box-shadow 0 0 5px 3px $statusBlue
+    width 100%
+    height 100%
+    position absolute
+    top 0
+    left 0
+    z-index 998
+    animation intro-highlight 2s ease-in-out infinite
+
+  .tts-editor&
+    z-index auto !important
+    &::before
+      display none
+
+  .modal-container .tts-editor&
+    background-color $Gray48
+    border 1px solid $Gray128
+    border-radius 0.5rem
+    margin-left 2rem
+    padding 1rem
+
+  & .tts-snippets-row-control-add
+    opacity 1 !important
+
+.modal-backdrop[data-intro-key]:not([data-intro-key="intro-help"])
+  display flex
+  justify-content center
+  align-items center
+  > *
+    position relative !important
+    top unset
+    left unset
+    transform unset
+
 button[data-help] *
 button[data-tutorial] *
   pointer-events none
@@ -78,11 +121,11 @@ button[data-tutorial] *
       margin-left 3rem
   .modal-body
     line-height 1.4375em
+    width 40rem
     > :first-child
       margin-top 0
     > :last-child
       margin-bottom 0
-
 
     hr
       margin 1.25rem 0
@@ -118,15 +161,34 @@ button[data-tutorial] *
       display inline
       padding 0.125rem 0.25rem
 
-    &[data-item="optimize-full"],
-    &[data-item="optimize-settings"]
+  &[data-item="optimize-full"],
+  &[data-item="optimize-settings"]
+    .modal-body
       width 50rem
+
+  &[data-item="intro-start"] .modal-body
+    text-align center
+    h1
+      margin 1rem 1rem 3rem
+    p
+      margin 2rem
+  &[data-item="intro-editor"]
+    flex 0 1 28rem
+    min-width 18rem
+
+
+  &[data-item="intro-help"]
+    z-index 1000
+    top 4rem
+    right 1rem
+    left unset
+    transform translate(0,0)
 
   &-skip:not(:hover)
     color $LinkG
 
 .help-demo
-  margin-top 2rem
+  margin-top 1.5rem
   &-prompt
     text-align center
   &-snippet-add
@@ -137,6 +199,7 @@ button[data-tutorial] *
       textarea
         border 1px solid $Gray200
         margin-right 1rem
+        flex 1 1 auto
 
       .tts-snippets-row
         &-left
@@ -154,3 +217,45 @@ button[data-tutorial] *
       font-size 0.9375rem
       margin 0.5rem 0 0.5rem 1.5rem
       white-space pre
+
+  &-pause
+    &-top
+      width 100%
+    &-item
+      display flex
+      justify-content space-between
+      align-items center
+      width 100%
+      margin 1rem 0
+      &-text,
+      &-button
+        background-color $Gray72
+        border 1px solid $Gray128
+        padding 0.5rem
+      &-text
+        border-right none
+        border-top-left-radius 4px
+        border-bottom-left-radius 4px
+        flex 1 1 auto
+      &-button
+        border-top-right-radius 4px
+        border-bottom-right-radius 4px
+        flex 0 0 auto
+        min-width 2rem
+    &-player
+      &, audio
+        width 100%
+
+@keyframes intro-highlight
+  0%
+    width calc(100% + 0.25rem)
+    height calc(100% + 0.25rem)
+    transform translate(-0.125rem, -0.125rem)
+  50%
+    width calc(100% + 0.75rem)
+    height calc(100% + 0.75rem)
+    transform translate(-0.375rem, -0.375rem)
+  100%
+    width calc(100% + 0.25rem)
+    height calc(100% + 0.25rem)
+    transform translate(-0.125rem, -0.125rem)

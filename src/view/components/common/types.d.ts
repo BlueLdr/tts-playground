@@ -7,6 +7,7 @@ type HTMLButtonProps = PropsOfElem<HTMLButtonElement>;
 type HTMLTextAreaProps = PropsOfElem<HTMLTextAreaElement> & {
   defaultValue?: string | number | undefined;
 };
+type HTMLDivProps = PropsOfElem<HTMLDivElement>;
 
 type EventListenerKeysOf<
   E extends HTMLElement,
