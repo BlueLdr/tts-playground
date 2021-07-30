@@ -30,7 +30,7 @@ export const EditorMain: Preact.FunctionComponent<{
   inputRef,
   listeners,
 }) => {
-  const { max_length } = useContext(EDITOR_STATE).value;
+  const { max_length, pause_duration } = useContext(EDITOR_STATE).value;
   const bits_length = bits ? bits.length + 1 : 0;
   const on_change_text = useCallback(
     (text: string) => setState({ text }),
@@ -42,6 +42,10 @@ export const EditorMain: Preact.FunctionComponent<{
   );
   const on_change_speed = useCallback(
     (speed: boolean) => setState({ speed }),
+    [setState]
+  );
+  const on_change_pause_duration = useCallback(
+    (duration: number) => setState({ pause_duration: duration }),
     [setState]
   );
   return (
@@ -76,7 +80,12 @@ export const EditorMain: Preact.FunctionComponent<{
           </label>
         </div>
         <BitsInput bits={bits} setBits={on_change_bits} />
-        <PauseAddControl speedModified={speed} text={text} />
+        <PauseAddControl
+          speedModified={speed}
+          text={text}
+          duration={pause_duration}
+          onChangeDuration={on_change_pause_duration}
+        />
       </div>
       <div className="row">
         <div className="tts-textarea-submit">
@@ -176,6 +185,18 @@ export const TTSTextArea: Preact.FunctionComponent<
             !e.altKey
           ) {
             e.preventDefault();
+          } else if (
+            (e.key === "c" || e.key === "C") &&
+            (e.ctrlKey || e.metaKey) &&
+            !e.altKey &&
+            !e.shiftKey &&
+            inputRef.current?.selectionStart === 0 &&
+            inputRef.current?.selectionEnd === value.length
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById("tts-clipboard-button")?.click();
+            return;
           }
           update_cursor_pos();
         }}

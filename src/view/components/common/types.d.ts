@@ -2,6 +2,8 @@ type PropsOfElem<T extends HTMLElement> = preact.JSX.HTMLAttributes<T>;
 type HTMLInputProps = PropsOfElem<HTMLInputElement> & {
   defaultValue?: string | number | undefined;
 };
+
+type HTMLButtonProps = PropsOfElem<HTMLButtonElement>;
 type HTMLTextAreaProps = PropsOfElem<HTMLTextAreaElement> & {
   defaultValue?: string | number | undefined;
 };

@@ -23,9 +23,10 @@ export const generate_pause = (duration, preserve_speed = false) =>
 export const PauseAddControl: Preact.FunctionComponent<{
   text: string;
   speedModified: boolean;
-}> = ({ text, speedModified }) => {
+  duration: number;
+  onChangeDuration: (d: number) => void;
+}> = ({ text, speedModified, duration, onChangeDuration }) => {
   const [open, set_open] = useStateIfMounted(false);
-  const [duration, set_duration] = useStateIfMounted(1);
   const [preserve, set_preserve] = useStateIfMounted(speedModified);
   const input_ref = useRef<HTMLInputElement>();
   const on_add_pause = useContext(ADD_SNIPPET_CALLBACK).value;
@@ -34,7 +35,15 @@ export const PauseAddControl: Preact.FunctionComponent<{
   const add_pause = useCallback(() => {
     const str = generate_pause(duration, preserve);
     return `${!preserve && !text.endsWith(" ") ? " " : ""}${str}`;
-  }, [duration, preserve, text]);
+  }, [duration, preserve, text, on_add_pause]);
+
+  const on_right_click = useCallback(
+    e => {
+      e.preventDefault();
+      on_add_pause(add_pause(), "end");
+    },
+    [add_pause]
+  );
 
   useEffect(() => {
     if (open) {
@@ -72,10 +81,10 @@ export const PauseAddControl: Preact.FunctionComponent<{
                   max={10}
                   step={0.1}
                   onInput={e =>
-                    set_duration(
+                    onChangeDuration(
                       ensure_number(
                         (e.target as HTMLInputElement).valueAsNumber,
-                        1
+                        duration
                       )
                     )
                   }
@@ -116,7 +125,17 @@ export const PauseAddControl: Preact.FunctionComponent<{
 
   return (
     <div className="tts-pause-control">
-      <button className="btn" onClick={() => set_open(true)}>
+      <button
+        className="btn"
+        onClick={e => {
+          if (e?.button === 2) {
+            on_right_click(e);
+          } else {
+            set_open(true);
+          }
+        }}
+        onContextMenu={on_right_click}
+      >
         Add Pause
       </button>
       {open && useModal(modal)}

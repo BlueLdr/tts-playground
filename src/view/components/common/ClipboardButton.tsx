@@ -10,6 +10,7 @@ export const ClipboardButton: Preact.FunctionComponent<{
   const copy = useCopyToClipboard(text);
   return (
     <button
+      id="tts-clipboard-button"
       className={`btn tts-clipboard-button${className ? ` ${className}` : ""}`}
       data-success={`${anim_active}`}
       disabled={disabled}

@@ -24,6 +24,7 @@ const initial_state: TTS.AppState = {
     max_length: stored_state?.editor?.max_length ?? 255,
     speed: stored_state?.editor?.speed ?? false,
     bits: stored_state?.editor?.bits ?? "",
+    pause_duration: stored_state?.editor?.pause_duration ?? 1,
   },
 };
 

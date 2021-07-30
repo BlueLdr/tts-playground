@@ -50,7 +50,7 @@ export const MessageModal: Preact.FunctionComponent<{
         <div />
       ) : (
         <button
-          className="btn btn-negative btn-with-icon"
+          className="btn btn-large btn-negative btn-with-icon"
           onClick={on_click_delete}
           disabled={!name}
         >
@@ -61,7 +61,7 @@ export const MessageModal: Preact.FunctionComponent<{
       {!isNew && (
         <div className="btn-multi">
           <button
-            className="btn btn-with-icon btn-left"
+            className="btn btn-large btn-with-icon btn-left"
             onClick={() => {
               loadMessage();
               dismiss();
@@ -71,14 +71,14 @@ export const MessageModal: Preact.FunctionComponent<{
             Load Into Editor
           </button>
           <ClipboardButton
-            className="btn btn-with-icon btn-right"
+            className="btn btn-large btn-with-icon btn-right"
             text={text}
           />
         </div>
       )}
 
       <button
-        className="btn btn-primary"
+        className="btn btn-large btn-primary"
         onClick={() => {
           updateMessage({
             name: value,

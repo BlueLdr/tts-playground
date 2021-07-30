@@ -91,6 +91,7 @@ export const HISTORY_SCHEMA: SchemaOf<TTS.EditorHistory> = {
     type: {
       ...MESSAGE_OPTIONS_SCHEMA,
       text: { type: "string" },
+      pause_duration: { type: "number", default: 1 },
     },
     default: null,
   },

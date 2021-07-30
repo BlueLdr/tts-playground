@@ -45,8 +45,9 @@ export const Editor: Preact.FunctionComponent<{
   const input_ref = useRef<HTMLTextAreaElement>();
   const [state, set_state] = useStateObject(editor_state);
   const state_ref = useValueRef(state);
-  const { text, speed, max_length: max_len, bits } = state;
+  const { text, speed, max_length: max_len, bits, pause_duration } = state;
   const max_length = useMemo(() => ensure_number(max_len, 255), [max_len]);
+  const pause_duration_ref = useValueRef(pause_duration);
 
   const get_current_cursor = useCallback(
     () => ({
@@ -77,6 +78,7 @@ export const Editor: Preact.FunctionComponent<{
           ? new_state.cursor_before ?? new_state.cursor
           : new_state.cursor;
         if (new_state.state !== state_ref.current) {
+          new_state.state.pause_duration = pause_duration_ref.current;
           set_state(new_state.state);
           cursor_from_history.current = next_cursor;
         } else {
@@ -105,8 +107,9 @@ export const Editor: Preact.FunctionComponent<{
       speed,
       text: trimmed_text,
       bits,
+      pause_duration,
     });
-  }, [max_length, speed, text, bits]);
+  }, [max_length, speed, text, bits, pause_duration]);
 
   const new_message = useMemo(
     () => ({
@@ -220,6 +223,7 @@ export const Editor: Preact.FunctionComponent<{
           speed: message.options?.speed ?? false,
           max_length: message.options?.max_length ?? 255,
           bits: message.options?.bits ?? "",
+          pause_duration: pause_duration ?? 1,
         },
         cursor: get_current_cursor(),
       });
@@ -240,6 +244,7 @@ export const Editor: Preact.FunctionComponent<{
       bits: "",
       speed: false,
       max_length: length_ref.current,
+      pause_duration: pause_duration_ref.current,
     };
     set_state(new_state);
     set_unsaved(false);
