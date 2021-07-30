@@ -10,6 +10,7 @@ import {
 import {
   EDITOR_STATE,
   EDITOR_UNSAVED,
+  HELP_ITEM,
   LOADED_MESSAGE,
   MESSAGES,
 } from "~/model";
@@ -35,6 +36,7 @@ const View: Preact.FunctionComponent = () => {
     value: { text, speed, max_length, bits },
   } = useContext(EDITOR_STATE);
   const [is_unsaved, set_unsaved] = useContextState(EDITOR_UNSAVED);
+  const help_item = useContext(HELP_ITEM).value;
   const loaded_message = messages[loaded_index];
   const [settings_open, set_settings_open] = useStateIfMounted(false);
   const dismiss = useCallback(() => set_settings_open(false), []);
@@ -121,7 +123,7 @@ const View: Preact.FunctionComponent = () => {
         <div className="header-right">
           <HelpButton />
           <button
-            className="tts-settings-button"
+            className="header-button"
             type="button"
             onClick={() => set_settings_open(true)}
           >
@@ -132,14 +134,22 @@ const View: Preact.FunctionComponent = () => {
       </div>
       <div className="tts-container">
         <div className="tts-container">
-          <div className="tts-col tts-col-messages">
+          <div
+            className="tts-col tts-col-messages"
+            data-help-intro-highlight={help_item === "intro-messages"}
+          >
             <MessagesList updateMessages={update_messages} />
           </div>
           <div className="tts-col tts-col-main">
             <Editor message={loaded_message} updateMessages={update_messages} />
           </div>
           <div className="tts-col tts-col-snippets">
-            <Snippets />
+            <div
+              className=""
+              data-help-intro-highlight={help_item === "intro-snippets"}
+            >
+              <Snippets />
+            </div>
           </div>
         </div>
       </div>

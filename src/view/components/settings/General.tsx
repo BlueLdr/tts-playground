@@ -12,9 +12,10 @@ export const GeneralSettings: Preact.FunctionComponent<{
   return (
     <div className="tts-settings-section">
       <div className="tts-settings-section-header">General Settings</div>
-      <div
+      {/*<div
         className="tts-settings-item tts-settings-insert"
         title="Insert a snippet from the snippets pad at either the cursor position or at the end of the message"
+        data-help="snippet-insert-pos"
       >
         <div className="tts-settings-item-label">Insert Snippets At:</div>
         <div className="tts-settings-item-control">
@@ -37,8 +38,11 @@ export const GeneralSettings: Preact.FunctionComponent<{
             <span className="radio-label">End</span>
           </label>
         </div>
-      </div>
-      <div className="tts-settings-item tts-settings-bits">
+      </div>*/}
+      <div
+        className="tts-settings-item tts-settings-bits"
+        data-help="bits-default"
+      >
         <div className="tts-settings-item-label">Default Bits String</div>
         <div className="tts-settings-item-control">
           <input
@@ -63,6 +67,7 @@ export const GeneralSettings: Preact.FunctionComponent<{
       <div
         className="tts-settings-item tts-settings-history"
         title="Number of undo/redo steps that will be stored. When you exceed this number, the oldest step will be discarded."
+        data-help="history-steps"
       >
         <div className="tts-settings-item-label">Max. Undo/Redo Steps</div>
         <div className="tts-settings-item-control">

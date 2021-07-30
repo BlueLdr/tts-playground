@@ -39,3 +39,24 @@
     flex-direction row-reverse
     justify-content flex-end
     align-items center
+
+  &-button
+    font-size 1.25rem
+    color $Gray232
+    background-color $Gray72
+    border 2px solid transparent
+    border-radius 4px
+    transition background-color 150ms
+    display flex
+    justify-content center
+    align-items center
+    padding 0.5rem
+    margin-left 0.5rem
+    width 2.5rem
+    height @width
+    &:hover
+      background-color $Gray96
+    &:active
+      background-color $Gray64
+    &[data-open="true"]
+      border-color $Gray112

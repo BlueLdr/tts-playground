@@ -62,8 +62,11 @@ export const useHoldClick = (
   }, [clicked]);
 };
 
-export const useModal = (content: Preact.VNode | null) => {
-  const container = document.getElementById("modal-container");
+export const useModal = (
+  content: Preact.VNode | null,
+  container_selector: string = "#modal-container"
+) => {
+  const container = document.querySelector(container_selector);
   if (container && content) {
     return createPortal(content, container);
   }

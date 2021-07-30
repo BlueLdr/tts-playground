@@ -1,6 +1,6 @@
 import * as Preact from "preact";
-import { SPEED_CHAR } from "~/common";
-import { OptimizeSampleDemo, SnippetAddDemo } from "./demos";
+import { PAUSE_CHAR_SPEED_MODIFIED, SPEED_CHAR } from "~/common";
+import { PauseSpeedDemo, OptimizeSampleDemo, SnippetAddDemo } from "./demos";
 
 /* for easy copy/paste
   {
@@ -38,13 +38,41 @@ export const HELP_DATA = help_data_type({
   "pause-add": {
     key: "pause-add",
     name: "Add Pause",
-    content: "",
+    content:
+      "Add text to the message that will make the speaker pause for the specified amount of time.",
   },
 
   "pause-speed": {
     key: "pause-speed",
-    name: "Pause: Preserve Speed Modifiers",
-    content: "",
+    name: "Pause: Preserve Speed Modifier",
+    content: ({ goToHelp }) => (
+      <Preact.Fragment>
+        <p>
+          The normal way to add a pause is using <code>/</code>, separated by
+          spaces. However, this behaves like punctuation, which removes the
+          effect of the speed modifier on any text before it. The{" "}
+          <code>{PAUSE_CHAR_SPEED_MODIFIED}</code> character has a similar
+          effect, but preserves the effect of the speed modifier.
+        </p>
+        <h4>
+          Why not use <code>{PAUSE_CHAR_SPEED_MODIFIED}</code> all the time?
+        </h4>
+        <p>
+          The <code>{PAUSE_CHAR_SPEED_MODIFIED}</code> character, while quiet,
+          is not completely silent like slashes are. It can also affect the
+          pronunciation of words before and after it. For example,{" "}
+          <code>{PAUSE_CHAR_SPEED_MODIFIED.repeat(4)} ow</code> will sound more
+          like "pow" than "ow", even with the space in between.
+          <br />
+        </p>
+        <p>
+          <button className="link" onClick={() => goToHelp("speed-overview")}>
+            Learn more about the Speed Modifier and Punctuation.
+          </button>
+        </p>
+        <PauseSpeedDemo />
+      </Preact.Fragment>
+    ),
   },
 
   "editor-voice": {
@@ -65,7 +93,16 @@ export const HELP_DATA = help_data_type({
   "use-bits": {
     key: "use-bits",
     name: "Bits String",
-    content: "",
+    content: () => (
+      <Preact.Fragment>
+        <p>
+          Enable this if you plan to send your message using Bits in Twitch
+          chat. This will count the Bits text towards the character limit, but
+          won't be part of the message speech. This will ensure that the message
+          sounds exactly the same when you send it as it does in testing.
+        </p>
+      </Preact.Fragment>
+    ),
   },
 
   /* ======================================
@@ -107,6 +144,10 @@ export const HELP_DATA = help_data_type({
           Right-Click this button to insert only the main text, without the
           prefix, suffix, or spaces. Right-Click and hold to repeatedly insert
           only the main text.
+        </p>
+        <p>
+          Select text in the editor and then insert the snippet to overwrite the
+          selected text.
         </p>
         <SnippetAddDemo />
       </Preact.Fragment>
@@ -306,6 +347,39 @@ export const HELP_DATA = help_data_type({
       </p>
     ),
   },
+  "bits-default": {
+    key: "bits-default",
+    name: "Default Bits String",
+    content: () => (
+      <Preact.Fragment>
+        <p>
+          Choose the string that you plan to use most often when creating
+          messages with Bits.
+        </p>
+        <p>
+          This defaults to <code>uni300</code> because this is (currently) the
+          shortest Bit text available, which leaves more room for speed modifier
+          characters.
+        </p>
+      </Preact.Fragment>
+    ),
+  },
+  "history-steps": {
+    key: "history-steps",
+    name: "Maximum Undo/Redo Steps",
+    content: () => (
+      <Preact.Fragment>
+        <p>
+          Adjust the maximum number of undo/redo steps that will be stored. When
+          you exceed this number, the oldest step will be discarded.
+        </p>
+        <p>
+          Note: You should only need to adjust this if you're on a slow computer
+          and the app is having performance issues.
+        </p>
+      </Preact.Fragment>
+    ),
+  },
 
   /* ======================================
    * =============== OTHER ================
@@ -332,6 +406,88 @@ export const HELP_DATA = help_data_type({
         <p>Did we miss something? <a href="">Report this issue</a>.</p>
         </Preact.Fragment>)
       }*/
+  },
+
+  /* ======================================
+   * =============== INTRO ================
+     ====================================== */
+  "intro-start": {
+    key: "intro-start",
+    name: "",
+    content: () => (
+      <Preact.Fragment>
+        <h1>Welcome to the TTS Playground!</h1>
+        <p>Let's take a quick tour of the app and its features!</p>
+      </Preact.Fragment>
+    ),
+  },
+  "intro-editor": {
+    key: "intro-editor",
+    name: "Editor",
+    content: () => (
+      <Preact.Fragment>
+        <h4>Craft and assemble your messages in the editor.</h4>
+        <p>Key features:</p>
+        <ul>
+          <li>Full undo/redo support (Ctrl+Z, Ctrl+Shift+Z)</li>
+          <li>Easily add pauses and snippets</li>
+          <li>Toggle speed modifier</li>
+          <li>Save Messages to access them later</li>
+        </ul>
+      </Preact.Fragment>
+    ),
+  },
+  "intro-messages": {
+    key: "intro-messages",
+    name: "Messages",
+    content: () => (
+      <Preact.Fragment>
+        <h4>View and load your saved Messages.</h4>
+        <p>Key Features:</p>
+        <ul>
+          <li>Copy Message text straight to the clipboard</li>
+          <li>Load saved Messages into the editor.</li>
+        </ul>
+      </Preact.Fragment>
+    ),
+  },
+  "intro-snippets": {
+    key: "intro-snippets",
+    name: "Snippets",
+    content: () => (
+      <Preact.Fragment>
+        <h4>
+          Insert repeated text snippets into your message with single click.
+        </h4>
+        <p>Key Features:</p>
+        <ul>
+          <li>Create, test, and store repeated text snippets</li>
+          <li>
+            Insert snippets into the editor by clicking the Add button (
+            <i className="fas fa-plus" />)
+          </li>
+          <li>
+            Click and hold the Add button (
+            <i className="fas fa-plus" />) to repeat the snippet.
+          </li>
+          <li>Group snippets to keep them organized</li>
+        </ul>
+      </Preact.Fragment>
+    ),
+  },
+  "intro-help": {
+    key: "intro-help",
+    name: "Help Button",
+    content: () => (
+      <Preact.Fragment>
+        <p>If you're not sure how something works:</p>
+        <ol>
+          <li>Click the Help button in the top right corner.</li>
+          <li>Click on the thing you want to learn more about.</li>
+          <li>Read the information provided in the help popup.</li>
+        </ol>
+      </Preact.Fragment>
+    ),
   },
 });
 

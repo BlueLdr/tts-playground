@@ -47,8 +47,8 @@ export const SnippetAddDemo: Preact.FunctionComponent = ({}) => {
           ref={input_ref}
           className="tts-textarea-input"
           value={text}
-          rows={8}
-          cols={56}
+          rows={4}
+          cols={40}
           onInput={e => {
             set_text((e.target as HTMLTextAreaElement).value);
           }}

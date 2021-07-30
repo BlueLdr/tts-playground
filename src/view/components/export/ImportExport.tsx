@@ -8,7 +8,7 @@ export const ImportExport: Preact.FunctionComponent = () => {
   return (
     <Preact.Fragment>
       <button
-        className="icon-button tts-export-button"
+        className="header-button tts-export-button"
         onClick={() => set_open(true)}
         title="Import/Export"
       >

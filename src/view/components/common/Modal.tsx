@@ -1,13 +1,22 @@
 import * as Preact from "preact";
-import { useCallback, useEffect } from "preact/hooks";
+import { useCallback, useEffect, useMemo } from "preact/hooks";
 import { maybeClassName } from "~/view/utils";
 
-export const Modal: Preact.FunctionComponent<{
-  className?: string;
-  id?: string;
-  dismiss: () => void;
-  closeOnClickBackdrop?: boolean;
-}> = ({ className, id, dismiss, closeOnClickBackdrop = true, children }) => {
+export const Modal: Preact.FunctionComponent<
+  {
+    dismiss?: () => void;
+    closeOnClickBackdrop?: boolean;
+    backdropData?: object;
+  } & HTMLDivProps
+> = ({
+  className,
+  id,
+  dismiss,
+  closeOnClickBackdrop = true,
+  children,
+  backdropData,
+  ...props
+}) => {
   const listener = useCallback(e => {
     if (e.key === "Escape") {
       e.stopPropagation();
@@ -41,6 +50,7 @@ export const Modal: Preact.FunctionComponent<{
           dismiss();
         }
       }}
+      {...backdropData}
     >
       <div
         id={id}
@@ -49,6 +59,7 @@ export const Modal: Preact.FunctionComponent<{
           e.stopPropagation();
           e.stopImmediatePropagation();
         }}
+        {...props}
       >
         {children}
       </div>
@@ -56,14 +67,28 @@ export const Modal: Preact.FunctionComponent<{
   );
 };
 
-export const ModalHeader: Preact.FunctionComponent<{ dismiss: () => void }> = ({
-  children,
-  dismiss,
-}) => (
-  <div className="modal-header">
-    <div className="modal-title">{children}</div>
-    <button className="icon-button modal-close" onClick={dismiss}>
-      <i className="fas fa-times" />
-    </button>
-  </div>
-);
+export const ModalHeader: Preact.FunctionComponent<{
+  dismiss: () => void;
+  showCloseButton?: boolean;
+}> = ({ children, dismiss, showCloseButton = true }) => {
+  const has_children = useMemo(
+    () =>
+      !!children &&
+      (!Array.isArray(children) ||
+        children.some(c => c != null && c !== false && c !== "")),
+    [children]
+  );
+  if (!has_children && !showCloseButton) {
+    return null;
+  }
+  return (
+    <div className="modal-header">
+      <div className="modal-title">{children}</div>
+      {showCloseButton && (
+        <button className="icon-button modal-close" onClick={dismiss}>
+          <i className="fas fa-times" />
+        </button>
+      )}
+    </div>
+  );
+};

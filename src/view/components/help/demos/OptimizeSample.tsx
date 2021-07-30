@@ -15,7 +15,7 @@ export const OptimizeSampleDemo: Preact.FunctionComponent = () => {
   );
 
   return (
-    <div className="help-demo-optimize-sample">
+    <div className="help-demo help-demo-optimize-sample">
       For example, the message
       <div className="help-demo-optimize-sample-text">
         "{optimize_sample}" ({optimize_sample.length} chars)

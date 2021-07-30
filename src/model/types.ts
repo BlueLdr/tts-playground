@@ -74,7 +74,6 @@ declare global {
     }
 
     interface EditorSettings {
-      insert_at_cursor: boolean;
       trim_whitespace: boolean;
       optimize_words: OptimizeTrigger;
       optimize_level: OptimizeLevel;

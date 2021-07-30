@@ -16,8 +16,10 @@ export const HelpButton: Preact.FunctionComponent = () => {
   const item = HELP_DATA[key] ?? null;
 
   const click_listener = useCallback(e => {
-    if (enabled_ref.current && e.target.id === "help-button") {
+    if (enabled_ref.current) {
       silence_event(e);
+    }
+    if (enabled_ref.current && e.target.id === "help-button") {
       set_enabled(false);
       return;
     }
@@ -72,7 +74,8 @@ export const HelpButton: Preact.FunctionComponent = () => {
     <Preact.Fragment>
       <button
         id="help-button"
-        className="btn btn-with-icon icon-only help-button"
+        data-help-intro-highlight={key === "intro-help"}
+        className="header-button help-button"
         onClickCapture={e => {
           e.preventDefault();
           e.stopPropagation();

@@ -51,10 +51,7 @@ export const useHistoryListeners = (
     EditorHistory.push(
       {
         state: state_ref.current,
-        cursor: {
-          start: input_ref.current.selectionStart,
-          end: input_ref.current.selectionEnd,
-        },
+        cursor: get_current_cursor(input_ref.current),
       },
       changed.length === 1 && changed[0] === last_prop_changed.current
     );

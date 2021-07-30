@@ -145,8 +145,6 @@ export const useInsertSnippet = (
   max_length: number,
   input_ref: preact.RefObject<HTMLTextAreaElement>
 ) => {
-  const editor_settings = hooks.useContext(EDITOR_SETTINGS).value;
-  const insert_at_cursor = useValueRef(editor_settings.insert_at_cursor);
   const text_ref = useValueRef(text);
   const length_ref = useValueRef(max_length);
   const cursor_pos = hooks.useRef(-1);
@@ -158,26 +156,14 @@ export const useInsertSnippet = (
         input_ref.current.selectionStart = cursor_pos.current;
         input_ref.current.selectionEnd = cursor_pos.current;
       }
-      let new_text;
-      if (insert_at_cursor.current) {
-        const [new_text_, new_index] = insert_text_at_selection(
-          text_ref.current,
-          value,
-          length_ref.current,
-          input_ref
-        );
-        new_text = new_text_;
-        cursor_pos.current = new_index;
-      } else {
-        if (
-          value.startsWith(" ") &&
-          (!text_ref.current || text_ref.current.endsWith(" "))
-        ) {
-          value = value.slice(1);
-        }
-        new_text = `${text_ref.current}${value}`.slice(0, length_ref.current);
-        cursor_pos.current = new_text.length;
-      }
+      const [new_text, new_index] = insert_text_at_selection(
+        text_ref.current,
+        value,
+        length_ref.current,
+        input_ref
+      );
+      cursor_pos.current = new_index;
+
       if (flag === "end") {
         if (new_text === text_ref.current) {
           cursor_pos.current = -1;
