@@ -50,6 +50,7 @@ declare global {
       max_length: number;
       speed: boolean;
       bits: string;
+      pause_duration: number;
     }
 
     interface EditorHistory {

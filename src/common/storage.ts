@@ -60,6 +60,7 @@ const sample_state: TTS.AppState = {
     speed: false,
     bits: "",
     text: "Sample text",
+    pause_duration: 1,
   },
 };
 
