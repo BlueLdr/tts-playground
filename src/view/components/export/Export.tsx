@@ -74,7 +74,7 @@ export const ExportForm: Preact.FunctionComponent<{ dismiss: () => void }> = ({
   ) : (
     <Preact.Fragment>
       <div className="modal-body tts-export-export">
-        <div className="tts-export-export-form">
+        <div className="tts-export-export-form" data-help="export-details">
           <h4>What data would you like to export?</h4>
           <ul>
             <li>
@@ -133,7 +133,11 @@ export const ExportForm: Preact.FunctionComponent<{ dismiss: () => void }> = ({
         </div>
       </div>
       <div className="modal-footer tts-export-footer">
-        <button className="btn btn-negative" onClick={() => set_page(true)}>
+        <button
+          className="btn btn-negative"
+          onClick={() => set_page(true)}
+          data-help="import-export-reset"
+        >
           Reset Storage
         </button>
         <button className="btn btn-primary" onClick={dismiss}>

@@ -11,6 +11,7 @@ export const ImportExport: Preact.FunctionComponent = () => {
         className="header-button tts-export-button"
         onClick={() => set_open(true)}
         title="Import/Export"
+        data-help="import-export-overview"
       >
         <i className="fas fa-exchange-alt" />
         <i className="fas fa-file" />
