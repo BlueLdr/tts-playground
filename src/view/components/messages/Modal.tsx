@@ -1,12 +1,17 @@
 import * as Preact from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
-import { ClipboardButton, Modal, ModalHeader } from "~/view/components";
+import {
+  ClipboardButton,
+  ExportMessage,
+  Modal,
+  ModalHeader,
+} from "~/view/components";
 import { useMessageFullText, useStateIfMounted } from "~/view/utils";
 
 export const MessageModal: Preact.FunctionComponent<{
   message: TTS.Message;
   loadMessage: () => void;
-  updateMessage: (message: TTS.Message) => void;
+  updateMessage: (message: TTS.Message) => boolean;
   deleteMessage: () => void;
   dismiss: () => void;
   previewMessage: (text: string) => void;
@@ -80,12 +85,15 @@ export const MessageModal: Preact.FunctionComponent<{
       <button
         className="btn btn-large btn-primary"
         onClick={() => {
-          updateMessage({
-            name: value,
-            text: message.text,
-            options,
-          });
-          dismiss();
+          if (
+            updateMessage({
+              name: value,
+              text: message.text,
+              options,
+            })
+          ) {
+            dismiss();
+          }
         }}
         disabled={!value || value === name}
       >
@@ -143,18 +151,21 @@ export const MessageModalBase: Preact.FunctionComponent<{
         </div>
         <div className="tts-message-modal-preview">{text}</div>
         <div className="tts-message-modal-details">
-          <h4>Options</h4>
-          <div className="row">
-            <span>
-              Character Limit: <strong>{max_length}</strong>
-            </span>
-            <span>
-              Use Speed Modifier: <strong>{speed ? "Yes" : "No"}</strong>
-            </span>
-            <span>
-              Use Bits: <strong>{!!bits ? "Yes" : "No"}</strong>
-            </span>
+          <div className="tts-message-modal-options">
+            <h4>Options</h4>
+            <div className="row">
+              <span>
+                Character Limit: <strong>{max_length}</strong>
+              </span>
+              <span>
+                Use Speed Modifier: <strong>{speed ? "Yes" : "No"}</strong>
+              </span>
+              <span>
+                Use Bits: <strong>{!!bits ? "Yes" : "No"}</strong>
+              </span>
+            </div>
           </div>
+          <ExportMessage message={message} />
         </div>
       </div>
       <div className="modal-footer">{children}</div>

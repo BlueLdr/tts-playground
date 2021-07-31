@@ -202,7 +202,20 @@ export const ImportForm: Preact.FunctionComponent<{
           </div>
         </div>
         <div className="modal-footer">
-          <div />
+          <button
+            className="btn btn-large"
+            onClick={() => {
+              set_data(undefined);
+              set_messages_dupes_result(undefined);
+              set_messages_final_result(undefined);
+              set_snippets_dupes_result(undefined);
+              set_snippets_final_result(undefined);
+              set_step(0);
+              set_success(false);
+            }}
+          >
+            Import More
+          </button>
           <button className="btn btn-primary btn-large" onClick={dismiss}>
             Finish
           </button>

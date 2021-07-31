@@ -312,6 +312,12 @@ export const HELP_DATA = help_data_type({
     ),
   },
 
+  "snippet-export": {
+    key: "snippet-export",
+    name: "Export Snippet",
+    content: "Export a snippet to backup or share it with others.",
+  },
+
   /* ======================================
    * ============= MESSAGES ===============
      ====================================== */
@@ -335,6 +341,12 @@ export const HELP_DATA = help_data_type({
         </p>
       </Preact.Fragment>
     ),
+  },
+
+  "messages-export": {
+    key: "messages-export",
+    name: "Export Message",
+    content: "Export a message to backup or share it with others.",
   },
 
   /* ======================================

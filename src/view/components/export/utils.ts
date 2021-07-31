@@ -31,12 +31,14 @@ export const export_snippets = (
   return data.map(s => ({
     ...conform_to_schema({ ...s, data: [] }, SNIPPET_SECTION_SCHEMA),
     __type: "snippets-section" as const,
-    data: s.data.map(sn => ({
-      ...conform_to_schema(sn, SNIPPET_SCHEMA),
-      __type: "snippet" as const,
-    })),
+    data: s.data.map(sn => export_snippet(sn)),
   }));
 };
+
+export const export_snippet = (data: TTS.Snippet) => ({
+  ...conform_to_schema(data, SNIPPET_SCHEMA),
+  __type: "snippet" as const,
+});
 
 export const generate_file = (data: object) => JSON.stringify(data, null, "  ");
 

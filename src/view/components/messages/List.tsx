@@ -13,7 +13,7 @@ import {
 } from "~/view/utils";
 
 export const MessagesList: Preact.FunctionComponent<{
-  updateMessages: (index: number, message?: TTS.Message) => void;
+  updateMessages: (index: number, message?: TTS.Message) => boolean;
 }> = ({ updateMessages }) => {
   const messages = useContext(MESSAGES).value;
   const [loaded_index, set_loaded_index] = useContextState(LOADED_MESSAGE);

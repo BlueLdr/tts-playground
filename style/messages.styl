@@ -30,10 +30,20 @@
       word-wrap break-word
 
     &-details
+      display flex
+      justify-content space-between
+      align-items flex-end
       .row
         color $Gray216
         strong
           color $Gray248
+      > .btn
+        flex 0 0 7rem
+        padding 1rem 0
+        i
+          margin-right 0.625rem
+    &-options
+      flex 1 1 100%
 
     .modal-footer
       .btn,
