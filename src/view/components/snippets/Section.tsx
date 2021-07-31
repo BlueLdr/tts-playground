@@ -82,6 +82,7 @@ export const SnippetsSection: Preact.FunctionComponent<{
             updateRow={value => update_row(edit_target, value)}
             onClickDelete={() => update_row(edit_target)}
             dismiss={() => set_edit_target(undefined)}
+            isNew={edit_target === section.data?.length}
           />
         )}
     </div>

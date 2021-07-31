@@ -1,6 +1,11 @@
 import * as Preact from "preact";
 import { useEffect, useRef } from "preact/hooks";
-import { AudioPlayer, Modal, ModalHeader } from "~/view/components";
+import {
+  AudioPlayer,
+  ExportSnippet,
+  Modal,
+  ModalHeader,
+} from "~/view/components";
 import { usePlaySnippet, useStateIfMounted } from "~/view/utils";
 
 const SNIPPETS_EDIT_MODAL_REQUEST: TTS.TTSRequest = {
@@ -13,7 +18,8 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
   updateRow: (row: TTS.Snippet) => void;
   onClickDelete: () => void;
   dismiss: () => void;
-}> = ({ row = {}, updateRow, dismiss }) => {
+  isNew?: boolean;
+}> = ({ row = {}, updateRow, dismiss, isNew }) => {
   const [value, set_value] = useStateIfMounted(row.text ?? "");
   const [prefix, set_prefix] = useStateIfMounted(row.options?.prefix ?? "");
   const [suffix, set_suffix] = useStateIfMounted(row.options?.suffix ?? "");
@@ -158,6 +164,7 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
         <button className="btn" onClick={dismiss}>
           Cancel
         </button>
+        {!isNew && <ExportSnippet snippet={new_row} />}
         <button
           className="btn btn-primary"
           onClick={() => {

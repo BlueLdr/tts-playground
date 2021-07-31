@@ -1,4 +1,6 @@
 export * from "./Export";
+export * from "./ExportMessage";
+export * from "./ExportSnippet";
 export * from "./Import";
 export * from "./ImportDuplicateMessages";
 export * from "./ImportDuplicateSnippets";
