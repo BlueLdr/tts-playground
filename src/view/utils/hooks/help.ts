@@ -57,7 +57,7 @@ export const useHelpItem = (enabled: boolean) => {
           });
         }
       } else if (enabled_ref.current) {
-        set_key("not-found");
+        set_key(new_key);
       }
     },
     []

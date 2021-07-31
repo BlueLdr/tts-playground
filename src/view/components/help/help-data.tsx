@@ -1,6 +1,11 @@
 import * as Preact from "preact";
 import { PAUSE_CHAR_SPEED_MODIFIED, SPEED_CHAR } from "~/common";
-import { PauseSpeedDemo, OptimizeSampleDemo, SnippetAddDemo } from "./demos";
+import {
+  ReportMissingHelpLink,
+  PauseSpeedDemo,
+  OptimizeSampleDemo,
+  SnippetAddDemo,
+} from "./demos";
 
 /* for easy copy/paste
   {
@@ -38,8 +43,15 @@ export const HELP_DATA = help_data_type({
   "pause-add": {
     key: "pause-add",
     name: "Add Pause",
-    content:
-      "Add text to the message that will make the speaker pause for the specified amount of time.",
+    content: () => (
+      <Preact.Fragment>
+        Add text to the message that will make the speaker pause for the
+        specified amount of time.
+        <br />
+        Right-Click the Add Pause button to quickly add a pause using the
+        duration that was previously set.
+      </Preact.Fragment>
+    ),
   },
 
   "pause-speed": {
@@ -399,13 +411,16 @@ export const HELP_DATA = help_data_type({
   "not-found": {
     key: "not-found",
     name: "Not Found",
-    content: "Sorry! We don't have any information about that.",
-    /*content: () => {
-      return (<Preact.Fragment>
+    content: () => {
+      return (
+        <Preact.Fragment>
           <p>Sorry! We don't have any information about that.</p>
-        <p>Did we miss something? <a href="">Report this issue</a>.</p>
-        </Preact.Fragment>)
-      }*/
+          <p>
+            Did we miss something? <ReportMissingHelpLink />.
+          </p>
+        </Preact.Fragment>
+      );
+    },
   },
 
   /* ======================================

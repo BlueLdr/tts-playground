@@ -13,7 +13,7 @@ const options: EventListenerOptions = { capture: true };
 export const HelpButton: Preact.FunctionComponent = () => {
   const [enabled, set_enabled, enabled_ref] = useStateRef<boolean>(false);
   const [key, on_click_item, is_tutorial] = useHelpItem(enabled);
-  const item = HELP_DATA[key] ?? null;
+  const item = key ? HELP_DATA[key] || HELP_DATA["not-found"] : null;
 
   const click_listener = useCallback(e => {
     if (enabled_ref.current) {

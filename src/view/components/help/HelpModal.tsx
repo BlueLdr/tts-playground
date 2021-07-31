@@ -22,12 +22,10 @@ export const HelpModal: Preact.FunctionComponent<{ isTutorial: boolean }> = ({
       set_history([]);
       return;
     }
-    set_history(history_ref.current.concat(key_ref.current));
     if (HELP_DATA[new_key]) {
-      set_key(new_key);
-    } else {
-      set_key("not-found");
+      set_history(history_ref.current.concat(key_ref.current));
     }
+    set_key(new_key);
   }, []);
 
   const go_back = useCallback(() => {
@@ -61,10 +59,11 @@ export const HelpModal: Preact.FunctionComponent<{ isTutorial: boolean }> = ({
     [is_intro ? key : undefined]
   );
 
-  if (!key || !HELP_DATA[key]) {
+  if (!key) {
     return null;
   }
-  const item: TTS.HelpItem = HELP_DATA[key];
+
+  const item: TTS.HelpItem = HELP_DATA[key] || HELP_DATA["not-found"];
   const dismiss = () => set_key(null);
   const { name, content: Content } = item;
   const body =
