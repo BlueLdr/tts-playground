@@ -533,6 +533,78 @@ export const HELP_DATA = help_data_type({
   },
 
   /* ======================================
+   * =========== IMPORT/EXPORT ============
+     ====================================== */
+
+  "import-export-overview": {
+    key: "import-export-overview",
+    name: "Import/Export Data",
+    content: () => (
+      <Preact.Fragment>
+        <p>
+          Import and Export Messages, Snippets, and Settings to backup or share
+          with others.
+        </p>
+        <details>
+          <summary>Export Data</summary>
+          {HELP_DATA["export-details"].content()}
+        </details>
+        <details>
+          <summary>Import Data</summary>
+          {HELP_DATA["import-details"].content()}
+        </details>
+      </Preact.Fragment>
+    ),
+  },
+
+  "export-details": {
+    key: "export-details",
+    name: "Export Data",
+    content: () => (
+      <p>
+        Export data to backup or share with others. Select which data you wish
+        to include (Messages, Snippets, and Settings). The output will be a{" "}
+        <code>.json</code> file.
+      </p>
+    ),
+  },
+
+  "import-details": {
+    key: "import-details",
+    name: "Import Data",
+    content: () => (
+      <Preact.Fragment>
+        <p>
+          Import data that was exported from the app. You must provide a valid{" "}
+          <code>.json</code> file.
+        </p>
+        <p>
+          If there are conflicts during the import (e.g. two Messages with the
+          same name), you will be prompted to resolve them (e.g. by renaming one
+          of the Messages). Exact duplicates will automatically be discarded.
+        </p>
+      </Preact.Fragment>
+    ),
+  },
+
+  "import-export-reset": {
+    key: "import-export-reset",
+    name: "Reset Storage",
+    content: () => (
+      <Preact.Fragment>
+        <p>
+          Resetting storage will clear all saved messages, snippets, and
+          settings, and restore the default sample data. If there's anything you
+          might want to keep, you should export the data before resetting.
+        </p>
+        <p>
+          Note: <b>This operation is not reversible.</b>
+        </p>
+      </Preact.Fragment>
+    ),
+  },
+
+  /* ======================================
    * =============== OTHER ================
      ====================================== */
 

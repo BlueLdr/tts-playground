@@ -186,7 +186,7 @@ export const ImportForm: Preact.FunctionComponent<{
 
   if (!parsed_data) {
     return (
-      <div className="modal-body tts-import-file">
+      <div className="modal-body tts-import-file" data-help="import-details">
         <ImportFileInput onChange={set_data} />
       </div>
     );
