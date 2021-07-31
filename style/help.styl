@@ -42,6 +42,9 @@
     &:hover::after
       border-color rgba($statusBlue, 1)
 
+  .help-link
+    display block
+
 [data-help-intro-highlight="true"]
   position relative !important
   opacity 1 !important
@@ -101,6 +104,9 @@ button[data-tutorial] *
     pointer-events none
   &:disabled
     z-index 0
+
+.help-link
+  display none
 
 .help-modal
   .modal-title
@@ -183,6 +189,8 @@ button[data-tutorial] *
     right 1rem
     left unset
     transform translate(0,0)
+    &, .modal-body
+      width 30rem
 
   &-skip:not(:hover)
     color $LinkG

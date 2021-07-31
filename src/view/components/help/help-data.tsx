@@ -1,5 +1,9 @@
 import * as Preact from "preact";
-import { PAUSE_CHAR_SPEED_MODIFIED, SPEED_CHAR } from "~/common";
+import {
+  PAUSE_CHAR_SPEED_MODIFIED,
+  REPOSITORY_URL,
+  SPEED_CHAR,
+} from "~/common";
 import {
   ReportMissingHelpLink,
   PauseSpeedDemo,
@@ -396,6 +400,27 @@ export const HELP_DATA = help_data_type({
   /* ======================================
    * =============== OTHER ================
      ====================================== */
+
+  "help-docs": {
+    key: "help-docs",
+    name: "Read the TTS Guide",
+    content: () => (
+      <Preact.Fragment>
+        <p>
+          This guide will walk you through the basics of TTS manipulation,
+          including general inflection and pronunciation, speed modifiers, and
+          sound effects.
+        </p>
+        <a
+          href={`${REPOSITORY_URL}/blob/master/docs/guide.md`}
+          target="_blank"
+          className="btn btn-primary btn-large"
+        >
+          Read the TTS Guide
+        </a>
+      </Preact.Fragment>
+    ),
+  },
 
   "skip-tutorials": {
     key: "skip-tutorials",

@@ -130,6 +130,12 @@ const View: Preact.FunctionComponent = () => {
             <i className="fas fa-cog" />
           </button>
           <ImportExport />
+          <button className="help-link btn btn-primary" data-help="intro-start">
+            App Overview
+          </button>
+          <button className="help-link btn btn-primary" data-help="help-docs">
+            Read the TTS Guide
+          </button>
         </div>
       </div>
       <div className="tts-container">
