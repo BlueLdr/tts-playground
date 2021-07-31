@@ -164,17 +164,19 @@
       left -1px
       z-index 100
 
-    &-control-add,
+    &-controls-button
+      transition-property background-color, opacity, color
     &-controls-button
       opacity 0
-      transition-property background-color, opacity, color
+    &-control-add
+      opacity 0.2
 
     &-control-add
       padding 0 0.375rem
 
     .tts-col-snippets:focus-within &-control-add,
     .tts-col-snippets:hover &-control-add
-      opacity 0.2
+      opacity 0.5
 
     &:focus-within &-control-add,
     &:focus-within &-controls-button,

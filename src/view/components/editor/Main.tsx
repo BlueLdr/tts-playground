@@ -70,7 +70,7 @@ export const EditorMain: Preact.FunctionComponent<{
         <div>
           <label
             className="checkbox"
-            data-tutorial="speed-tutorial"
+            data-tutorial="speed-overview"
             data-help="speed-overview"
           >
             <input
