@@ -1,30 +1,40 @@
 import * as common from "~/common";
-import { OptimizeLevel, OptimizeTrigger } from "./types";
 
 const stored_state = common.get_stored_state();
 const initial_state: TTS.AppState = {
-  volume: stored_state?.volume ?? 1,
-  message: stored_state?.message ?? -1,
+  volume: stored_state?.volume ?? common.DEFAULT_STATE.volume,
+  message: stored_state?.message ?? common.DEFAULT_STATE.message,
   settings: {
-    trim_whitespace: stored_state?.settings?.trim_whitespace ?? false,
+    trim_whitespace:
+      stored_state?.settings?.trim_whitespace ??
+      common.DEFAULT_STATE.settings.trim_whitespace,
     optimize_words:
-      stored_state?.settings?.optimize_words ?? OptimizeTrigger.manual,
+      stored_state?.settings?.optimize_words ??
+      common.DEFAULT_STATE.settings.optimize_words,
     optimize_level:
-      stored_state?.settings?.optimize_level ?? OptimizeLevel.normal,
-    voice: stored_state?.settings?.voice ?? common.VOICE_NAMES[0],
+      stored_state?.settings?.optimize_level ??
+      common.DEFAULT_STATE.settings.optimize_level,
+    voice: stored_state?.settings?.voice ?? common.DEFAULT_STATE.settings.voice,
     bits_string:
-      stored_state?.settings?.bits_string ?? common.DEFAULT_BITS_STRING,
+      stored_state?.settings?.bits_string ??
+      common.DEFAULT_STATE.settings.bits_string,
     history_steps:
       stored_state?.settings?.history_steps ??
-      common.DEFAULT_HISTORY_STEPS_LIMIT,
-    skip_tutorials: stored_state?.settings?.skip_tutorials ?? false,
+      common.DEFAULT_STATE.settings.history_steps,
+    skip_tutorials:
+      stored_state?.settings?.skip_tutorials ??
+      common.DEFAULT_STATE.settings.skip_tutorials,
   },
   editor: {
-    text: stored_state?.editor?.text ?? "",
-    max_length: stored_state?.editor?.max_length ?? 255,
-    speed: stored_state?.editor?.speed ?? false,
-    bits: stored_state?.editor?.bits ?? "",
-    pause_duration: stored_state?.editor?.pause_duration ?? 1,
+    text: stored_state?.editor?.text ?? common.DEFAULT_STATE.editor.text,
+    max_length:
+      stored_state?.editor?.max_length ??
+      common.DEFAULT_STATE.editor.max_length,
+    speed: stored_state?.editor?.speed ?? common.DEFAULT_STATE.editor.speed,
+    bits: stored_state?.editor?.bits ?? common.DEFAULT_STATE.editor.bits,
+    pause_duration:
+      stored_state?.editor?.pause_duration ??
+      common.DEFAULT_STATE.editor.pause_duration,
   },
 };
 

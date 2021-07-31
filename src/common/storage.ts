@@ -39,11 +39,12 @@ export const get_stored_help = (): TTS.HelpCompletedMap =>
 export const set_stored_help = (value: TTS.HelpCompletedMap) =>
   localStorage.setItem("tts-help", JSON.stringify(value));
 
-export const reset_all_storage = () => {
+export const reset_all_storage = (clear_help?: boolean) => {
   if (confirm("Are you REALLY sure you wanna do this?")) {
     localStorage.setItem("tts-state", "");
     localStorage.setItem("tts-messages", "");
     localStorage.setItem("tts-snippets", "");
+    clear_help && localStorage.setItem("tts-help", "");
     window.location.reload();
   }
 };
