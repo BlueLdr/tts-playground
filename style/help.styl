@@ -128,11 +128,14 @@ button[data-tutorial] *
   .modal-body
     line-height 1.4375em
     width 40rem
+    font-weight 300
     > :first-child
       margin-top 0
     > :last-child
       margin-bottom 0
 
+    b
+      font-weight 600
     hr
       margin 1.25rem 0
 
@@ -167,21 +170,32 @@ button[data-tutorial] *
       display inline
       padding 0.125rem 0.25rem
 
-  &[data-item="optimize-full"],
-  &[data-item="optimize-settings"]
-    .modal-body
-      width 50rem
-
-  &[data-item="intro-start"] .modal-body
-    text-align center
-    h1
-      margin 1rem 1rem 3rem
-    p
-      margin 2rem
-  &[data-item="intro-editor"]
-    flex 0 1 28rem
-    min-width 18rem
-
+    summary
+      background-color $Gray96
+      border-bottom none
+      border-radius inherit
+      padding 0.75rem 1rem
+      margin 0 -1rem
+      cursor pointer
+    details
+      background-color $Gray64
+      border 1px solid $Gray128
+      border-bottom-width 0
+      padding 0 1rem
+      &:first-of-type
+        border-top-left-radius 4px
+        border-top-right-radius 4px
+      &:last-of-type
+        border-bottom-left-radius 4px
+        border-bottom-right-radius 4px
+        border-bottom-width 1px
+        &[open] summary
+          border-bottom-left-radius 0
+          border-bottom-right-radius 0
+      &[open]
+        padding-bottom 1rem
+        summary
+          border-bottom 1px solid $Gray128
 
   &[data-item="intro-help"]
     z-index 1000
@@ -219,6 +233,88 @@ button[data-tutorial] *
           opacity 1
         &-controls
           display none
+
+  &-snippet-text
+    width 100%
+    padding 3rem 0 4rem
+    display flex
+    justify-content center
+    align-items center
+    .snippet
+      &, & > *
+        font-size 1.25rem
+        position relative
+      &-space-before,
+      &-space-after
+        width 0.75rem
+      &-prefix,
+      &-suffix
+        opacity 1
+        > span
+          opacity 0.6
+    &-label
+      color $Gray248
+      font-size 1rem
+      font-weight 300
+      position absolute
+      opacity 1
+      white-space nowrap
+      &::after
+        content " "
+        background-color  $Gray176
+        width 1px
+        height 1.5rem
+        display block
+        position absolute
+
+    .snippet-prefix &-label
+    .snippet-text &-label
+    .snippet-suffix &-label
+      left 50%
+      transform translate(-50%, 0)
+      &:after
+        height 1.25rem
+        left 50%
+
+    .snippet-prefix &-label
+    .snippet-suffix &-label
+      bottom calc(100% + 1rem)
+
+    .snippet-space-before &-label
+    .snippet-space-after &-label
+      top calc(100% + 0.5rem)
+      &:after
+        top -0.375rem
+
+    .snippet-space-before &-label
+      right calc(100% + 1.717rem - 0.375rem)
+      &:after
+        left calc(100% + 1rem)
+        transform rotate(45deg)
+
+    .snippet-text &-label
+      top calc(100% + 0.75rem)
+      &:after
+        bottom calc(100% - 0.25rem)
+
+
+    .snippet-space-after &-label
+      left calc(100% + 1.717rem - 0.375rem)
+      &:after
+        right calc(100% + 1rem)
+        transform rotate(-45deg)
+
+  &-snippet-effects
+    width 100%
+    display flex
+    justify-content center
+    align-items center
+    .tts-snippets-modal
+      &-text
+        max-width 20rem
+      &-suffix input
+        border-top-right-radius 4px
+        border-bottom-right-radius 4px
 
   &-optimize-sample
     &-text

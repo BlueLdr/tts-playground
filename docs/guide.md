@@ -9,6 +9,8 @@ ___
 
 Adding certain characters at the end of the message will make the speech high-pitched and sped up, as if the speaker is panicking or excited.
 
+// speed varies based on # of chars
+
 #### Recent Discoveries
 // slow down: >=  
 // Amy - inverse

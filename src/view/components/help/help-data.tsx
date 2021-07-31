@@ -9,6 +9,8 @@ import {
   PauseSpeedDemo,
   OptimizeSampleDemo,
   SnippetAddDemo,
+  SnippetTextDemo,
+  SnippetEffectDemo,
 } from "./demos";
 
 /* for easy copy/paste
@@ -30,7 +32,7 @@ const HELP_COMMON = {
     "The Speed Modifier causes the speech to become higher-pitched and faster, as if the speaker is excited or panicking.",
   speed_enable: `Enabling "Speed Modifier" will fill the rest of the message up to the character limit with the speed modifier character.`,
   speed_brian:
-    "Brian is the only voice that works well with the speed modifier. Most other voices will have little to no change in pitch or speed.",
+    "Brian is the only voice that consistently works well with the speed modifier. Most other voices will have little to no change in pitch or speed.",
 };
 
 export const HELP_DATA = help_data_type({
@@ -124,11 +126,40 @@ export const HELP_DATA = help_data_type({
   /* ======================================
    * ============= SNIPPETS ===============
      ====================================== */
+
   "snippets-overview": {
     key: "snippets-overview",
     name: "Snippets",
-    content: "",
+    content: props => (
+      <Preact.Fragment>
+        <p>
+          Snippets are bits of text that can be easily inserted into your
+          message. Expand each section below to learn more.
+        </p>
+        <details>
+          <summary>The Parts of a Snippet</summary>
+          {HELP_DATA["snippet-text"].content(props)}
+        </details>
+        <details>
+          <summary>Snippet Groups</summary>
+          {HELP_DATA["snippets-group"].content()}
+        </details>
+        <details>
+          <summary>Inserting Snippets</summary>
+          {HELP_DATA["snippet-insert"].content()}
+        </details>
+        <details>
+          <summary>Snippet Actions</summary>
+          {HELP_DATA["snippet-actions"].content()}
+        </details>
+        <details>
+          <summary>Example: Creating Sound Effects</summary>
+          {HELP_DATA["snippet-effects"].content()}
+        </details>
+      </Preact.Fragment>
+    ),
   },
+
   "snippets-group": {
     key: "snippets-group",
     name: "Snippet Group",
@@ -140,11 +171,66 @@ export const HELP_DATA = help_data_type({
       </p>
     ),
   },
+
   "snippet-text": {
     key: "snippet-text",
     name: "Snippet Text",
-    content: "",
+    content: ({ goToHelp }) => (
+      <Preact.Fragment>
+        <p>
+          A snippet is made up of three parts: the prefix, the main text, and
+          the suffix.
+        </p>
+        <p>
+          The <b>prefix</b> is inserted at the beginning of the snippet, and is
+          not repeated. This allows you to start the snippet with a certain
+          character or string before the repeated main text. This is most
+          commonly used for{" "}
+          <button className="link" onClick={() => goToHelp("snippet-effects")}>
+            Creating Sound Effects
+          </button>
+          .
+        </p>
+        <p>
+          The <b>main text</b> is inserted in the middle of the snippet, and can
+          be repeated however many times you want. See the{" "}
+          <button className="link" onClick={() => goToHelp("snippet-insert")}>
+            Insert Snippet help section
+          </button>{" "}
+          to learn how to use this.
+        </p>
+        <p>
+          The <b>suffix</b> is inserted at the end of the snippet, and, like the
+          prefix, it is not repeated. This is particularly useful for
+          punctuation.
+        </p>
+        <p>
+          <b>Other options</b>
+        </p>
+        <ul>
+          <li>
+            <b>Space Before/After</b>: When these are enabled, the editor will
+            ensure that there is always a space before and/or after the snippet
+            when you insert it. Some snippets won't be spoken correctly when
+            they aren't separated from other words. Others will work fine.
+          </li>
+          <li>
+            <b>Default Repeat Count</b>: This sets the default number of times
+            the main text is repeated when you insert the snippet once. For
+            example, if the snippet below had a default repeat count of 3,
+            inserting it once would add the text <code>preMainMainMain?^</code>{" "}
+            to the message.
+          </li>
+        </ul>
+        <p>
+          Note that all parts of the snippet <b>except the Main Text</b> are
+          optional.
+        </p>
+        <SnippetTextDemo />
+      </Preact.Fragment>
+    ),
   },
+
   "snippet-insert": {
     key: "snippet-insert",
     name: "Insert Snippet",
@@ -169,6 +255,7 @@ export const HELP_DATA = help_data_type({
       </Preact.Fragment>
     ),
   },
+
   "snippet-actions": {
     key: "snippet-actions",
     name: "Snippet Actions",
@@ -203,9 +290,57 @@ export const HELP_DATA = help_data_type({
     ),
   },
 
+  "snippet-effects": {
+    key: "snippet-effects",
+    name: "Snippet Example: Creating Sound Effects",
+    content: () => (
+      <Preact.Fragment>
+        <p>
+          Most TTS voices will make sound effects when you repeat a sequence of
+          characters. For example, <code>yPXPXPXPXPX</code>
+          will sound like a sprinkler or spray bottle. However, repeating the
+          characters <code>PX</code> alone will simply be pronounced as "pee
+          ecks". Starting the sequence with a vowel will cause the speech engine
+          to pronounce it as a word rather than letters.
+        </p>
+        <p>
+          So if we want to create a snippet for this sound, it would look
+          something like this.
+        </p>
+        <SnippetEffectDemo />
+      </Preact.Fragment>
+    ),
+  },
+
+  /* ======================================
+   * ============= MESSAGES ===============
+     ====================================== */
+
+  "messages-overview": {
+    key: "messages-overview",
+    name: "Messages",
+    content: () => (
+      <Preact.Fragment>
+        <h4>View and load your saved Messages.</h4>
+        <p>Key Features:</p>
+        <ul>
+          <li>Copy Message text straight to the clipboard</li>
+          <li>Load saved Messages into the editor.</li>
+          <li>Rename or delete saved Messages.</li>
+        </ul>
+        <p>
+          Note: If you load a Message into the editor and modify it, you will
+          have the option to either save changes to the existing Message or save
+          it as a new Message.
+        </p>
+      </Preact.Fragment>
+    ),
+  },
+
   /* ======================================
    * =========== OPTIMIZATION =============
      ====================================== */
+
   "optimize-full": {
     key: "optimize-full",
     name: "Message Optimization",
@@ -226,6 +361,7 @@ export const HELP_DATA = help_data_type({
       </Preact.Fragment>
     ),
   },
+
   "optimize-settings": {
     key: "optimize-settings",
     name: "Message Optimization: Settings",
@@ -292,6 +428,7 @@ export const HELP_DATA = help_data_type({
       </Preact.Fragment>
     ),
   },
+
   "optimize-manual": {
     key: "optimize-manual",
     name: "Manually Trigger Optimization",
@@ -316,14 +453,9 @@ export const HELP_DATA = help_data_type({
   /* ======================================
    * =============== SPEED ================
      ====================================== */
+
   "speed-overview": {
     key: "speed-overview",
-    name: "Speed Modifier",
-    content: "",
-  },
-
-  "speed-tutorial": {
-    key: "speed-tutorial",
     name: "Speed Modifier",
     tutorial: true,
     content: () => (
@@ -350,6 +482,7 @@ export const HELP_DATA = help_data_type({
   /* ======================================
    * ============== SETTINGS ==============
      ====================================== */
+
   "tutorials-help": {
     key: "tutorials-help",
     name: "Feature Tutorials",
@@ -363,6 +496,7 @@ export const HELP_DATA = help_data_type({
       </p>
     ),
   },
+
   "bits-default": {
     key: "bits-default",
     name: "Default Bits String",
@@ -380,6 +514,7 @@ export const HELP_DATA = help_data_type({
       </Preact.Fragment>
     ),
   },
+
   "history-steps": {
     key: "history-steps",
     name: "Maximum Undo/Redo Steps",
@@ -451,6 +586,7 @@ export const HELP_DATA = help_data_type({
   /* ======================================
    * =============== INTRO ================
      ====================================== */
+
   "intro-start": {
     key: "intro-start",
     name: "",
@@ -461,6 +597,7 @@ export const HELP_DATA = help_data_type({
       </Preact.Fragment>
     ),
   },
+
   "intro-editor": {
     key: "intro-editor",
     name: "Editor",
@@ -477,6 +614,7 @@ export const HELP_DATA = help_data_type({
       </Preact.Fragment>
     ),
   },
+
   "intro-messages": {
     key: "intro-messages",
     name: "Messages",
@@ -491,6 +629,7 @@ export const HELP_DATA = help_data_type({
       </Preact.Fragment>
     ),
   },
+
   "intro-snippets": {
     key: "intro-snippets",
     name: "Snippets",
@@ -515,6 +654,7 @@ export const HELP_DATA = help_data_type({
       </Preact.Fragment>
     ),
   },
+
   "intro-help": {
     key: "intro-help",
     name: "Help Button",
@@ -523,7 +663,7 @@ export const HELP_DATA = help_data_type({
         <p>If you're not sure how something works:</p>
         <ol>
           <li>Click the Help button in the top right corner.</li>
-          <li>Click on the thing you want to learn more about.</li>
+          <li>Click the item on the page that you want to learn about.</li>
           <li>Read the information provided in the help popup.</li>
         </ol>
       </Preact.Fragment>
