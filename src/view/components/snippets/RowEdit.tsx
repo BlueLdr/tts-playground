@@ -64,7 +64,6 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
           >
             <span>Prefix</span>
             <input
-              ref={input_ref}
               value={prefix}
               onInput={e => set_prefix((e.target as HTMLInputElement).value)}
             />
@@ -83,7 +82,6 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
           >
             <span>Suffix</span>
             <input
-              ref={input_ref}
               value={suffix}
               onInput={e => set_suffix((e.target as HTMLInputElement).value)}
             />
