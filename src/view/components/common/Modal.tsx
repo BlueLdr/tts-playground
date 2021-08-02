@@ -1,6 +1,12 @@
 import * as Preact from "preact";
-import { useCallback, useEffect, useMemo } from "preact/hooks";
-import { maybeClassName } from "~/view/utils";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from "preact/hooks";
+import { getFirstFocusable, maybeClassName } from "~/view/utils";
 
 export const Modal: Preact.FunctionComponent<
   {
@@ -17,6 +23,25 @@ export const Modal: Preact.FunctionComponent<
   backdropData,
   ...props
 }) => {
+  const modal_ref = useRef<HTMLDivElement>();
+  const mounted = useRef(false);
+  const on_focus = useCallback(e => {
+    if (mounted.current && !modal_ref.current?.contains(e.target)) {
+      e.stopPropagation();
+      getFirstFocusable(modal_ref.current)?.focus();
+    }
+  }, []);
+
+  useLayoutEffect(() => {
+    mounted.current = true;
+    getFirstFocusable(modal_ref.current)?.focus();
+    window.addEventListener("focus", on_focus, { capture: true });
+    return () => {
+      window.removeEventListener("focus", on_focus, { capture: true });
+      mounted.current = false;
+    };
+  }, []);
+
   const listener = useCallback(e => {
     if (e.key === "Escape") {
       e.stopPropagation();
@@ -54,6 +79,7 @@ export const Modal: Preact.FunctionComponent<
     >
       <div
         id={id}
+        ref={modal_ref}
         className={`modal${maybeClassName(className)}`}
         onClick={e => {
           e.stopPropagation();

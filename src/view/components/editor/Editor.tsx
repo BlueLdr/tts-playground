@@ -54,8 +54,8 @@ export const Editor: Preact.FunctionComponent<{
 
   const get_current_cursor = useCallback(
     () => ({
-      start: input_ref.current.selectionStart,
-      end: input_ref.current.selectionEnd,
+      start: input_ref.current?.selectionStart ?? -1,
+      end: input_ref.current?.selectionEnd ?? -1,
     }),
     []
   );
