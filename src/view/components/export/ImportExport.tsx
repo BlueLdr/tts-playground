@@ -13,8 +13,7 @@ export const ImportExport: Preact.FunctionComponent = () => {
         title="Import/Export"
         data-help="import-export-overview"
       >
-        <i className="fas fa-exchange-alt" />
-        <i className="fas fa-file" />
+        <i className="fas fa-share-square" />
       </button>
       {open && useModal(<ImportExportModal dismiss={() => set_open(false)} />)}
     </Preact.Fragment>

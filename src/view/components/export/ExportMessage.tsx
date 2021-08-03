@@ -7,7 +7,7 @@ export const ExportMessage: Preact.FunctionComponent<{ message: TTS.Message }> =
     const filename = useMemo(
       () =>
         `tts-message-${message.name
-          .split(" ")
+          ?.split(" ")
           .map(p =>
             p.length > 0
               ? `${p[0].toUpperCase()}${p.slice(1).toLowerCase()}`
