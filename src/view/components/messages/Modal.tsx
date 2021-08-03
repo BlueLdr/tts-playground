@@ -165,7 +165,7 @@ export const MessageModalBase: Preact.FunctionComponent<{
               </span>
             </div>
           </div>
-          <ExportMessage message={message} />
+          {!isNew && <ExportMessage message={message} />}
         </div>
       </div>
       <div className="modal-footer">{children}</div>
