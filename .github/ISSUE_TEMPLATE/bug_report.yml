@@ -1,5 +1,5 @@
-name: 🐞 Bug
-description: File a bug/issue
+name: Bug Report (Form)
+description: Fill out the form to report a bug
 title: "[BUG] <title>"
 labels: [bug]
 body:
