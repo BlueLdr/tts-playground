@@ -27,7 +27,7 @@ body:
     validations:
       required: false
   - type: dropdown
-    id: browsers
+    id: os
     attributes:
       label: What OS are you using?
       multiple: true
