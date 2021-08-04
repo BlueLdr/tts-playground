@@ -3,6 +3,7 @@ export * from "./context";
 export * from "./common";
 export * from "./editor";
 export * from "./export";
+export * from "./Footer";
 export * from "./help";
 export * from "./messages";
 export * from "./settings";
