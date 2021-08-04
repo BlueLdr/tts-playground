@@ -330,25 +330,25 @@ export const OPTIMIZE_TESTS = [
 ];
 
 const all_message =
-  "  one guy two guy three four five guy six guy  and seven guy, eight   guy nine guy ten guy for guy, before you go, make sure you don't speak too quick alright? goodnight. forget about it. we make big cookie for to bring customer back. foursome at the forefront. who would've thought?  reeeeaaaiiiiiiuiiiiglloooooyyyyy  ";
+  "  one guy two guy three four five guy six guy  and seven guy, eight   guy nine guy ten guy for guy, before you go, make sure you don't speak too quick alright? goodnight!  forget about it. we make big cookie for to bring customer back. foursome at the forefront. they've gotta go?  reeeeaaaiiiiiiuiiiiglloooooyyyyy  ";
 
 export const OPTIMIZE_LEVEL_TESTS = [
   {
     input: all_message,
     level: "safe",
     output:
-      "1 guy 2 guy 3 4 5 guy 6 guy & 7 guy,8 guy 9 guy 10 guy for guy,before you go,make sure you don't speak 2 quick alrite? goodnite. forget about it. we make big cookie for to bring customer back. foursome at the forefront. who would've thought? reeaaiiuiigllooyy",
+      "1guy2guy3 4 5guy6guy&7guy,8guy9guy10guy for guy,before you go,make sure you don't speak2quick alrite?goodnite!forget about it. we make big cookie for to bring customer back. foursome at the forefront. they've gotta go?reeaaiiuiigllooyy",
   },
   {
     input: all_message,
     level: "normal",
     output:
-      "1 guy 2 guy 3 4 5 guy 6 guy & 7 guy,8 guy 9 guy 10 guy for guy,before u go,make sure u don't speak 2 quick alrite? goodnite. forget about it. we make big cookie for to bring customer back. foursome at the forefront. who would've thought? reeaaiiuiigllooyy",
+      "1guy2guy3 4 5guy6guy&7guy,8guy9guy10guy for guy,before u go,make sure u don't speak2quick alrite?goodnite!forget about it. we make big cookie for to bring customer back. foursome at the forefront. theyve gotta go?reeaaiiuiigllooyy",
   },
   {
     input: all_message,
     level: "max",
     output:
-      "1 guy 2 guy 3 4 5 guy 6 guy & 7 guy,8 guy 9 guy 10 guy 4 guy,be4 u go,make sure u don't speak 2 quick alrite? goodnite. 4get about it. we make big cookie 4 2 bring customer back. 4some at the 4front. who wouldve thought? reeaaiiuiigllooyy",
+      "1guy2guy3 4 5guy6guy&7guy,8guy9guy10guy4guy,be4u go,make sure u don't speak2quick alrite?goodnite! 4get about it. we make big cookie4 2bring customer back. 4some at the4front. theyve gotta go?reeaaiiuiigllooyy",
   },
 ];
