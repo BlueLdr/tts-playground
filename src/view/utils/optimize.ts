@@ -23,6 +23,7 @@ const PLAIN_TRANSFORMS = {
   [OptimizeLevel.normal]: {
     are: "r",
     you: "u",
+    why: "y",
   },
   [OptimizeLevel.max]: {
     for: "4",
@@ -44,7 +45,12 @@ const TRANSFORMS: { [K in OptimizeLevel]: TextTransform[] } = {
         v.replace(new RegExp("([aeiouy])(\\1){2,}", "gi"), "$1$1"),
     },
   ],
-  [OptimizeLevel.normal]: [],
+  [OptimizeLevel.normal]: [
+    {
+      match: v => /[aeiouy]'ve\b/i.test(v),
+      transform: v => v.replace(/'ve\b/i, "ve"),
+    },
+  ],
   [OptimizeLevel.max]: [
     {
       match: v => /fore?$/i.test(v),
@@ -58,11 +64,38 @@ const TRANSFORMS: { [K in OptimizeLevel]: TextTransform[] } = {
       match: v => /^fou?r\w*/i.test(v),
       transform: v => v.replace(/^fou?r/i, "4"),
     },
-    {
-      match: v => /'ve\b/i.test(v),
-      transform: v => v.replace(/'ve\b/i, "ve"),
-    },
   ],
+};
+
+const SAFE_WHITESPACE_TRANSFORMS = [
+  {
+    before: /[ &,]/i,
+    after: /[ a-z0-9]/i,
+    reversible: true,
+  },
+  {
+    before: /[ a-z]/i,
+    after: /[ 0-9]/i,
+    reversible: true,
+  },
+  {
+    before: /[?!]/,
+    after: /[ a-z]/i,
+  },
+];
+
+const space_can_be_removed = (prev_char: string, next_char: string) => {
+  // prevent forming urls, which will be removed in speech
+  if (prev_char === ".") {
+    return false;
+  }
+  return SAFE_WHITESPACE_TRANSFORMS.some(
+    t =>
+      (t.before.test(prev_char) && t.after.test(next_char)) ||
+      (!t.reversible
+        ? false
+        : t.before.test(next_char) && t.after.test(prev_char))
+  );
 };
 
 const optimize_word = (
@@ -180,12 +213,7 @@ export const optimize_whitespace = (
     } else {
       const prev_char = output.slice(-1);
       const next_char = input[i + 1];
-      if (
-        prev_char !== " " &&
-        prev_char !== "," &&
-        next_char !== " " &&
-        next_char !== ","
-      ) {
+      if (!space_can_be_removed(prev_char, next_char)) {
         output += char;
       }
     }
