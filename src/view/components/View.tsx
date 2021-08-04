@@ -21,6 +21,7 @@ import {
   Snippets,
   SettingsModal,
   HelpButton,
+  Footer,
 } from "~/view/components";
 import {
   useContextState,
@@ -148,6 +149,7 @@ const View: Preact.FunctionComponent = () => {
           </div>
           <div className="tts-col tts-col-main">
             <Editor message={loaded_message} updateMessages={update_messages} />
+            <Footer />
           </div>
           <div className="tts-col tts-col-snippets">
             <div
