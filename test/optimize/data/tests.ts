@@ -329,6 +329,29 @@ export const OPTIMIZE_TESTS = [
   },
 ];
 
+export const SELECTION_TESTS = [
+  {
+    input: "  you | a|re   not right    ",
+    output: "  you |a|re   not right    ",
+  },
+  {
+    input: "  you,| a|re   not right    ",
+    output: "  you,|a|re   not right    ",
+  },
+  {
+    input: "  you | are |  not right    ",
+    output: "  you |r|  not right    ",
+  },
+  {
+    input: "  you  |are   not right |   ",
+    output: "  you  |r not rite|   ",
+  },
+  {
+    input: "Do not send| this message to the |streamer.",
+    output: "Do not send| this message2the |streamer.",
+  },
+];
+
 const all_message =
   "  one guy two guy three four five guy six guy  and seven guy, eight   guy nine guy ten guy for guy, before you go, make sure you don't speak too quick alright? goodnight!  forget about it. we make big cookie for to bring customer back. foursome at the forefront. they've gotta go?  reeeeaaaiiiiiiuiiiiglloooooyyyyy  ";
 

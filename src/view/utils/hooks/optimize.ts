@@ -88,6 +88,7 @@ export const useOptimizeMessage = (
       window.removeEventListener("optimize-message", optimize_message_listener);
   }, []);
 };
+
 export const useOptimizeMessageTrigger = (
   input_ref: preact.RefObject<HTMLTextAreaElement>,
   callback_pre?: TTS.OptimizeCallback,
@@ -101,7 +102,7 @@ export const useOptimizeMessageTrigger = (
   );
 
   const cb = hooks.useCallback(
-    (trigger: OptimizeTrigger) => {
+    (trigger: OptimizeTrigger, refocus_target?: HTMLElement) => {
       callback_pre?.(
         state_ref.current.text,
         input_ref.current?.selectionStart,
@@ -115,6 +116,9 @@ export const useOptimizeMessageTrigger = (
           input_ref.current?.selectionEnd,
           trigger
         );
+        if (trigger === OptimizeTrigger.manual) {
+          refocus_target?.focus();
+        }
         return;
       }
       const evt: TTS.OptimizeEvent = new CustomEvent("optimize-message", {
@@ -122,7 +126,12 @@ export const useOptimizeMessageTrigger = (
         detail: {
           trigger,
           input: input_ref,
-          callback: callback_post,
+          callback: (...args: Parameters<TTS.OptimizeCallback>) => {
+            callback_post(...args);
+            if (trigger === OptimizeTrigger.manual) {
+              refocus_target?.focus();
+            }
+          },
         },
       });
       input_ref.current?.dispatchEvent(evt);

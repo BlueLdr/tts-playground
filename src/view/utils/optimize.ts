@@ -173,7 +173,10 @@ export const optimize_whitespace = (
   const { trim_whitespace } = settings;
   let { selectionStart = -1, selectionEnd = -1 } = input_ref.current || {};
   const ignore_cursor = trigger <= OptimizeTrigger.blur;
-  if (!trim_whitespace || selectionStart !== selectionEnd) {
+  if (
+    !trim_whitespace ||
+    (selectionStart !== selectionEnd && trigger !== OptimizeTrigger.manual)
+  ) {
     return [text, selectionStart, selectionEnd] as const;
   }
   let cursor_initial = selectionStart;
@@ -238,7 +241,10 @@ export const optimize_message_words = (
   let { selectionStart = -1, selectionEnd = -1 } = input_ref.current || {};
   const ignore_cursor = trigger <= OptimizeTrigger.blur;
   const should_optimize_words = trigger <= optimize_words;
-  if (!should_optimize_words || selectionStart !== selectionEnd) {
+  if (
+    !should_optimize_words ||
+    (selectionStart !== selectionEnd && trigger !== OptimizeTrigger.manual)
+  ) {
     return [text, selectionStart, selectionEnd] as const;
   }
 
@@ -349,21 +355,75 @@ export const optimize_message_words = (
   return [output, cursor_final, cursor_final] as const;
 };
 
+export const optimize_selection = (
+  text: string,
+  input_ref: preact.RefObject<HTMLTextAreaElement>,
+  trigger: OptimizeTrigger,
+  settings: TTS.EditorSettings
+): readonly [string, number, number] => {
+  let { selectionStart = -1, selectionEnd = -1 } = input_ref.current || {};
+  const text_before = text.slice(0, selectionStart);
+  const input = text.slice(selectionStart, selectionEnd - 1);
+  const text_after = text.slice(selectionEnd - 1);
+
+  const [text_trimmed] = optimize_message_words(
+    input,
+    {
+      current: {
+        ...input_ref.current,
+        selectionStart: 0,
+        selectionEnd: input.length,
+      },
+    },
+    trigger,
+    settings
+  );
+  const [output] = optimize_whitespace(
+    text_trimmed,
+    {
+      current: {
+        ...input_ref.current,
+        selectionStart: 0,
+        selectionEnd: text_trimmed.length,
+      },
+    },
+    trigger,
+    settings
+  );
+  const space_before =
+    input.startsWith(" ") &&
+    (text_before.length === 0 ||
+      !space_can_be_removed(text_before.slice(-1), input[1]));
+  const space_after =
+    input.endsWith(" ") &&
+    (text_after.length === 0 ||
+      !space_can_be_removed(input.slice(-2, -1), text_after[0]));
+
+  const output_ = `${text_before}${space_before ? " " : ""}${output}${
+    space_after ? " " : ""
+  }`;
+  return [`${output_}${text_after}`, selectionStart, output_.length + 1];
+};
+
 export const optimize_message = (
   text: string,
   input_ref: preact.RefObject<HTMLTextAreaElement>,
   trigger: OptimizeTrigger,
   settings: TTS.EditorSettings
-) => {
+): readonly [string, number, number] => {
   const { optimize_words, trim_whitespace } = settings;
   let { selectionStart = -1, selectionEnd = -1 } = input_ref.current || {};
   const should_optimize_words = trigger <= optimize_words;
   if (
     (!trim_whitespace && should_optimize_words) ||
     !text ||
-    selectionStart !== selectionEnd
+    (selectionStart !== selectionEnd && trigger !== OptimizeTrigger.manual)
   ) {
     return [text, selectionStart, selectionEnd] as const;
+  }
+
+  if (selectionStart !== selectionEnd) {
+    return optimize_selection(text, input_ref, trigger, settings);
   }
 
   let [text_trimmed, cursor_start, cursor_end] = optimize_message_words(

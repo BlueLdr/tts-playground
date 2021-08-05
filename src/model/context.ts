@@ -65,7 +65,7 @@ export const ADD_SNIPPET_CALLBACK = createNamedContext<
 >(() => {}, "ADD_SNIPPET_CALLBACK");
 
 export const OPTIMIZE_MESSAGE_CALLBACK = createNamedContext<
-  (trigger: OptimizeTrigger) => void
+  (trigger: OptimizeTrigger, refocus?: HTMLElement) => void
 >(() => {}, "OPTIMIZE_MESSAGE_CALLBACK");
 
 export const EDITOR_SETTINGS = createNamedContext<TTS.EditorSettings>(
