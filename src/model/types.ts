@@ -105,6 +105,7 @@ declare global {
       trigger: OptimizeTrigger;
       input: preact.RefObject<HTMLTextAreaElement>;
       callback?: OptimizeCallback;
+      refocus_target?: HTMLElement;
     }>;
 
     interface AppState {

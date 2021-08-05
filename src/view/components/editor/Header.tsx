@@ -1,5 +1,5 @@
 import * as Preact from "preact";
-import { useCallback, useContext, useEffect } from "preact/hooks";
+import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 import { VOICE_NAMES } from "~/common";
 import {
   EDITOR_SETTINGS,
@@ -33,6 +33,7 @@ export const EditorHeader: Preact.FunctionComponent<{
       }),
     []
   );
+  const refocus_target = useRef<HTMLElement | null>();
 
   const [value, set_value] = useStateIfMounted(maxLength);
   const [set_max_length] = useDebounce(setMaxLength, 75);
@@ -112,7 +113,12 @@ export const EditorHeader: Preact.FunctionComponent<{
           >
             <button
               className="btn btn-large"
-              onClick={() => optimize_message(OptimizeTrigger.manual)}
+              onFocus={e => {
+                refocus_target.current = e.relatedTarget as HTMLElement;
+              }}
+              onClick={() =>
+                optimize_message(OptimizeTrigger.manual, refocus_target.current)
+              }
               data-help="optimize-manual"
             >
               Optimize Message
