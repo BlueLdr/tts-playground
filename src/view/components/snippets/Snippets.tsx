@@ -95,7 +95,7 @@ export const Snippets: Preact.FunctionComponent = () => {
       {edit_target != null &&
         useModal(
           <SnippetsSectionModal
-            name={snippets[edit_target]?.name}
+            section={snippets[edit_target]}
             setName={on_finish_edit}
             dismiss={() => set_edit_target(undefined)}
             deleteSection={on_delete_section}

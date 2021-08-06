@@ -40,6 +40,12 @@ export const export_snippet = (data: TTS.Snippet) => ({
   __type: "snippet" as const,
 });
 
+export const export_snippets_section = (data: TTS.SnippetsSection) => ({
+  ...conform_to_schema({ ...data, data: [] }, SNIPPET_SECTION_SCHEMA),
+  __type: "snippets-section" as const,
+  data: data.data.map(sn => export_snippet(sn)),
+});
+
 export const generate_file = (data: object) => JSON.stringify(data, null, "  ");
 
 export const is_duplicate_message = (a: TTS.Message, b: TTS.Message) =>

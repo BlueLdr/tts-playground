@@ -2,14 +2,16 @@ import * as Preact from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
 import { do_confirm } from "~/common";
 import { Modal, ModalHeader } from "~/view/components";
+import { ExportSnippetsSection } from "~/view/components/export/ExportSnippetSection";
 import { useStateIfMounted } from "~/view/utils";
 
 export const SnippetsSectionModal: Preact.FunctionComponent<{
-  name: string;
+  section: TTS.SnippetsSection;
   setName: (value: string) => void;
   deleteSection: () => void;
   dismiss: () => void;
-}> = ({ name, setName, deleteSection, dismiss }) => {
+}> = ({ section, setName, deleteSection, dismiss }) => {
+  const { name } = section;
   const input_ref = useRef<HTMLInputElement>();
   const [value, set_value] = useStateIfMounted(name);
   const on_click_delete = useCallback(() => {
@@ -52,6 +54,7 @@ export const SnippetsSectionModal: Preact.FunctionComponent<{
         <button className="btn" onClick={dismiss}>
           Cancel
         </button>
+        <ExportSnippetsSection section={section} />
         <button
           className="btn btn-primary"
           onClick={() => {
