@@ -5,9 +5,9 @@
   "repository": "https://www.github.com/BlueLdr/tts-playground",
   "main": "src",
   "scripts": {
-    "start": "parcel -p 8080 src/index.html",
+    "start": "./scripts/start.sh",
     "dev": "npm start",
-    "build": "parcel build src/index.html",
+    "build": "./scripts/build.sh",
     "format": "./scripts/format.sh",
     "format:validate": "./scripts/format.sh list-different",
     "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' ava",
