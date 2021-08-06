@@ -120,3 +120,49 @@ export const deep_equals = (
   }
   return a === b;
 };
+
+export const do_alert = (...args) => {
+  const focused = document.activeElement;
+  alert(...args);
+  if (focused instanceof HTMLElement) {
+    focused?.focus();
+  }
+};
+
+export const do_confirm = (...args) => {
+  const focused = document.activeElement;
+  const result = confirm(...args);
+  if (focused instanceof HTMLElement) {
+    focused?.focus();
+  }
+  return result;
+};
+
+export const random_hex_str = (length: number) => {
+  if (length <= 0) {
+    return "";
+  }
+  const multiple = Math.pow(10, length * 2);
+  const min = parseInt("f".repeat(length - 1), 16);
+
+  let num;
+  while ((num = Math.round(Math.random() * multiple)) <= min) {}
+
+  return num.toString(16).slice(-length);
+};
+
+export const generate_id = (base: string) => {
+  const d = Date.now().toString(16);
+  const r = random_hex_str(16 - d.length);
+  const rd = `${r.slice(0, Math.round(r.length / 2))}${d}${r.slice(
+    Math.round(r.length / 2)
+  )}`.split("");
+  const n = base.split("").map(c => (c.charCodeAt(0) % 16).toString(16));
+  if (n.length < 16) {
+    n.push(...random_hex_str(16 - n.length).split(""));
+  }
+  return n
+    .slice(0, 16)
+    .map((c, i) => `${rd[i]}${c}`)
+    .join("");
+};

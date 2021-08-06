@@ -16,7 +16,6 @@ export const HelpModal: Preact.FunctionComponent<{ isTutorial: boolean }> = ({
   const key_ref = useValueRef(key);
 
   const go_to_help = useCallback((new_key: HelpDataKey | null) => {
-    console.log(`new_key: `, new_key);
     if (new_key === null) {
       set_key(null);
       set_history([]);

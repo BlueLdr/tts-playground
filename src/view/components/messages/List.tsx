@@ -1,5 +1,5 @@
 import * as Preact from "preact";
-import { useContext } from "preact/hooks";
+import { useContext, useMemo } from "preact/hooks";
 import { LOADED_MESSAGE, MESSAGES } from "~/model";
 import { AudioPlayer } from "~/view/components";
 import { MessageModal } from "~/view/components/messages/Modal";
@@ -13,13 +13,18 @@ import {
 } from "~/view/utils";
 
 export const MessagesList: Preact.FunctionComponent<{
-  updateMessages: (index: number, message?: TTS.Message) => boolean;
+  updateMessages: (index: string | null, message?: TTS.Message) => boolean;
 }> = ({ updateMessages }) => {
   const messages = useContext(MESSAGES).value;
-  const [loaded_index, set_loaded_index] = useContextState(LOADED_MESSAGE);
-  const [edit_target, set_edit_target] = useStateIfMounted(undefined);
+  const [loaded_id, set_loaded_id] = useContextState(LOADED_MESSAGE);
+  const [edit_target, set_edit_target] = useStateIfMounted<string | null>(null);
 
   const [tts_data, preview_tts] = useAudioPlayer("messages-sidebar-player");
+
+  const edit_target_msg = useMemo(
+    () => messages.find(m => m.id === edit_target),
+    [messages, edit_target]
+  );
 
   return (
     <div className="tts-messages">
@@ -30,11 +35,12 @@ export const MessagesList: Preact.FunctionComponent<{
         <h4>Messages</h4>
       </div>
       <div className="tts-message-list">
-        {messages.map((m, i) => (
+        {messages.map(m => (
           <MessagesListItem
-            active={i === loaded_index}
+            key={m.id}
+            active={m.id === loaded_id}
             message={m}
-            openMessageInModal={() => set_edit_target(i)}
+            openMessageInModal={() => set_edit_target(m.id)}
           />
         ))}
       </div>
@@ -46,11 +52,11 @@ export const MessagesList: Preact.FunctionComponent<{
       {edit_target != null &&
         useModal(
           <MessageModal
-            message={messages[edit_target]}
-            loadMessage={() => set_loaded_index(edit_target)}
+            message={edit_target_msg}
+            loadMessage={() => set_loaded_id(edit_target)}
             updateMessage={value => updateMessages(edit_target, value)}
             deleteMessage={() => updateMessages(edit_target)}
-            dismiss={() => set_edit_target(undefined)}
+            dismiss={() => set_edit_target(null)}
             previewMessage={preview_tts}
           />
         )}

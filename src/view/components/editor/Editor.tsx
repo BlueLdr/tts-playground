@@ -6,6 +6,7 @@ import {
   useMemo,
   useRef,
 } from "preact/hooks";
+import { do_confirm } from "~/common";
 import {
   ADD_SNIPPET_CALLBACK,
   EDITOR_STATE,
@@ -35,9 +36,20 @@ import {
   useValueRef,
 } from "~/view/utils";
 
+const empty_message = (length: number): TTS.Message => ({
+  id: "",
+  text: "",
+  name: "",
+  options: {
+    bits: "",
+    max_length: length,
+    speed: false,
+  },
+});
+
 export const Editor: Preact.FunctionComponent<{
   message?: TTS.Message;
-  updateMessages: (index: number, value: TTS.Message) => boolean;
+  updateMessages: (id: string | null, value: TTS.Message) => boolean;
 }> = ({ message, updateMessages }) => {
   const [editor_state, set_editor_state] = useContextState(EDITOR_STATE);
   const [is_unsaved, set_unsaved] = useContextState(EDITOR_UNSAVED);
@@ -116,6 +128,7 @@ export const Editor: Preact.FunctionComponent<{
 
   const new_message = useMemo(
     () => ({
+      id: message?.id,
       text:
         bits && `${text} ${bits}`.length > max_length
           ? text.slice(0, max_length - bits.length - 1)
@@ -208,40 +221,67 @@ export const Editor: Preact.FunctionComponent<{
   );
 
   const first_render = useRef(true);
+  const load_message = useCallback((msg?: TTS.Message) => {
+    msg = msg ?? empty_message(length_ref.current);
+    set_state({
+      text: msg?.text ?? "",
+      speed: msg.options?.speed,
+      max_length: msg.options?.max_length,
+      bits: msg.options?.bits ?? "",
+    });
+    EditorHistory.reset({
+      state: {
+        text: msg.text,
+        speed: msg.options?.speed ?? false,
+        max_length: msg.options?.max_length ?? length_ref.current,
+        bits: msg.options?.bits ?? "",
+        pause_duration: state_ref.current?.pause_duration ?? 1,
+      },
+      cursor: get_current_cursor(),
+    });
+  }, []);
   useEffect(() => {
     if (first_render.current) {
+      console.log(`not updating editor state`);
       first_render.current = false;
       return;
     }
     if (message) {
-      set_state({
-        text: message.text,
-        speed: message.options?.speed,
-        max_length: message.options?.max_length,
-        bits: message.options?.bits ?? "",
-      });
-      EditorHistory.reset({
-        state: {
-          text: message.text,
-          speed: message.options?.speed ?? false,
-          max_length: message.options?.max_length ?? 255,
-          bits: message.options?.bits ?? "",
-          pause_duration: pause_duration ?? 1,
-        },
-        cursor: get_current_cursor(),
-      });
+      load_message(message);
     }
   }, [message]);
+
+  const msg_ref = useValueRef(message);
+  useEffect(() => {
+    const on_load_message = (e: TTS.LoadMessageEvent) => {
+      if (e.detail.id === e.detail.prev_id && !e.detail.passive) {
+        load_message(msg_ref.current);
+      }
+      if (
+        e.detail.passive &&
+        !(e.detail.id === null && e.detail.prev_id !== null)
+      ) {
+        first_render.current = true;
+      }
+      e.detail.callback();
+    };
+    window.addEventListener("load-message", on_load_message, { capture: true });
+    return () => {
+      window.removeEventListener("load-message", on_load_message, {
+        capture: true,
+      });
+    };
+  }, []);
 
   const length_ref = useValueRef(max_length);
   const reset = useCallback(() => {
     if (
       is_unsaved &&
-      !confirm("Discard unsaved changes to the current message?")
+      !do_confirm("Discard unsaved changes to the current message?")
     ) {
       return;
     }
-    set_loaded_message(-1, true);
+    set_loaded_message(null, true);
     const new_state = {
       text: "",
       bits: "",

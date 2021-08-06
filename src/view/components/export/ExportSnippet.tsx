@@ -17,7 +17,6 @@ export const ExportSnippet: Preact.FunctionComponent<{ snippet: TTS.Snippet }> =
       () => generate_file(export_snippet(snippet)),
       [snippet]
     );
-    console.log(`filename: `, filename);
 
     return (
       <a

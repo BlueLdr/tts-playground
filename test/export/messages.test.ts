@@ -235,3 +235,13 @@ test("import mix of duplicate messages", t => {
   t.deepEqual(dup_snippets, []);
   t.deepEqual(uncategorized_snippets, []);
 });
+
+test("validate one message with missing id", t => {
+  const initial = MESSAGE_ONE;
+  const { id, ...message_one_input } = MESSAGE_ONE;
+  const validated = validate_import_data(
+    message_one_input
+  ) as TTS.ExportedMessage;
+  t.is(id.length, validated.id?.length);
+  t.deepEqual(initial, { ...validated, id });
+});

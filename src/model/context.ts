@@ -40,11 +40,14 @@ export const EDITOR_STATE = createNamedContext<TTS.EditorState>(
   "EDITOR_STATE"
 );
 
-export const LOADED_MESSAGE = createNamedContext<number>(
-  INITIAL_STATE.message ?? -1,
+export const LOADED_MESSAGE = createNamedContext<string | null>(
+  INITIAL_STATE.message ?? null,
   "LOADED_MESSAGE"
 ) as Preact.Context<
-  ImmutableContextValue<number, (index: number, force?: boolean) => boolean>
+  ImmutableContextValue<
+    string | null,
+    (index: string | null, force?: boolean, passive?: boolean) => boolean
+  >
 >;
 
 export const EDITOR_UNSAVED = createNamedContext<boolean>(

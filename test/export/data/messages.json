@@ -1,5 +1,6 @@
 [
   {
+    "id": "5b824821170bd1573d3f1c7f560c16db",
     "text": "extra message 1 text",
     "name": "Extra Message 1",
     "options": {
@@ -9,6 +10,7 @@
     }
   },
   {
+    "id": "508b4c21170bd1573d3f1c7f560c2e1a",
     "text": "extra message 2 text",
     "name": "Extra Message 2",
     "options": {
@@ -18,6 +20,7 @@
     }
   },
   {
+    "id": "5c8a4d21170bd1573d3f1c7f560c3c11",
     "text": "extra message 3 text",
     "name": "Extra Message 3",
     "options": {

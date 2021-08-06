@@ -1,4 +1,4 @@
-import { deep_equals } from "~/common";
+import { deep_equals, generate_id } from "~/common";
 import {
   conform_to_schema,
   MESSAGE_SCHEMA,
@@ -292,6 +292,9 @@ export const validate_import_data = (
   }
 
   if (data["__type"] === "message") {
+    if (!data["id"] && data["name"]) {
+      data["id"] = generate_id(data["name"]);
+    }
     return { __type: "message", ...conform_to_schema(data, MESSAGE_SCHEMA) };
   }
 
