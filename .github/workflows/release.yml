@@ -24,6 +24,10 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: cp dist/index.html ./tts-playground.html
+      - run: echo "TTS_TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+      - run: echo "TTS_NAME=${TTS_TAG/-release/}" >> $GITHUB_ENV
+      - run: echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY" >> $GITHUB_ENV
+      - run: echo $GITHUB_ENV
 
       - name: Release
         uses: ncipollo/release-action@v1
@@ -32,3 +36,11 @@ jobs:
           artifacts: "./tts-playground.html"
           draft: true
           token: ${{ secrets.GITHUB_TOKEN }}
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          name: TTS Playground ${{ env.TTS_NAME }}
+          body: >
+            Deployed at: [https://blueldr.github.io/tts-playground](https://blueldr.github.io/tts-playground)
+
+            Download and run locally: [tts-playground.html](https://github.com/${{ env.GITHUB_REPOSITORY }}/releases/download/${{ env.TTS_TAG }}/tts-playground.html)
