@@ -101,6 +101,13 @@
         width 100%
         justify-content center
 
+    &-edit
+      opacity 0.2
+      transition-property color, opacity
+      .tts-col-snippets:focus-within &,
+      .tts-col-snippets:hover &
+        opacity 1
+
   &-row
     border 1px solid transparent
     display flex

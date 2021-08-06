@@ -79,13 +79,6 @@ export const useLoadedMessage = (messages: TTS.Message[]) => {
 export const useSaveMessage = () => {
   const [messages, set_messages] = useContextState(MESSAGES);
   const [loaded_message, loaded_id, set_loaded_id] = useLoadedMessage(messages);
-  hooks.useEffect(() => {
-    console.log(`loaded_id`, loaded_id);
-  }, [loaded_id]);
-
-  hooks.useEffect(() => {
-    console.log(`loaded_message`, loaded_message);
-  }, [loaded_message]);
   const {
     value: { text, speed, max_length, bits },
   } = hooks.useContext(EDITOR_STATE);

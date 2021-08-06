@@ -242,7 +242,6 @@ export const Editor: Preact.FunctionComponent<{
   }, []);
   useEffect(() => {
     if (first_render.current) {
-      console.log(`not updating editor state`);
       first_render.current = false;
       return;
     }
