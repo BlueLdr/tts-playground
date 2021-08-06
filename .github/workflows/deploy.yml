@@ -5,11 +5,12 @@ name: Deployment CI
 
 on:
   push:
-    branches: [ master ]
+    tags:
+      - "*release*"
 
 jobs:
   build:
-
+    if: github.event.base_ref == "refs/heads/master"
     runs-on: ubuntu-latest
 
     strategy:
