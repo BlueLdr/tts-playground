@@ -1,4 +1,5 @@
 import { OptimizeLevel, OptimizeTrigger } from "~/model/types";
+import { match_case } from "~/view/utils/common";
 
 interface TextTransform {
   match: (value: string) => boolean;
@@ -36,7 +37,7 @@ const TRANSFORMS: { [K in OptimizeLevel]: TextTransform[] } = {
   [OptimizeLevel.safe]: [
     {
       match: v => /^\w*ight$/i.test(v),
-      transform: v => v.replace(/ight$/i, "ite"),
+      transform: v => v.replace(/ight$/i, match => match_case("ite", match)),
     },
     {
       // replace any sequence of 3 or more of the same vowel with 2 of that vowel
@@ -48,7 +49,8 @@ const TRANSFORMS: { [K in OptimizeLevel]: TextTransform[] } = {
   [OptimizeLevel.normal]: [
     {
       match: v => /[aeiouy]'ve\b/i.test(v),
-      transform: v => v.replace(/'ve\b/i, "ve"),
+      transform: v =>
+        v.replace(/'ve\b/i, match => match_case("'ve", match, "'")),
     },
   ],
   [OptimizeLevel.max]: [
@@ -105,7 +107,14 @@ const optimize_word = (
   for (let i = OptimizeLevel.safe; i <= level; i++) {
     const transforms = PLAIN_TRANSFORMS[i];
     if (word.toLowerCase() in transforms) {
-      return transforms[word.toLowerCase()];
+      const after = transforms[word.toLowerCase()];
+      if (word === word.toLowerCase()) {
+        return after.toLowerCase();
+      }
+      if (word === word.toUpperCase()) {
+        return after.toUpperCase();
+      }
+      return word.replace(word, match => match_case(after, match));
     }
   }
 

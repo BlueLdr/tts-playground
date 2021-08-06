@@ -353,25 +353,25 @@ export const SELECTION_TESTS = [
 ];
 
 const all_message =
-  "  one guy two guy three four five guy six guy  and seven guy, eight   guy nine guy ten guy for guy, before you go, make sure you don't speak too quick alright? goodnight!  forget about it. we make big cookie for to bring customer back. foursome at the forefront. they've gotta go?  reeeeaaaiiiiiiuiiiiglloooooyyyyy  ";
+  "  one guy two guy three four five guy six guy  and seven guy, eight   guy nine guy ten guy for guy, before you go, make sure you don't speak too quick alright? goodnight!  forget about it. we make big cookie for to bring customer back. foursome at the forefront. they've gotta go? YOU ARE WHY you are why yOu aRe whY You Are Why THEY've I'VE who'VE you'Ve we'vE alrIGHT alRiGhT alRIght.   reeeeaaaiiiiiiuiiiiglloooooyyyyy  ";
 
 export const OPTIMIZE_LEVEL_TESTS = [
   {
     input: all_message,
     level: "safe",
     output:
-      "1guy2guy3 4 5guy6guy&7guy,8guy9guy10guy for guy,before you go,make sure you don't speak2quick alrite?goodnite!forget about it. we make big cookie for to bring customer back. foursome at the forefront. they've gotta go?reeaaiiuiigllooyy",
+      "1guy2guy3 4 5guy6guy&7guy,8guy9guy10guy for guy,before you go,make sure you don't speak2quick alrite?goodnite!forget about it. we make big cookie for to bring customer back. foursome at the forefront. they've gotta go?YOU ARE WHY you are why yOu aRe whY You Are Why THEY've I'VE who'VE you'Ve we'vE alrITE alRiTe alRIte. reeaaiiuiigllooyy",
   },
   {
     input: all_message,
     level: "normal",
     output:
-      "1guy2guy3 4 5guy6guy&7guy,8guy9guy10guy for guy,before u go,make sure u don't speak2quick alrite?goodnite!forget about it. we make big cookie for to bring customer back. foursome at the forefront. theyve gotta go?reeaaiiuiigllooyy",
+      "1guy2guy3 4 5guy6guy&7guy,8guy9guy10guy for guy,before u go,make sure u don't speak2quick alrite?goodnite!forget about it. we make big cookie for to bring customer back. foursome at the forefront. theyve gotta go?U R Y u r y u r y U R Y THEYve IVE whoVE youVe wevE alrITE alRiTe alRIte. reeaaiiuiigllooyy",
   },
   {
     input: all_message,
     level: "max",
     output:
-      "1guy2guy3 4 5guy6guy&7guy,8guy9guy10guy4guy,be4u go,make sure u don't speak2quick alrite?goodnite! 4get about it. we make big cookie4 2bring customer back. 4some at the4front. theyve gotta go?reeaaiiuiigllooyy",
+      "1guy2guy3 4 5guy6guy&7guy,8guy9guy10guy4guy,be4u go,make sure u don't speak2quick alrite?goodnite! 4get about it. we make big cookie4 2bring customer back. 4some at the4front. theyve gotta go?U R Y u r y u r y U R Y THEYve IVE whoVE youVe wevE alrITE alRiTe alRIte. reeaaiiuiigllooyy",
   },
 ];
