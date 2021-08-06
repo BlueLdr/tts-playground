@@ -24,6 +24,11 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+
+    - run: echo "TTS_TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+    - run: echo "TTS_NAME=${TTS_TAG/-release/}" >> $GITHUB_ENV
+    - run: echo "export TTS_VERSION=$TTS_NAME" >> .env
+
     - run: npm ci
     - run: npm run build
 
