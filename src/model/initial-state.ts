@@ -3,7 +3,10 @@ import * as common from "~/common";
 const stored_state = common.get_stored_state();
 const initial_state: TTS.AppState = {
   volume: stored_state?.volume ?? common.DEFAULT_STATE.volume,
-  message: stored_state?.message ?? common.DEFAULT_STATE.message,
+  message:
+    typeof stored_state?.message === "string"
+      ? stored_state.message
+      : common.DEFAULT_STATE.message,
   settings: {
     trim_whitespace:
       stored_state?.settings?.trim_whitespace ??

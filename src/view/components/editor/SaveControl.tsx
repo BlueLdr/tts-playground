@@ -1,12 +1,13 @@
 import * as Preact from "preact";
-import { useContext } from "preact/hooks";
-import { LOADED_MESSAGE, MESSAGES } from "~/model";
+import { useContext, useEffect, useRef } from "preact/hooks";
+import { generate_id } from "~/common";
+import { MESSAGES } from "~/model";
 import { MessageModalBase } from "~/view/components";
-import { useModal, useStateIfMounted } from "~/view/utils";
+import { useLoadedMessage, useModal, useStateIfMounted } from "~/view/utils";
 
 export const SaveMessage: Preact.FunctionComponent<{
   message: TTS.Message;
-  updateMessages: (index: number, value: TTS.Message) => boolean;
+  updateMessages: (id: string | null, value: TTS.Message) => boolean;
   disabled?: boolean;
 }> = ({ message, updateMessages, disabled }) => {
   const [open, set_open] = useStateIfMounted(false);
@@ -33,16 +34,22 @@ export const SaveMessage: Preact.FunctionComponent<{
 
 export const SaveMessageModal: Preact.FunctionComponent<{
   message: TTS.Message;
-  updateMessages: (index: number, value: TTS.Message) => boolean;
+  updateMessages: (id: string | null, value: TTS.Message) => boolean;
   dismiss: () => void;
 }> = ({ message, updateMessages, dismiss }) => {
   const messages = useContext(MESSAGES).value;
-  const loaded_index = useContext(LOADED_MESSAGE).value;
-  const loaded_message = messages[loaded_index];
+  const [loaded_message, loaded_id] = useLoadedMessage(messages);
 
   const { name } = message;
   const [value, set_value] = useStateIfMounted(name);
   const new_name = value?.trim();
+
+  const saved = useRef(false);
+  useEffect(() => {
+    if (name !== value) {
+      saved.current = false;
+    }
+  }, [value, name]);
 
   return (
     <MessageModalBase
@@ -59,13 +66,20 @@ export const SaveMessageModal: Preact.FunctionComponent<{
         <button
           className="btn btn-primary"
           onClick={() => {
+            if (saved.current) {
+              return;
+            }
+            saved.current = true;
             if (
-              updateMessages(-1, {
+              updateMessages(null, {
                 ...message,
+                id: generate_id(new_name),
                 name: new_name,
               })
             ) {
               dismiss();
+            } else {
+              saved.current = false;
             }
           }}
           disabled={!new_name || new_name === name}
@@ -76,13 +90,20 @@ export const SaveMessageModal: Preact.FunctionComponent<{
       <button
         className="btn btn-primary"
         onClick={() => {
+          if (saved.current) {
+            return;
+          }
+          saved.current = true;
           if (
-            updateMessages(loaded_index, {
+            updateMessages(loaded_id, {
               ...message,
+              id: !!loaded_message ? message.id : generate_id(new_name),
               name: new_name,
             })
           ) {
             dismiss();
+          } else {
+            saved.current = false;
           }
         }}
         disabled={!new_name}

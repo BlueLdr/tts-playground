@@ -1,3 +1,5 @@
+import { do_alert } from "./utils";
+
 export const TTS_URL = (voice: string = "Brian") =>
   `https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=`;
 
@@ -32,7 +34,7 @@ export const get_tts_data = async (
   }
 
   if (speak.status != 200) {
-    alert(await speak.text());
+    do_alert(await speak.text());
     request.text = "";
     return Promise.reject(speak.error());
   }

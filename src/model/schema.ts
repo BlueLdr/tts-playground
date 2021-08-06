@@ -70,6 +70,7 @@ export const MESSAGE_OPTIONS_SCHEMA: SchemaOf<TTS.MessageOptions> = {
 };
 
 export const MESSAGE_SCHEMA: SchemaOf<TTS.Message> = {
+  id: { type: "string" },
   name: { type: "string" },
   text: { type: "string" },
   options: {

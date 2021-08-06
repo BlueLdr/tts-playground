@@ -1,4 +1,9 @@
-import { DEFAULT_BITS_STRING, DEFAULT_HISTORY_STEPS_LIMIT } from "~/common";
+import {
+  DEFAULT_BITS_STRING,
+  DEFAULT_HISTORY_STEPS_LIMIT,
+  do_confirm,
+  generate_id,
+} from "~/common";
 import { OptimizeLevel, OptimizeTrigger } from "~/model/types";
 
 const load_storage_or = (key, def) => {
@@ -25,7 +30,10 @@ export const set_stored_snippets = (value: TTS.SnippetsSection[]) =>
   localStorage.setItem("tts-snippets", JSON.stringify(value));
 
 export const get_stored_messages = (): TTS.Message[] =>
-  load_storage_or("tts-messages", sample_messages);
+  load_storage_or("tts-messages", sample_messages).map(m => ({
+    ...m,
+    id: m.id ?? generate_id(m.name),
+  }));
 export const set_stored_messages = (value: TTS.Message[]) =>
   localStorage.setItem("tts-messages", JSON.stringify(value));
 
@@ -40,7 +48,7 @@ export const set_stored_help = (value: TTS.HelpCompletedMap) =>
   localStorage.setItem("tts-help", JSON.stringify(value));
 
 export const reset_all_storage = (clear_help?: boolean) => {
-  if (confirm("Are you REALLY sure you wanna do this?")) {
+  if (do_confirm("Are you REALLY sure you wanna do this?")) {
     localStorage.setItem("tts-state", "");
     localStorage.setItem("tts-messages", "");
     localStorage.setItem("tts-snippets", "");
@@ -59,7 +67,7 @@ export const DEFAULT_STATE: TTS.AppState = {
     history_steps: DEFAULT_HISTORY_STEPS_LIMIT,
     skip_tutorials: false,
   },
-  message: -1,
+  message: null,
   volume: 0.5,
   editor: {
     max_length: 255,
@@ -137,6 +145,7 @@ const sample_snippets: TTS.SnippetsSection[] = [
 
 const sample_messages: TTS.Message[] = [
   {
+    id: "sample-message-1",
     name: "Sample Message",
     text: "This is a sample message. No silly noises here boink",
     options: {
@@ -146,6 +155,7 @@ const sample_messages: TTS.Message[] = [
     },
   },
   {
+    id: "sample-message-2",
     name: "Silly Message",
     text: "This is a silly message. Do not send this message to the streamer. OOHOO HOO ᴾᴾᴾ HE DOESN'T KNOW LMAO ᴾᴾᴾᴾᴾᴾ HE LACKS CRITICAL INFORMATION OMEGA LAUGHING ᴾᴾᴾᴾᴾᴾᴾ",
     options: {

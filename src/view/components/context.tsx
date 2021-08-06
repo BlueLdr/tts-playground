@@ -2,6 +2,7 @@ import * as Preact from "preact";
 import { PureComponent } from "preact/compat";
 import * as hooks from "preact/hooks";
 import { useEffect } from "preact/hooks";
+import { do_confirm } from "~/common";
 import * as storage from "~/common";
 import {
   ADD_SNIPPET_CALLBACK,
@@ -20,11 +21,7 @@ import {
   SNIPPETS,
   VOLUME_CTX,
 } from "~/model";
-import {
-  useOptimizeMessage,
-  useStateIfMounted,
-  useValueRef,
-} from "~/view/utils";
+import { useOptimizeMessage, useStateRef, useValueRef } from "~/view/utils";
 
 const CONTEXTS = {
   VOLUME_CTX: {
@@ -168,39 +165,50 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
   const help_completed = hooks.useContext(HELP_COMPLETED).value;
 
   const editor_unsaved = hooks.useContext(EDITOR_UNSAVED).value;
-  const [loaded_message, set_loaded_message] = useStateIfMounted(
-    INITIAL_STATE?.message ?? -1
+  const [loaded_id, set_loaded_id, loaded_id_ref] = useStateRef(
+    INITIAL_STATE?.message ?? null
   );
   const editor_unsaved_ref = useValueRef(editor_unsaved);
   const should_optimize = hooks.useRef<boolean>(false);
-  const load_message = hooks.useCallback((index: number, force?: boolean) => {
-    if (index == null) {
+  const load_message = hooks.useCallback(
+    (id: string | null, force?: boolean, passive?: boolean) => {
+      if (id !== null && typeof id !== "string") {
+        return false;
+      }
+      let discard = true;
+      if (editor_unsaved_ref.current && force !== true) {
+        discard = do_confirm("Are you sure you want to discard your changes?");
+      }
+      if (discard) {
+        should_optimize.current = false;
+        const event: TTS.LoadMessageEvent = new CustomEvent("load-message", {
+          detail: {
+            callback: () => set_loaded_id(id),
+            id: id,
+            prev_id: loaded_id_ref.current,
+            passive,
+          },
+        });
+        window.dispatchEvent(event);
+        return true;
+      }
       return false;
-    }
-    let discard = true;
-    if (editor_unsaved_ref.current && force !== true) {
-      discard = confirm("Are you sure you want to discard your changes?");
-    }
-    if (discard) {
-      should_optimize.current = false;
-      set_loaded_message(index);
-      return true;
-    }
-    return false;
-  }, []);
+    },
+    []
+  );
   const ctx_value = hooks.useMemo(
-    () => new ImmutableContextValue(loaded_message, load_message),
-    [load_message, loaded_message]
+    () => new ImmutableContextValue(loaded_id, load_message),
+    [load_message, loaded_id]
   );
 
   useEffect(() => {
     storage.set_stored_state({
       volume,
-      message: loaded_message,
+      message: loaded_id,
       editor: editor_state,
       settings: editor_settings,
     });
-  }, [volume, editor_state, loaded_message, editor_settings]);
+  }, [volume, editor_state, loaded_id, editor_settings]);
 
   useEffect(() => {
     storage.set_stored_messages(messages);

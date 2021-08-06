@@ -1,5 +1,6 @@
 import * as Preact from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
+import { do_alert, do_confirm } from "~/common";
 import {
   ClipboardButton,
   ExportMessage,
@@ -29,8 +30,15 @@ export const MessageModal: Preact.FunctionComponent<{
   const text = useMessageFullText(message);
   const [value, set_value] = useStateIfMounted(name);
 
+  const saved = useRef(false);
+  useEffect(() => {
+    if (name !== value) {
+      saved.current = false;
+    }
+  }, [value, name]);
+
   const on_click_delete = useCallback(() => {
-    const should_delete = confirm(
+    const should_delete = do_confirm(
       "Are you sure you want to delete this message?"
     );
     if (should_delete) {
@@ -85,14 +93,25 @@ export const MessageModal: Preact.FunctionComponent<{
       <button
         className="btn btn-large btn-primary"
         onClick={() => {
+          if (saved.current) {
+            return;
+          }
+          saved.current = true;
+          if (!message.id) {
+            do_alert("couldn't save due to missing id");
+            console.error("couldn't save due to missing id");
+          }
           if (
             updateMessage({
+              id: message.id,
               name: value,
               text: message.text,
               options,
             })
           ) {
             dismiss();
+          } else {
+            saved.current = false;
           }
         }}
         disabled={!value || value === name}

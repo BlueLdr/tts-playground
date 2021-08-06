@@ -17,6 +17,7 @@ export enum OptimizeLevel {
 declare global {
   namespace TTS {
     interface Message {
+      id: string;
       text: string;
       name: string;
       options: MessageOptions;
@@ -27,6 +28,13 @@ declare global {
       speed: boolean;
       bits: string;
     }
+
+    type LoadMessageEvent = CustomEvent<{
+      callback: () => void;
+      id: string | null;
+      prev_id: string | null;
+      passive?: boolean;
+    }>;
 
     interface Snippet {
       text: string;
@@ -101,7 +109,7 @@ declare global {
 
     interface AppState {
       volume: number;
-      message: number;
+      message: string | null;
       editor: EditorState;
       settings: EditorSettings;
     }

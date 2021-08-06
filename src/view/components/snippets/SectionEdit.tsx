@@ -1,5 +1,6 @@
 import * as Preact from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
+import { do_confirm } from "~/common";
 import { Modal, ModalHeader } from "~/view/components";
 import { useStateIfMounted } from "~/view/utils";
 
@@ -12,7 +13,7 @@ export const SnippetsSectionModal: Preact.FunctionComponent<{
   const input_ref = useRef<HTMLInputElement>();
   const [value, set_value] = useStateIfMounted(name);
   const on_click_delete = useCallback(() => {
-    const should_delete = confirm(
+    const should_delete = do_confirm(
       "Are you sure you want to delete this group and all snippets in it?"
     );
     if (should_delete) {

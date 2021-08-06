@@ -1,5 +1,6 @@
 import * as Preact from "preact";
 import { useCallback, useEffect } from "preact/hooks";
+import { do_confirm } from "~/common";
 import { useCopyToClipboard, useRequestStatus } from "~/view/utils";
 
 const listener_opts = { once: true };
@@ -30,7 +31,7 @@ export const SnippetsRowControls: Preact.FunctionComponent<{
   }, [open]);
 
   const on_delete = useCallback(() => {
-    const should_continue = confirm(
+    const should_continue = do_confirm(
       "Are you sure you want to delete this snippet?"
     );
     if (should_continue) {
