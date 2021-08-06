@@ -47,3 +47,35 @@ export const insert_text_at_selection = (
 export const trim_whitespace = (text: string) => {
   return text.trim().replace(/(\s)\s+/g, "$1");
 };
+
+const UPPERCASE =
+  /[A-ZÀ-ÞĀĂĄĆĈĊČĎĐĒĔĖĘĚĜĞĠĢĤĦĨĪĬĮİĲĴĶĹĻĽĿŁŃŅŇŊŌŎŐŒŔŖŘŚŜŞŠŢŤŦŨŪŬŮŰŲŴŶŸŹŻŽƁƂƄƆƇƉƊƋƎƏƐƑƓƔƖƗƘƜƝƟƠƢƤƦƧƩƬƮƯƱƲƳƵƷƸƼǄǇǊǍǏǑǓǕǗǙǛǞǠǢǤǦǨǪǬǮǱǴǶǷǸǺǼǾȀȂȄȆȈȊȌȎȐȒȔȖȘȚȜȞȠȢȤȦȨȪȬȮȰȲȺȻȽȾɁɃɄɅɆɈɊɌɎͰͲͶͿΆΈΉΊΌΎΏΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩΪΫϏϘϚϜϞϠϢϤϦϨϪϬϮϴ]/;
+// taken/modified from https://stackoverflow.com/a/17265031
+export const match_case = (
+  text: string,
+  pattern: string,
+  discard?: string | RegExp
+) => {
+  let result = "";
+
+  for (let i = 0; i < text.length; i++) {
+    const c = text.charAt(i);
+    const p = pattern.charAt(i);
+    if (
+      discard &&
+      (typeof discard === "string"
+        ? discard === c || discard.includes(c)
+        : discard.test(c))
+    ) {
+      continue;
+    }
+
+    if (UPPERCASE.test(p)) {
+      result += c.toLocaleUpperCase();
+    } else {
+      result += c.toLocaleLowerCase();
+    }
+  }
+
+  return result;
+};
