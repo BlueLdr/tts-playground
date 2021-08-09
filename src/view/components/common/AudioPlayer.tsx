@@ -3,11 +3,11 @@ import { useCallback, useEffect, useRef } from "preact/hooks";
 import { VOLUME_CTX } from "~/model";
 import { maybeClassName, useContextState, useDebounce } from "~/view/utils";
 
-export const AudioPlayer: Preact.FunctionComponent<{
-  id?: string;
-  data: string;
-  className?: string;
-}> = ({ id, data, className }) => {
+export const AudioPlayer: Preact.FunctionComponent<
+  {
+    data: string;
+  } & PropsOfElem<HTMLAudioElement>
+> = ({ id, data, className, ...props }) => {
   const [volume, onChangeVolume] = useContextState(VOLUME_CTX);
   const audio_ref = useRef<HTMLAudioElement>();
   const set_volume_cb = useCallback(
@@ -50,6 +50,7 @@ export const AudioPlayer: Preact.FunctionComponent<{
         id={id ? `${id}-audio` : "audio"}
         controls={true}
         onVolumeChange={set_volume}
+        {...props}
       >
         {data && (
           <source

@@ -30,7 +30,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: cp dist/index.html ./tts-playground.html
-      - run: echo $GITHUB_ENV
+      - run: npm run test
 
       - name: Release
         uses: ncipollo/release-action@v1
