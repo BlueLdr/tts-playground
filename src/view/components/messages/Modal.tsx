@@ -1,13 +1,25 @@
 import * as Preact from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
-import { do_alert, do_confirm } from "~/common";
+import { do_alert, do_confirm, play_audio } from "~/common";
 import {
+  AudioPlayer,
   ClipboardButton,
   ExportMessage,
   Modal,
   ModalHeader,
+  StatusIndicator,
 } from "~/view/components";
-import { useMessageFullText, useStateIfMounted } from "~/view/utils";
+import {
+  useMessageFullText,
+  usePlayMessage,
+  useStateIfMounted,
+} from "~/view/utils";
+
+const MESSAGE_MODAL_REQUEST: TTS.TTSRequest = {
+  text: "",
+  promise: new Promise(() => {}),
+  data: "",
+};
 
 export const MessageModal: Preact.FunctionComponent<{
   message: TTS.Message;
@@ -134,7 +146,22 @@ export const MessageModalBase: Preact.FunctionComponent<{
   const {
     options: { max_length, speed, bits },
   } = message || {};
-  const text = useMessageFullText(message);
+
+  const [data, status, submit_message, text] = usePlayMessage(
+    message,
+    "message-modal-player",
+    MESSAGE_MODAL_REQUEST
+  );
+
+  const on_play = useCallback(
+    e => {
+      if (!data) {
+        e.preventDefault();
+        submit_message();
+      }
+    },
+    [data]
+  );
 
   useEffect(() => {
     input_ref.current?.focus();
@@ -155,20 +182,12 @@ export const MessageModalBase: Preact.FunctionComponent<{
               onInput={e => setName((e.target as HTMLInputElement).value)}
             />
           </label>
-          {
-            // TODO: move full player here
-            /*{previewMessage && (
-              <button
-                className="btn btn-with-icon"
-                onClick={() => previewMessage(text)}
-              >
-                <i className="fas fa-volume-up" />
-                Preview Message
-              </button>
-            )}*/
-          }
         </div>
         <div className="tts-message-modal-preview">{text}</div>
+        <div className="tts-message-modal-player">
+          <AudioPlayer data={data} id="message-modal-player" onPlay={on_play} />
+          <StatusIndicator status={status} />
+        </div>
         <div className="tts-message-modal-details">
           <div className="tts-message-modal-options">
             <h4>Options</h4>
