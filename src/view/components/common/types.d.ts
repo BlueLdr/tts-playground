@@ -29,3 +29,25 @@ type EventListenersOf<
   E extends HTMLElement,
   A = preact.JSX.HTMLAttributes<E>
 > = Partial<Pick<preact.JSX.HTMLAttributes<E>, EventListenerKeysOf<E>>>;
+
+interface ExpandableChecklistProps<T> {
+  items: ExpandableChecklistItem<T>[];
+  label: preact.ComponentChildren;
+  onChange: (
+    items: ExpandableChecklistItem<T>[],
+    parent?: ExpandableChecklistItem<any>
+  ) => void;
+  allowCheckAll?: boolean;
+  parent?: ExpandableChecklistItem<any>;
+}
+
+interface ExpandableChecklistItem<T> {
+  data: T;
+  key: string | number;
+  selected: T extends (infer F)[]
+    ? ExpandableChecklistItem<F>[]
+    : T extends { data: (infer F)[] }
+    ? ExpandableChecklistItem<F>[]
+    : boolean;
+  Render: preact.ComponentType<{ data: T }>;
+}
