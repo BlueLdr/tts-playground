@@ -1,6 +1,6 @@
 import * as Preact from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
-import { do_alert, do_confirm, play_audio } from "~/common";
+import { do_alert, do_confirm } from "~/common";
 import {
   AudioPlayer,
   ClipboardButton,
