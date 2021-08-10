@@ -1,102 +1,30 @@
 import { OptimizeLevel, OptimizeTrigger } from "~/model/types";
 import { match_case } from "~/view/utils/common";
+import {
+  PLAIN_TRANSFORMS,
+  RESTORE_WHITESPACE_TRANSFORMS,
+  SAFE_WHITESPACE_TRANSFORMS,
+  TRANSFORMS,
+} from "~/view/utils/optimize-transforms";
 
-interface TextTransform {
-  match: (value: string) => boolean;
-  transform: string | ((value: string) => string);
-}
-
-const PLAIN_TRANSFORMS = {
-  [OptimizeLevel.safe]: {
-    too: "2",
-    one: "1",
-    two: "2",
-    three: "3",
-    four: "4",
-    five: "5",
-    six: "6",
-    seven: "7",
-    eight: "8",
-    nine: "9",
-    ten: "10",
-    and: "&",
-  },
-  [OptimizeLevel.normal]: {
-    are: "r",
-    you: "u",
-    why: "y",
-  },
-  [OptimizeLevel.max]: {
-    for: "4",
-    fore: "4",
-    to: "2",
-  },
-} as const;
-
-const TRANSFORMS: { [K in OptimizeLevel]: TextTransform[] } = {
-  [OptimizeLevel.safe]: [
-    {
-      match: v => /^\w*ight$/i.test(v),
-      transform: v => v.replace(/ight$/i, match => match_case("ite", match)),
-    },
-    {
-      // replace any sequence of 3 or more of the same vowel with 2 of that vowel
-      match: v => new RegExp("([aeiouy])(\\1){2,}", "i").test(v),
-      transform: v =>
-        v.replace(new RegExp("([aeiouy])(\\1){2,}", "gi"), "$1$1"),
-    },
-  ],
-  [OptimizeLevel.normal]: [
-    {
-      match: v => /[aeiouy]'ve\b/i.test(v),
-      transform: v =>
-        v.replace(/'ve\b/i, match => match_case("'ve", match, "'")),
-    },
-  ],
-  [OptimizeLevel.max]: [
-    {
-      match: v => /fore?$/i.test(v),
-      transform: v => v.replace(/fore?$/i, "4"),
-    },
-    {
-      match: v => /^fore?/i.test(v),
-      transform: v => v.replace(/^fore?/i, "4"),
-    },
-    {
-      match: v => /^fou?r\w*/i.test(v),
-      transform: v => v.replace(/^fou?r/i, "4"),
-    },
-  ],
-};
-
-const SAFE_WHITESPACE_TRANSFORMS = [
-  {
-    before: /[ &,]/i,
-    after: /[ a-z0-9]/i,
-    reversible: true,
-  },
-  {
-    before: /[ a-z]/i,
-    after: /[ 0-9]/i,
-    reversible: true,
-  },
-  {
-    before: /[?!]/,
-    after: /[ a-z]/i,
-  },
-];
-
-const space_can_be_removed = (prev_char: string, next_char: string) => {
+const space_can_be_removed = (before: string, after: string) => {
   // prevent forming urls, which will be removed in speech
-  if (prev_char === ".") {
+  if (before.endsWith(".")) {
     return false;
   }
-  return SAFE_WHITESPACE_TRANSFORMS.some(
-    t =>
-      (t.before.test(prev_char) && t.after.test(next_char)) ||
-      (!t.reversible
-        ? false
-        : t.before.test(next_char) && t.after.test(prev_char))
+  return (
+    SAFE_WHITESPACE_TRANSFORMS.some(
+      t =>
+        (new RegExp(`${t.before}$`, "i").test(before) &&
+          new RegExp(`^${t.after}`, "i").test(after)) ||
+        (!t.reversible
+          ? false
+          : new RegExp(`^${t.before}`, "i").test(after) &&
+            new RegExp(`${t.after}$`, "i").test(before))
+    ) &&
+    !RESTORE_WHITESPACE_TRANSFORMS.some(
+      t => t.before.test(before) && t.after.test(after)
+    )
   );
 };
 
@@ -126,7 +54,7 @@ const optimize_word = (
         output =
           typeof t.transform === "string"
             ? t.transform
-            : t.transform?.(word) ?? word;
+            : t.transform?.(output) ?? output;
       }
     });
   }
@@ -223,9 +151,9 @@ export const optimize_whitespace = (
     } else if (!ignore_cursor && i === cursor_initial && cursor_space_right) {
       output += char;
     } else {
-      const prev_char = output.slice(-1);
-      const next_char = input[i + 1];
-      if (!space_can_be_removed(prev_char, next_char)) {
+      const before = output;
+      const after = input.slice(i + 1);
+      if (!space_can_be_removed(before, after)) {
         output += char;
       }
     }
