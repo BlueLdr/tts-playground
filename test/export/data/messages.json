@@ -6,7 +6,8 @@
     "options": {
       "max_length": 255,
       "speed": true,
-      "bits": false
+      "bits": false,
+      "speed_char": "¡"
     }
   },
   {
@@ -16,7 +17,8 @@
     "options": {
       "max_length": 256,
       "speed": true,
-      "bits": false
+      "bits": false,
+      "speed_char": "¡"
     }
   },
   {
@@ -26,7 +28,8 @@
     "options": {
       "max_length": 257,
       "speed": true,
-      "bits": false
+      "bits": false,
+      "speed_char": "¡"
     }
   }
 ]

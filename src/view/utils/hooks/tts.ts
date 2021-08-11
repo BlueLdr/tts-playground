@@ -1,7 +1,8 @@
 import * as hooks from "preact/hooks";
-import { get_tts_data, play_audio, SPEED_CHAR } from "~/common";
+import { get_tts_data, play_audio } from "~/common";
 import { EDITOR_SETTINGS } from "~/model";
 import {
+  get_speed_modifier,
   useMemoRef,
   useRequestStatus,
   useStateRef,
@@ -22,11 +23,8 @@ export const usePlayMessage = (
 
   const [data, set_data, data_ref] = useStateRef("");
   const full_text = useMemoRef(() => {
-    const bits_length = bits && bits_string ? bits_string.length + 1 : 0;
     if (speed && max_length !== text.length) {
-      return `${text} ${SPEED_CHAR.repeat(
-        Math.max(max_length - text.length - 1 - bits_length, 0)
-      )}`;
+      return `${text}${get_speed_modifier(message)}`;
     }
     return text;
   }, [speed, text, max_length, bits, bits_string]);
@@ -126,6 +124,6 @@ export const useMessageFullText = (message: TTS.Message) => {
     if (!speed || text_.length >= max_length - 1) {
       return text_;
     }
-    return `${text_}${SPEED_CHAR.repeat(max_length - text.length)}`;
+    return `${text_}${get_speed_modifier(message)}`;
   }, [text, max_length, speed]);
 };

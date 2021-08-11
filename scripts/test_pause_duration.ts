@@ -45,7 +45,7 @@ const test_pauses = async () => {
     test_results[voice] = await test_voice(voice);
   }
 
-  console.log(`results`, JSON.stringify(test_results));
+  return test_results;
 };
 
 export default test_pauses;

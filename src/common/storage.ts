@@ -1,6 +1,7 @@
 import {
   DEFAULT_BITS_STRING,
   DEFAULT_HISTORY_STEPS_LIMIT,
+  DEFAULT_SPEED_CHAR,
   do_confirm,
   generate_id,
 } from "~/common";
@@ -75,6 +76,7 @@ export const DEFAULT_STATE: TTS.AppState = {
     bits: "",
     text: "Sample text",
     pause_duration: 1,
+    speed_char: DEFAULT_SPEED_CHAR,
   },
 };
 
@@ -152,6 +154,7 @@ const sample_messages: TTS.Message[] = [
       bits: "",
       speed: false,
       max_length: 255,
+      speed_char: DEFAULT_SPEED_CHAR,
     },
   },
   {
@@ -162,6 +165,7 @@ const sample_messages: TTS.Message[] = [
       bits: "",
       speed: true,
       max_length: 255,
+      speed_char: DEFAULT_SPEED_CHAR,
     },
   },
 ];

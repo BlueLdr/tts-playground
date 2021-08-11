@@ -1,3 +1,4 @@
+import { DEFAULT_SPEED_CHAR } from "~/common";
 import TTS from "~/model/types";
 
 export const MESSAGE_ONE: TTS.ExportedMessage = {
@@ -8,6 +9,7 @@ export const MESSAGE_ONE: TTS.ExportedMessage = {
     max_length: 255,
     speed: true,
     bits: "",
+    speed_char: DEFAULT_SPEED_CHAR,
   },
   __type: "message",
 };
@@ -19,6 +21,7 @@ export const MESSAGE_TWO: TTS.ExportedMessage = {
     max_length: 256,
     speed: true,
     bits: "",
+    speed_char: DEFAULT_SPEED_CHAR,
   },
   __type: "message",
 };
@@ -30,6 +33,7 @@ export const MESSAGE_THREE: TTS.ExportedMessage = {
     max_length: 257,
     speed: true,
     bits: "",
+    speed_char: DEFAULT_SPEED_CHAR,
   },
   __type: "message",
 };
@@ -42,6 +46,7 @@ export const MESSAGE_FOUR: TTS.ExportedMessage = {
     max_length: 258,
     speed: true,
     bits: "",
+    speed_char: DEFAULT_SPEED_CHAR,
   },
   __type: "message",
 };

@@ -11,12 +11,12 @@ export const useHistoryListeners = (
 ) => {
   const editor_state = hooks.useContext(EDITOR_STATE).value;
   const state_ref = useValueRef(editor_state);
-  const { max_length, speed, bits } = editor_state;
+  const { max_length, speed, bits, speed_char } = editor_state;
 
   const prev_cursor_pos = useRef(input_ref.current?.selectionStart ?? -1);
   const prev_action = useRef<TextAction | undefined>();
   const last_prop_changed = useRef<
-    "max_length" | "speed" | "bits" | "text" | undefined
+    "max_length" | "speed" | "bits" | "text" | "speed_char" | undefined
   >();
 
   const get_current_cursor = useCallback(
@@ -42,6 +42,7 @@ export const useHistoryListeners = (
       max_length: max_length !== state.max_length,
       speed: speed !== state.speed,
       bits: bits !== state.bits,
+      speed_char: speed_char !== state.speed_char,
     })
       .filter(([, v]) => !!v)
       .map(([prop]) => prop);
@@ -58,7 +59,7 @@ export const useHistoryListeners = (
     // @ts-expect-error:
     last_prop_changed.current = changed.length > 1 ? undefined : changed[0];
     prev_action.current = undefined;
-  }, [max_length, speed, bits]);
+  }, [max_length, speed, bits, speed_char]);
 
   const onChange = useCallback(e => {
     let action: TextAction,

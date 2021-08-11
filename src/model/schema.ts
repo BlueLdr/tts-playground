@@ -1,4 +1,8 @@
-import { DEFAULT_BITS_STRING, DEFAULT_HISTORY_STEPS_LIMIT } from "~/common";
+import {
+  DEFAULT_BITS_STRING,
+  DEFAULT_HISTORY_STEPS_LIMIT,
+  DEFAULT_SPEED_CHAR,
+} from "~/common";
 import { OptimizeLevel, OptimizeTrigger } from "~/model/types";
 
 export type TypeString<T extends boolean | string | number> = T extends boolean
@@ -67,6 +71,7 @@ export const MESSAGE_OPTIONS_SCHEMA: SchemaOf<TTS.MessageOptions> = {
   max_length: { type: "number", default: 255 },
   speed: { type: "boolean", default: false },
   bits: { type: "string", default: "" },
+  speed_char: { type: "string", default: DEFAULT_SPEED_CHAR },
 };
 
 export const MESSAGE_SCHEMA: SchemaOf<TTS.Message> = {
@@ -93,6 +98,7 @@ export const HISTORY_SCHEMA: SchemaOf<TTS.EditorHistory> = {
       ...MESSAGE_OPTIONS_SCHEMA,
       text: { type: "string" },
       pause_duration: { type: "number", default: 1 },
+      speed_char: { type: "string", default: DEFAULT_SPEED_CHAR },
     },
     default: null,
   },

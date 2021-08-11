@@ -27,6 +27,7 @@ declare global {
       max_length: number;
       speed: boolean;
       bits: string;
+      speed_char?: string;
     }
 
     type LoadMessageEvent = CustomEvent<{
@@ -61,6 +62,7 @@ declare global {
       speed: boolean;
       bits: string;
       pause_duration: number;
+      speed_char: string;
     }
 
     interface EditorHistory {

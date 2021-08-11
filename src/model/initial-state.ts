@@ -38,6 +38,9 @@ const initial_state: TTS.AppState = {
     pause_duration:
       stored_state?.editor?.pause_duration ??
       common.DEFAULT_STATE.editor.pause_duration,
+    speed_char:
+      stored_state?.editor?.speed_char ??
+      common.DEFAULT_STATE.editor.speed_char,
   },
 };
 

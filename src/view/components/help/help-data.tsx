@@ -2,7 +2,8 @@ import * as Preact from "preact";
 import {
   PAUSE_CHAR_SPEED_MODIFIED,
   REPOSITORY_URL,
-  SPEED_CHAR,
+  DEFAULT_SPEED_CHAR,
+  SPEED_CHARS,
 } from "~/common";
 import {
   ReportMissingHelpLink,
@@ -33,6 +34,8 @@ const HELP_COMMON = {
   speed_enable: `Enabling "Speed Modifier" will fill the rest of the message up to the character limit with the speed modifier character.`,
   speed_brian:
     "Brian is the only voice that consistently works well with the speed modifier. Most other voices will have little to no change in pitch or speed.",
+  speed_amy:
+    "When using Amy, speed modifiers have the opposite of their normal effects.",
 };
 
 export const HELP_DATA = help_data_type({
@@ -473,21 +476,54 @@ export const HELP_DATA = help_data_type({
     content: () => (
       <Preact.Fragment>
         <p>{HELP_COMMON.speed}</p>
-        <p>
-          {HELP_COMMON.speed_enable.slice(0, -1)} (<code>{SPEED_CHAR}</code>).
-        </p>
+        <p>{HELP_COMMON.speed_enable}</p>
+        <details>
+          <summary>Speed Modifier Characters</summary>
+          {HELP_DATA["speed-chars"].content()}
+        </details>
         <h3>Important Tips</h3>
         <ul>
           <li>
             The speed modifier will not affect any text that follows
             punctuation. For example, in the message{" "}
-            <code>Hey you, get off my lawn{SPEED_CHAR.repeat(10)}</code>,{" "}
-            <code>Hey you</code> will be spoken normally, and{" "}
+            <code>Hey you, get off my lawn{DEFAULT_SPEED_CHAR.repeat(10)}</code>
+            , <code>Hey you</code> will be spoken normally, and{" "}
             <code>get off my lawn</code> will be sped up.
           </li>
           <li>{HELP_COMMON.speed_brian}</li>
+          <li>
+            {HELP_COMMON.speed_amy} So <code>{SPEED_CHARS[0]}</code> and{" "}
+            <code>{SPEED_CHARS[1]}</code> will make her speak slower/deeper, and{" "}
+            <code>{SPEED_CHARS[2]}</code> will make her speed up.
+          </li>
         </ul>
       </Preact.Fragment>
+    ),
+  },
+
+  "speed-chars": {
+    key: "speed-chars",
+    name: "Speed Modifier Characters",
+    content: () => (
+      <ul>
+        <li>
+          <code>{SPEED_CHARS[0]}</code>: "Inverted Exclamation Mark" is the
+          default speed modifier character. It is the most reliable and
+          consistent for producing the desired speed and pitch.
+        </li>
+        <li>
+          <code>{SPEED_CHARS[1]}</code>: "Opening Parenthesis Closing
+          Parenthesis" performs very similarly to <code>{SPEED_CHARS[0]}</code>,
+          but with slightly less intensity and subtle differences in inflection.
+          Try this if <code>{SPEED_CHARS[0]}</code> isn't quite giving you the
+          result you want.
+        </li>
+        <li>
+          <code>{SPEED_CHARS[2]}</code>: "Greater Than or Equal To" surprisingly
+          has the opposite effect of the other modifiers: it causes the speaker
+          to slow down and lower their pitch later in the sentence.
+        </li>
+      </ul>
     ),
   },
 

@@ -6,7 +6,7 @@ import {
   useMemo,
   useRef,
 } from "preact/hooks";
-import { do_confirm } from "~/common";
+import { DEFAULT_SPEED_CHAR, do_confirm } from "~/common";
 import {
   ADD_SNIPPET_CALLBACK,
   EDITOR_STATE,
@@ -44,6 +44,7 @@ const empty_message = (length: number): TTS.Message => ({
     bits: "",
     max_length: length,
     speed: false,
+    speed_char: DEFAULT_SPEED_CHAR,
   },
 });
 
@@ -60,7 +61,14 @@ export const Editor: Preact.FunctionComponent<{
   const input_ref = useRef<HTMLTextAreaElement>();
   const [state, set_state] = useStateObject(editor_state);
   const state_ref = useValueRef(state);
-  const { text, speed, max_length: max_len, bits, pause_duration } = state;
+  const {
+    text,
+    speed,
+    max_length: max_len,
+    bits,
+    pause_duration,
+    speed_char,
+  } = state;
   const max_length = useMemo(() => ensure_number(max_len, 255), [max_len]);
   const pause_duration_ref = useValueRef(pause_duration);
 
@@ -123,8 +131,9 @@ export const Editor: Preact.FunctionComponent<{
       text: trimmed_text,
       bits,
       pause_duration,
+      speed_char,
     });
-  }, [max_length, speed, text, bits, pause_duration]);
+  }, [max_length, speed, text, bits, pause_duration, speed_char]);
 
   const new_message = useMemo(
     () => ({
@@ -138,10 +147,11 @@ export const Editor: Preact.FunctionComponent<{
         max_length,
         speed,
         bits,
+        speed_char,
       },
     }),
 
-    [max_length, speed, text, message?.name, bits]
+    [max_length, speed, text, message?.name, bits, speed_char]
   );
 
   const [data, status, submit_message, message_text] =
@@ -228,6 +238,7 @@ export const Editor: Preact.FunctionComponent<{
       speed: msg.options?.speed,
       max_length: msg.options?.max_length,
       bits: msg.options?.bits ?? "",
+      speed_char: msg.options?.speed_char ?? DEFAULT_SPEED_CHAR,
     });
     EditorHistory.reset({
       state: {
@@ -236,6 +247,7 @@ export const Editor: Preact.FunctionComponent<{
         max_length: msg.options?.max_length ?? length_ref.current,
         bits: msg.options?.bits ?? "",
         pause_duration: state_ref.current?.pause_duration ?? 1,
+        speed_char: state_ref.current?.speed_char ?? DEFAULT_SPEED_CHAR,
       },
       cursor: get_current_cursor(),
     });
@@ -287,6 +299,7 @@ export const Editor: Preact.FunctionComponent<{
       speed: false,
       max_length: length_ref.current,
       pause_duration: pause_duration_ref.current,
+      speed_char: state_ref.current?.speed_char,
     };
     set_state(new_state);
     set_unsaved(false);
@@ -327,6 +340,7 @@ export const Editor: Preact.FunctionComponent<{
         text={text}
         onSubmit={on_submit}
         speed={speed}
+        speedChar={speed_char}
         status={status}
         bits={bits}
         setState={set_state}
