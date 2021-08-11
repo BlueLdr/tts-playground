@@ -17,7 +17,7 @@ export const usePlayMessage = (
   const { bits_string } = hooks.useContext(EDITOR_SETTINGS).value ?? {};
   const {
     text,
-    options: { speed, max_length, bits, voice },
+    options: { speed, max_length, bits, voice, speed_char },
   } = message;
   const voice_ref = useValueRef(voice);
 
@@ -27,7 +27,7 @@ export const usePlayMessage = (
       return `${text}${get_speed_modifier(message)}`;
     }
     return text;
-  }, [speed, text, max_length, bits, bits_string]);
+  }, [speed, text, max_length, bits, bits_string, speed_char]);
 
   const [status, fetch_tts] = useRequestStatus(get_tts_data);
   const on_submit = hooks.useCallback(() => {
@@ -117,7 +117,7 @@ export const useAudioPlayer = (
 export const useMessageFullText = (message: TTS.Message) => {
   const {
     text,
-    options: { max_length, speed, bits },
+    options: { max_length, speed, bits, speed_char },
   } = message;
   return hooks.useMemo(() => {
     let text_ = bits ? `${bits} ${text}` : text;
@@ -125,5 +125,5 @@ export const useMessageFullText = (message: TTS.Message) => {
       return text_;
     }
     return `${text_}${get_speed_modifier(message)}`;
-  }, [text, max_length, speed]);
+  }, [text, max_length, speed, speed_char]);
 };
