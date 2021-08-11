@@ -1,6 +1,6 @@
 import * as hooks from "preact/hooks";
 import { get_tts_data, play_audio } from "~/common";
-import { EDITOR_SETTINGS } from "~/model";
+import { EDITOR_SETTINGS, EDITOR_STATE } from "~/model";
 import {
   get_speed_modifier,
   useMemoRef,
@@ -14,12 +14,12 @@ export const usePlayMessage = (
   player_id?: string,
   request?: TTS.TTSRequest
 ) => {
-  const { voice, bits_string } = hooks.useContext(EDITOR_SETTINGS).value ?? {};
-  const voice_ref = useValueRef(voice);
+  const { bits_string } = hooks.useContext(EDITOR_SETTINGS).value ?? {};
   const {
     text,
-    options: { speed, max_length, bits },
+    options: { speed, max_length, bits, voice },
   } = message;
+  const voice_ref = useValueRef(voice);
 
   const [data, set_data, data_ref] = useStateRef("");
   const full_text = useMemoRef(() => {
@@ -56,7 +56,7 @@ export const usePlaySnippet = (
   player_id?: string,
   request?: TTS.TTSRequest
 ) => {
-  const voice = hooks.useContext(EDITOR_SETTINGS).value?.voice;
+  const voice = hooks.useContext(EDITOR_STATE).value?.voice;
   const voice_ref = useValueRef(voice);
   const [data, set_data, data_ref] = useStateRef("");
 
@@ -92,7 +92,7 @@ export const useAudioPlayer = (
   player_id?: string,
   request?: TTS.TTSRequest
 ) => {
-  const voice = hooks.useContext(EDITOR_SETTINGS).value?.voice;
+  const voice = hooks.useContext(EDITOR_STATE).value?.voice;
   const voice_ref = useValueRef(voice);
   const [data, set_data, data_ref] = useStateRef<string>("");
   hooks.useEffect(() => {

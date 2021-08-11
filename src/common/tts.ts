@@ -1,6 +1,7 @@
+import { DEFAULT_VOICE } from "~/common/constants";
 import { do_alert } from "./utils";
 
-export const TTS_URL = (voice: string = "Brian") =>
+export const TTS_URL = (voice: string = DEFAULT_VOICE) =>
   `https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=`;
 
 const REQUEST: TTS.TTSRequest = {
@@ -18,7 +19,7 @@ const REQUEST: TTS.TTSRequest = {
 export const get_tts_data = async (
   text: string,
   request: TTS.TTSRequest = REQUEST,
-  voice: string = "Brian"
+  voice: string = DEFAULT_VOICE
 ): Promise<string> => {
   if (!text) {
     return Promise.reject();

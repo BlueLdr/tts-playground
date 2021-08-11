@@ -1,38 +1,17 @@
 import * as Preact from "preact";
-import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
+import { useContext, useEffect, useRef } from "preact/hooks";
 import { VOICE_NAMES } from "~/common";
-import {
-  EDITOR_SETTINGS,
-  OPTIMIZE_MESSAGE_CALLBACK,
-  OptimizeTrigger,
-} from "~/model";
-import {
-  ensure_number,
-  useContextState,
-  useDebounce,
-  useStateIfMounted,
-  useValueRef,
-} from "~/view/utils";
+import { OPTIMIZE_MESSAGE_CALLBACK, OptimizeTrigger } from "~/model";
+import { ensure_number, useDebounce, useStateIfMounted } from "~/view/utils";
 
 export const EditorHeader: Preact.FunctionComponent<{
   reset: () => void;
   maxLength: number;
   setMaxLength: (value: number) => void;
-}> = ({ maxLength, setMaxLength, reset }) => {
-  const [settings, set_settings] = useContextState(EDITOR_SETTINGS);
+  voice: string;
+  setVoice: (value: string) => void;
+}> = ({ maxLength, setMaxLength, voice, setVoice, reset }) => {
   const optimize_message = useContext(OPTIMIZE_MESSAGE_CALLBACK).value;
-  const settings_ref = useValueRef(settings);
-  const on_change_settings = useCallback(
-    <K extends keyof TTS.EditorSettings>(
-      key: K,
-      value: TTS.EditorSettings[K]
-    ) =>
-      set_settings({
-        ...settings_ref.current,
-        [key]: value,
-      }),
-    []
-  );
   const refocus_target = useRef<HTMLElement | null>();
 
   const [value, set_value] = useStateIfMounted(maxLength);
@@ -42,6 +21,7 @@ export const EditorHeader: Preact.FunctionComponent<{
       set_value(maxLength);
     }
   }, [maxLength]);
+
   return (
     <Preact.Fragment>
       <div className="tts-header">
@@ -91,13 +71,8 @@ export const EditorHeader: Preact.FunctionComponent<{
             <div className="tts-options-item-control">
               <select
                 data-help="editor-voice"
-                value={settings.voice}
-                onChange={e =>
-                  on_change_settings(
-                    "voice",
-                    (e.target as HTMLSelectElement).value
-                  )
-                }
+                value={voice}
+                onChange={e => setVoice((e.target as HTMLSelectElement).value)}
               >
                 {VOICE_NAMES.map(name => (
                   <option value={name} key={name}>

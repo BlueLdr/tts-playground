@@ -6,7 +6,7 @@ import {
   useMemo,
   useRef,
 } from "preact/hooks";
-import { DEFAULT_SPEED_CHAR, do_confirm } from "~/common";
+import { DEFAULT_SPEED_CHAR, DEFAULT_VOICE, do_confirm } from "~/common";
 import {
   ADD_SNIPPET_CALLBACK,
   EDITOR_STATE,
@@ -36,7 +36,7 @@ import {
   useValueRef,
 } from "~/view/utils";
 
-const empty_message = (length: number): TTS.Message => ({
+const empty_message = (length: number, voice: string): TTS.Message => ({
   id: "",
   text: "",
   name: "",
@@ -44,7 +44,8 @@ const empty_message = (length: number): TTS.Message => ({
     bits: "",
     max_length: length,
     speed: false,
-    speed_char: DEFAULT_SPEED_CHAR,
+    speed_char: undefined,
+    voice: voice ?? DEFAULT_VOICE,
   },
 });
 
@@ -68,9 +69,11 @@ export const Editor: Preact.FunctionComponent<{
     bits,
     pause_duration,
     speed_char,
+    voice,
   } = state;
   const max_length = useMemo(() => ensure_number(max_len, 255), [max_len]);
   const pause_duration_ref = useValueRef(pause_duration);
+  const voice_ref = useValueRef(voice);
 
   const get_current_cursor = useCallback(
     () => ({
@@ -132,10 +135,11 @@ export const Editor: Preact.FunctionComponent<{
       bits,
       pause_duration,
       speed_char,
+      voice,
     });
-  }, [max_length, speed, text, bits, pause_duration, speed_char]);
+  }, [max_length, speed, text, bits, pause_duration, speed_char, voice]);
 
-  const new_message = useMemo(
+  const new_message = useMemo<TTS.Message>(
     () => ({
       id: message?.id,
       text:
@@ -148,10 +152,11 @@ export const Editor: Preact.FunctionComponent<{
         speed,
         bits,
         speed_char,
+        voice,
       },
     }),
 
-    [max_length, speed, text, message?.name, bits, speed_char]
+    [max_length, speed, text, message?.name, bits, speed_char, voice]
   );
 
   const [data, status, submit_message, message_text] =
@@ -232,13 +237,16 @@ export const Editor: Preact.FunctionComponent<{
 
   const first_render = useRef(true);
   const load_message = useCallback((msg?: TTS.Message) => {
-    msg = msg ?? empty_message(length_ref.current);
+    msg = msg ?? empty_message(length_ref.current, voice_ref.current);
     set_state({
       text: msg?.text ?? "",
       speed: msg.options?.speed,
       max_length: msg.options?.max_length,
       bits: msg.options?.bits ?? "",
-      speed_char: msg.options?.speed_char ?? DEFAULT_SPEED_CHAR,
+      speed_char:
+        msg.options?.speed_char ??
+        (msg.options?.speed ? DEFAULT_SPEED_CHAR : undefined),
+      voice: msg.options?.voice ?? state_ref.current?.voice ?? DEFAULT_VOICE,
     });
     EditorHistory.reset({
       state: {
@@ -247,7 +255,10 @@ export const Editor: Preact.FunctionComponent<{
         max_length: msg.options?.max_length ?? length_ref.current,
         bits: msg.options?.bits ?? "",
         pause_duration: state_ref.current?.pause_duration ?? 1,
-        speed_char: state_ref.current?.speed_char ?? DEFAULT_SPEED_CHAR,
+        speed_char:
+          msg.options?.speed_char ??
+          (msg.options?.speed ? DEFAULT_SPEED_CHAR : undefined),
+        voice: msg.options?.voice ?? state_ref.current?.voice ?? DEFAULT_VOICE,
       },
       cursor: get_current_cursor(),
     });
@@ -300,6 +311,7 @@ export const Editor: Preact.FunctionComponent<{
       max_length: length_ref.current,
       pause_duration: pause_duration_ref.current,
       speed_char: state_ref.current?.speed_char,
+      voice: voice_ref.current,
     };
     set_state(new_state);
     set_unsaved(false);
@@ -326,6 +338,11 @@ export const Editor: Preact.FunctionComponent<{
     [set_state]
   );
 
+  const set_voice = useCallback(
+    (val: string) => set_state({ voice: val }),
+    [set_state]
+  );
+
   const is_intro = help_item === "intro-editor";
 
   const content = (
@@ -333,6 +350,8 @@ export const Editor: Preact.FunctionComponent<{
       <EditorHeader
         maxLength={max_length}
         setMaxLength={set_max_length}
+        voice={voice}
+        setVoice={set_voice}
         reset={reset}
       />
       <EditorMain

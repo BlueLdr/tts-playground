@@ -17,7 +17,6 @@ const initial_state: TTS.AppState = {
     optimize_level:
       stored_state?.settings?.optimize_level ??
       common.DEFAULT_STATE.settings.optimize_level,
-    voice: stored_state?.settings?.voice ?? common.DEFAULT_STATE.settings.voice,
     bits_string:
       stored_state?.settings?.bits_string ??
       common.DEFAULT_STATE.settings.bits_string,
@@ -41,6 +40,7 @@ const initial_state: TTS.AppState = {
     speed_char:
       stored_state?.editor?.speed_char ??
       common.DEFAULT_STATE.editor.speed_char,
+    voice: stored_state?.editor?.voice ?? common.DEFAULT_STATE.editor.voice,
   },
 };
 

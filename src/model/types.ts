@@ -28,6 +28,7 @@ declare global {
       speed: boolean;
       bits: string;
       speed_char?: string;
+      voice: string;
     }
 
     type LoadMessageEvent = CustomEvent<{
@@ -60,6 +61,7 @@ declare global {
       text: string;
       max_length: number;
       speed: boolean;
+      voice: string;
       bits: string;
       pause_duration: number;
       speed_char: string;
@@ -87,7 +89,6 @@ declare global {
       trim_whitespace: boolean;
       optimize_words: OptimizeTrigger;
       optimize_level: OptimizeLevel;
-      voice: string;
       bits_string: string;
       history_steps: number;
       skip_tutorials: boolean;

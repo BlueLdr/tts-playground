@@ -2,6 +2,7 @@ import {
   DEFAULT_BITS_STRING,
   DEFAULT_HISTORY_STEPS_LIMIT,
   DEFAULT_SPEED_CHAR,
+  DEFAULT_VOICE,
 } from "~/common";
 import { OptimizeLevel, OptimizeTrigger } from "~/model/types";
 
@@ -39,7 +40,6 @@ export const SETTINGS_SCHEMA: SchemaOf<TTS.EditorSettings> = {
   trim_whitespace: { type: "boolean", default: false },
   optimize_words: { type: "number", default: OptimizeTrigger.manual },
   optimize_level: { type: "number", default: OptimizeLevel.normal },
-  voice: { type: "string", default: "Brian" },
   bits_string: { type: "string", default: DEFAULT_BITS_STRING },
   history_steps: { type: "number", default: DEFAULT_HISTORY_STEPS_LIMIT },
   skip_tutorials: { type: "boolean", default: false },
@@ -72,6 +72,7 @@ export const MESSAGE_OPTIONS_SCHEMA: SchemaOf<TTS.MessageOptions> = {
   speed: { type: "boolean", default: false },
   bits: { type: "string", default: "" },
   speed_char: { type: "string", default: DEFAULT_SPEED_CHAR },
+  voice: { type: "string", default: DEFAULT_VOICE },
 };
 
 export const MESSAGE_SCHEMA: SchemaOf<TTS.Message> = {

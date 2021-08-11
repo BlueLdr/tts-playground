@@ -10,6 +10,7 @@ export const MESSAGE_ONE: TTS.ExportedMessage = {
     speed: true,
     bits: "",
     speed_char: DEFAULT_SPEED_CHAR,
+    voice: "Brian",
   },
   __type: "message",
 };
@@ -22,6 +23,7 @@ export const MESSAGE_TWO: TTS.ExportedMessage = {
     speed: true,
     bits: "",
     speed_char: DEFAULT_SPEED_CHAR,
+    voice: "Brian",
   },
   __type: "message",
 };
@@ -34,6 +36,7 @@ export const MESSAGE_THREE: TTS.ExportedMessage = {
     speed: true,
     bits: "",
     speed_char: DEFAULT_SPEED_CHAR,
+    voice: "Brian",
   },
   __type: "message",
 };
@@ -47,6 +50,7 @@ export const MESSAGE_FOUR: TTS.ExportedMessage = {
     speed: true,
     bits: "",
     speed_char: DEFAULT_SPEED_CHAR,
+    voice: "Brian",
   },
   __type: "message",
 };

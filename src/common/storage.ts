@@ -2,6 +2,7 @@ import {
   DEFAULT_BITS_STRING,
   DEFAULT_HISTORY_STEPS_LIMIT,
   DEFAULT_SPEED_CHAR,
+  DEFAULT_VOICE,
   do_confirm,
   generate_id,
 } from "~/common";
@@ -64,7 +65,6 @@ export const DEFAULT_STATE: TTS.AppState = {
     trim_whitespace: true,
     optimize_words: OptimizeTrigger.manual,
     optimize_level: OptimizeLevel.normal,
-    voice: "Brian",
     history_steps: DEFAULT_HISTORY_STEPS_LIMIT,
     skip_tutorials: false,
   },
@@ -77,6 +77,7 @@ export const DEFAULT_STATE: TTS.AppState = {
     text: "Sample text",
     pause_duration: 1,
     speed_char: DEFAULT_SPEED_CHAR,
+    voice: DEFAULT_VOICE,
   },
 };
 
@@ -155,6 +156,7 @@ const sample_messages: TTS.Message[] = [
       speed: false,
       max_length: 255,
       speed_char: DEFAULT_SPEED_CHAR,
+      voice: DEFAULT_VOICE,
     },
   },
   {
@@ -166,6 +168,7 @@ const sample_messages: TTS.Message[] = [
       speed: true,
       max_length: 255,
       speed_char: DEFAULT_SPEED_CHAR,
+      voice: DEFAULT_VOICE,
     },
   },
 ];

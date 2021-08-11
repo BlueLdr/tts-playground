@@ -47,6 +47,8 @@
       align-items flex-end
       .row
         color $Gray216
+        > :not(:first-child)
+          margin-left 1.5rem
         strong
           color $Gray248
       > .btn
@@ -56,6 +58,16 @@
           margin-right 0.625rem
     &-options
       flex 1 1 100%
+      h4
+        margin-bottom 0.75rem
+      .row
+        margin-top 0.75rem
+
+    &-export
+      margin-top 1.5rem
+      &, & .btn
+        width -moz-fit-content
+        width fit-content
 
     .modal-footer
       .btn,

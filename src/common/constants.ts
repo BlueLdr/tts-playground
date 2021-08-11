@@ -9,7 +9,8 @@ export const VOICE_NAMES = [
   "Joey",
   "Matthew",
   "Geraint",
-];
+] as const;
+export const DEFAULT_VOICE = VOICE_NAMES[0];
 
 export const SPEED_CHARS = ["¡", "₍₎", "≥"] as const;
 export const DEFAULT_SPEED_CHAR = SPEED_CHARS[0];
