@@ -1,6 +1,6 @@
 import * as Preact from "preact";
 import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
-import { SPEED_CHAR } from "~/common";
+import { DEFAULT_SPEED_CHAR, SPEED_CHARS } from "~/common";
 import {
   EDITOR_SETTINGS,
   EDITOR_STATE,
@@ -18,6 +18,7 @@ export const EditorMain: Preact.FunctionComponent<{
   onSubmit: (text?: string) => void;
   inputRef: Preact.RefObject<HTMLTextAreaElement>;
   speed: boolean;
+  speedChar: string;
   bits: string;
   status: TTS.RequestStatus;
   listeners: EventListenersOf<HTMLTextAreaElement>;
@@ -26,6 +27,7 @@ export const EditorMain: Preact.FunctionComponent<{
   setState,
   onSubmit,
   speed,
+  speedChar,
   bits,
   status,
   inputRef,
@@ -42,8 +44,12 @@ export const EditorMain: Preact.FunctionComponent<{
     [setState]
   );
   const on_change_speed = useCallback(
-    (speed: boolean) => setState({ speed }),
-    [setState]
+    (char: string) =>
+      setState({
+        speed: !!char,
+        speed_char: char || speedChar,
+      }),
+    [setState, speedChar]
   );
   const on_change_pause_duration = useCallback(
     (duration: number) => setState({ pause_duration: duration }),
@@ -59,6 +65,7 @@ export const EditorMain: Preact.FunctionComponent<{
         bitsString={bits}
         maxLength={max_length - bits_length}
         speed={speed}
+        speedChar={speedChar}
         {...listeners}
       />
       <div className="tts-textarea-bottom">
@@ -73,14 +80,21 @@ export const EditorMain: Preact.FunctionComponent<{
             data-tutorial="speed-overview"
             data-help="speed-overview"
           >
-            <input
-              type="checkbox"
-              checked={speed}
+            <select
+              value={speed ? speedChar : ""}
               onInput={e =>
-                on_change_speed((e.target as HTMLInputElement).checked)
+                on_change_speed((e.target as HTMLSelectElement).value)
               }
-            />
-            Speed Modifier
+            >
+              <option value="" selected={!speed}>
+                Speed Modifier: Off
+              </option>
+              {SPEED_CHARS.map(c => (
+                <option key={c} value={c} selected={speed && speedChar === c}>
+                  Speed Modifier: {c}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
         <BitsInput bits={bits} setBits={on_change_bits} />
@@ -116,6 +130,7 @@ export const TTSTextArea: Preact.FunctionComponent<
     onChangeText: (text: string) => void;
     inputRef: Preact.RefObject<HTMLTextAreaElement>;
     speed: boolean;
+    speedChar: string;
     maxLength: number;
     bitsString: string;
   } & Omit<HTMLTextAreaProps, "value">
@@ -123,6 +138,7 @@ export const TTSTextArea: Preact.FunctionComponent<
   value,
   onChangeText,
   speed,
+  speedChar = DEFAULT_SPEED_CHAR,
   id,
   maxLength,
   bitsString,
@@ -161,7 +177,8 @@ export const TTSTextArea: Preact.FunctionComponent<
   let end = "";
   const max_len = parseInt(`${maxLength}`);
   if (speed && max_len !== value.length) {
-    end = SPEED_CHAR.repeat(Math.max(0, max_len - value.length - 1));
+    const count = Math.max(0, max_len - value.length - 1);
+    end = speedChar.repeat(count).slice(0, count);
   }
   if (bitsString) {
     end += ` ${bitsString}`;

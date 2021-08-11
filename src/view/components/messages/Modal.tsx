@@ -1,6 +1,6 @@
 import * as Preact from "preact";
 import { useCallback, useEffect, useRef } from "preact/hooks";
-import { do_alert, do_confirm } from "~/common";
+import { DEFAULT_SPEED_CHAR, do_alert, do_confirm } from "~/common";
 import {
   AudioPlayer,
   ClipboardButton,
@@ -144,7 +144,7 @@ export const MessageModalBase: Preact.FunctionComponent<{
 }> = ({ message, name, setName, dismiss, isNew, previewMessage, children }) => {
   const input_ref = useRef<HTMLInputElement>();
   const {
-    options: { max_length, speed, bits },
+    options: { max_length, speed, bits, speed_char = DEFAULT_SPEED_CHAR },
   } = message || {};
 
   const [data, status, submit_message, text] = usePlayMessage(
@@ -196,7 +196,8 @@ export const MessageModalBase: Preact.FunctionComponent<{
                 Character Limit: <strong>{max_length}</strong>
               </span>
               <span>
-                Use Speed Modifier: <strong>{speed ? "Yes" : "No"}</strong>
+                Use Speed Modifier:{" "}
+                <strong>{speed ? <code>{speed_char}</code> : "No"}</strong>
               </span>
               <span>
                 Use Bits: <strong>{!!bits ? "Yes" : "No"}</strong>

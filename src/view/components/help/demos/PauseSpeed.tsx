@@ -1,6 +1,6 @@
 import * as Preact from "preact";
 import { useMemo } from "preact/hooks";
-import { SPEED_CHAR } from "~/common";
+import { DEFAULT_SPEED_CHAR } from "~/common";
 import { AudioPlayer, generate_pause } from "~/view/components";
 import { useAudioPlayer } from "~/view/utils";
 
@@ -11,7 +11,7 @@ const PAUSE_DEMO_MODAL_REQUEST: TTS.TTSRequest = {
 };
 
 const create_text = str =>
-  `this is before the pause ${str} this is after the pause ${SPEED_CHAR.repeat(
+  `this is before the pause ${str} this is after the pause ${DEFAULT_SPEED_CHAR.repeat(
     20
   )}`;
 

@@ -11,7 +11,8 @@ export const VOICE_NAMES = [
   "Geraint",
 ];
 
-export const SPEED_CHAR = "¡";
+export const SPEED_CHARS = ["¡", "₍₎", "≥"] as const;
+export const DEFAULT_SPEED_CHAR = SPEED_CHARS[0];
 export const PAUSE_CHAR_SPEED_MODIFIED = "ᴾ";
 
 export const DEFAULT_BITS_STRING = "uni300";
