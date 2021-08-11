@@ -10,6 +10,6 @@ export const get_speed_modifier = (message: TTS.Message) => {
     return "";
   }
   return speed_char
-    .repeat(max_length - text.length)
-    .slice(0, max_length - text.length);
+    .repeat(max_length - text_.length)
+    .slice(0, max_length - text_.length);
 };

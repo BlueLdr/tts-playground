@@ -7,7 +7,8 @@
       "max_length": 255,
       "speed": true,
       "bits": false,
-      "speed_char": "¡"
+      "speed_char": "¡",
+      "voice": "Brian"
     }
   },
   {
@@ -18,7 +19,8 @@
       "max_length": 256,
       "speed": true,
       "bits": false,
-      "speed_char": "¡"
+      "speed_char": "¡",
+      "voice": "Brian"
     }
   },
   {
@@ -29,7 +31,8 @@
       "max_length": 257,
       "speed": true,
       "bits": false,
-      "speed_char": "¡"
+      "speed_char": "¡",
+      "voice": "Brian"
     }
   }
 ]

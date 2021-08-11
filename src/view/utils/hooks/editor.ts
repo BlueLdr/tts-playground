@@ -80,7 +80,7 @@ export const useSaveMessage = () => {
   const [messages, set_messages] = useContextState(MESSAGES);
   const [loaded_message, loaded_id, set_loaded_id] = useLoadedMessage(messages);
   const {
-    value: { text, speed, speed_char, max_length, bits },
+    value: { text, speed, speed_char, max_length, bits, voice },
   } = hooks.useContext(EDITOR_STATE);
   const [is_unsaved, set_unsaved] = useContextState(EDITOR_UNSAVED);
 
@@ -89,10 +89,11 @@ export const useSaveMessage = () => {
       ? !!text
       : loaded_message.text !== text ||
           loaded_message.options?.speed !== speed ||
-          loaded_message.options?.bits !== bits ||
           loaded_message.options?.speed_char !== speed_char ||
+          loaded_message.options?.bits !== bits ||
+          loaded_message.options?.voice !== voice ||
           loaded_message.options?.max_length !== max_length;
-  }, [loaded_message, text, speed, max_length, bits, speed_char]);
+  }, [loaded_message, text, speed, max_length, bits, speed_char, voice]);
 
   hooks.useEffect(() => {
     set_unsaved(new_is_unsaved);

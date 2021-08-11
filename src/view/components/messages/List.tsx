@@ -1,10 +1,8 @@
 import * as Preact from "preact";
 import { useContext, useMemo } from "preact/hooks";
 import { LOADED_MESSAGE, MESSAGES } from "~/model";
-import { AudioPlayer } from "~/view/components";
 import { MessageModal } from "~/view/components/messages/Modal";
 import {
-  useAudioPlayer,
   useContextState,
   useCopyToClipboard,
   useMessageFullText,
@@ -18,8 +16,6 @@ export const MessagesList: Preact.FunctionComponent<{
   const messages = useContext(MESSAGES).value;
   const [loaded_id, set_loaded_id] = useContextState(LOADED_MESSAGE);
   const [edit_target, set_edit_target] = useStateIfMounted<string | null>(null);
-
-  const [tts_data, preview_tts] = useAudioPlayer("messages-sidebar-player");
 
   const edit_target_msg = useMemo(
     () => messages.find(m => m.id === edit_target),
@@ -44,11 +40,6 @@ export const MessagesList: Preact.FunctionComponent<{
           />
         ))}
       </div>
-      <AudioPlayer
-        id="messages-sidebar-player"
-        className="tts-messages-sidebar-player invisible"
-        data={tts_data}
-      />
       {edit_target != null &&
         useModal(
           <MessageModal
@@ -57,7 +48,6 @@ export const MessagesList: Preact.FunctionComponent<{
             updateMessage={value => updateMessages(edit_target, value)}
             deleteMessage={() => updateMessages(edit_target)}
             dismiss={() => set_edit_target(null)}
-            previewMessage={preview_tts}
           />
         )}
     </div>
