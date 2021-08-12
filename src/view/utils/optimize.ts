@@ -8,6 +8,8 @@ import {
   WORD_CHARACTERS,
 } from "~/view/utils/optimize-transforms";
 
+const WHITESPACE = "[^S\r\n]";
+
 const space_can_be_removed = (before: string, after: string) => {
   // prevent forming urls, which will be removed in speech
   if (before.endsWith(".")) {
@@ -64,14 +66,14 @@ const optimize_word = (
 };
 
 const get_first_char = (text: string, index: number = 0) => {
-  return (index === 0 ? text : text.slice(index)).search(/[^\s]/i);
+  return (index === 0 ? text : text.slice(index)).search(/[^\s]/);
 };
 const get_last_char = (text: string, index: number = text.length) => {
   const input = (index === text.length ? text : text.slice(0, index))
     .split("")
     .reverse()
     .join("");
-  const i = input.search(/[^\s]/i);
+  const i = input.search(/[^\s]/);
   return i === -1 ? i : text.length - i;
 };
 
@@ -102,19 +104,51 @@ const parse_symbol = (text: string) => {
   return text.slice(0, index);
 };
 
+const trim_duplicate_whitespace = (text: string) =>
+  text.replace(/\s+(\n)/g, "$1").replace(/(\s)\s+/g, "$1");
+
+export const trim_excess_whitespace = (
+  text: string,
+  input_ref: preact.RefObject<HTMLTextAreaElement>
+) => {
+  let { selectionStart = -1, selectionEnd = -1 } = input_ref.current || {};
+  if (
+    selectionStart === -1 ||
+    selectionEnd === -1 ||
+    (selectionStart === selectionEnd &&
+      (selectionStart === 0 || selectionEnd === text.length))
+  ) {
+    return [trim_duplicate_whitespace(text.trim()), -1, -1] as const;
+  }
+
+  let start = trim_duplicate_whitespace(
+    text.slice(0, selectionStart).trimStart()
+  );
+  let middle = trim_duplicate_whitespace(
+    text.slice(selectionStart, selectionEnd)
+  );
+  let end = trim_duplicate_whitespace(text.slice(selectionEnd).trimEnd());
+  if (/\s$/i.test(start) && /^\s/i.test(middle)) {
+    middle = middle.slice(1);
+  }
+  if (/\s$/i.test(middle) && /^\s/i.test(end)) {
+    middle = middle.slice(0, -1);
+  }
+  return [
+    `${start}${middle}${end}`,
+    start.length,
+    start.length + middle.length,
+  ] as const;
+};
+
 export const optimize_whitespace = (
   text: string,
   input_ref: preact.RefObject<HTMLTextAreaElement>,
-  trigger: OptimizeTrigger,
-  settings: TTS.EditorSettings
+  trigger: OptimizeTrigger
 ) => {
-  const { trim_whitespace } = settings;
   let { selectionStart = -1, selectionEnd = -1 } = input_ref.current || {};
   const ignore_cursor = trigger <= OptimizeTrigger.blur;
-  if (
-    !trim_whitespace ||
-    (selectionStart !== selectionEnd && trigger !== OptimizeTrigger.manual)
-  ) {
+  if (selectionStart !== selectionEnd && trigger !== OptimizeTrigger.manual) {
     return [text, selectionStart, selectionEnd] as const;
   }
   let cursor_initial = selectionStart;
@@ -328,8 +362,7 @@ export const optimize_selection = (
         selectionEnd: text_trimmed.length,
       },
     },
-    trigger,
-    settings
+    trigger
   );
   const space_before =
     input.startsWith(" ") &&
@@ -356,7 +389,7 @@ export const optimize_message = (
   let { selectionStart = -1, selectionEnd = -1 } = input_ref.current || {};
   const should_optimize_words = trigger <= optimize_words;
   if (
-    (!trim_whitespace && should_optimize_words) ||
+    (!trim_whitespace && !should_optimize_words) ||
     !text ||
     (selectionStart !== selectionEnd && trigger !== OptimizeTrigger.manual)
   ) {
@@ -365,6 +398,14 @@ export const optimize_message = (
 
   if (selectionStart !== selectionEnd) {
     return optimize_selection(text, input_ref, trigger, settings);
+  }
+
+  if (
+    trim_whitespace &&
+    !should_optimize_words &&
+    trigger <= OptimizeTrigger.blur
+  ) {
+    return trim_excess_whitespace(text, input_ref);
   }
 
   let [text_trimmed, cursor_start, cursor_end] = optimize_message_words(
@@ -382,7 +423,6 @@ export const optimize_message = (
         selectionEnd: cursor_end,
       },
     },
-    trigger,
-    settings
+    trigger
   );
 };

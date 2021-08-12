@@ -109,7 +109,10 @@ export const useOptimizeMessageTrigger = (
         input_ref.current?.selectionEnd,
         trigger
       );
-      if (trigger > settings_ref.current.optimize_words) {
+      if (
+        !settings_ref.current.trim_whitespace &&
+        trigger > settings_ref.current.optimize_words
+      ) {
         callback_post?.(
           state_ref.current.text,
           input_ref.current?.selectionStart,
