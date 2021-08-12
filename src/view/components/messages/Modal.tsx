@@ -98,8 +98,14 @@ export const MessageModal: Preact.FunctionComponent<{
             Load Into Editor
           </button>
           <ClipboardButton
+            id="msg-modal"
             className="btn btn-large btn-with-icon btn-right"
             text={text}
+          />
+          <textarea
+            id="clipboard-input-msg-modal"
+            className="clipboard-input invisible"
+            tabIndex={-1}
           />
         </div>
       )}

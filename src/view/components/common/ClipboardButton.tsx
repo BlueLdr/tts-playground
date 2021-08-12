@@ -2,15 +2,16 @@ import * as Preact from "preact";
 import { useCopyToClipboard, useTempAnimation } from "~/view/utils";
 
 export const ClipboardButton: Preact.FunctionComponent<{
+  id?: string;
   text: string;
   disabled?: boolean;
   className?: string;
-}> = ({ text, disabled, className }) => {
+}> = ({ id, text, disabled, className }) => {
   const [anim_active, trigger_anim, set_active] = useTempAnimation(2000);
-  const copy = useCopyToClipboard(text);
+  const copy = useCopyToClipboard(text, id);
   return (
     <button
-      id="tts-clipboard-button"
+      id={`tts-clipboard-button${id ? `-${id}` : ""}`}
       className={`btn tts-clipboard-button${className ? ` ${className}` : ""}`}
       data-success={`${anim_active}`}
       disabled={disabled}
@@ -18,7 +19,9 @@ export const ClipboardButton: Preact.FunctionComponent<{
       onClick={() =>
         copy()
           .then(trigger_anim)
-          .catch(() => {})
+          .catch(() => {
+            console.error(`Failed to copy text to clipboard.`);
+          })
       }
     >
       <div className="tts-clipboard-button-inner">

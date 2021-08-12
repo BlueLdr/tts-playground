@@ -115,17 +115,19 @@ export const useTempAnimation = (duration: number, delay?: number) => {
   return [active, trigger, set_active] as const;
 };
 
-export const useCopyToClipboard = (text?: string) => {
+export const useCopyToClipboard = (text?: string, id?: string) => {
   return hooks.useCallback(async () => {
-    const elem = document.getElementById("clipboard-input");
+    const elem = document.getElementById(
+      `clipboard-input${id ? `-${id}` : ""}`
+    );
     if (!text || !(elem instanceof HTMLTextAreaElement)) {
       return Promise.reject();
     }
     const active = document.activeElement as HTMLElement;
     elem.value = text;
-    elem.focus();
     elem.select();
     elem.setSelectionRange(0, 99999);
+    elem.focus();
     const success = document.execCommand("copy");
     elem.value = "";
     elem.blur();
