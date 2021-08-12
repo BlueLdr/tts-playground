@@ -1,31 +1,35 @@
 import * as Preact from "preact";
 import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
-import { PAUSE_CHAR_SPEED_MODIFIED } from "~/common";
+import { PAUSE_CHAR_DURATION, PAUSE_CHAR_SPEED_MODIFIED } from "~/common";
 import { Modal, ModalHeader } from "~/view/components";
 import { ensure_number, useModal, useStateIfMounted } from "~/view/utils";
 import { ADD_SNIPPET_CALLBACK } from "~/model";
 
-export const SLASH_DURATION = 2.5 / 14; // seconds
-export const MOD_PAUSE_CHAR_DURATION = 1.067 / 14; // seconds
-
-export const generate_unmodified_pause = duration =>
-  "/ ".repeat(Math.max(1, Math.round(duration / SLASH_DURATION)));
-export const generate_modified_pause = duration =>
+export const generate_unmodified_pause = (duration: number, voice: string) =>
+  "/ ".repeat(
+    Math.max(1, Math.round(duration / PAUSE_CHAR_DURATION[voice].normal))
+  );
+export const generate_modified_pause = (duration: number, voice: string) =>
   PAUSE_CHAR_SPEED_MODIFIED.repeat(
-    Math.max(1, Math.round(duration / MOD_PAUSE_CHAR_DURATION))
+    Math.max(1, Math.round(duration / PAUSE_CHAR_DURATION[voice].speed))
   );
 
-export const generate_pause = (duration, preserve_speed = false) =>
+export const generate_pause = (
+  duration: number,
+  voice: string,
+  preserve_speed = false
+) =>
   preserve_speed
-    ? generate_modified_pause(duration)
-    : generate_unmodified_pause(duration);
+    ? generate_modified_pause(duration, voice)
+    : generate_unmodified_pause(duration, voice);
 
 export const PauseAddControl: Preact.FunctionComponent<{
   text: string;
   speedModified: boolean;
   duration: number;
   onChangeDuration: (d: number) => void;
-}> = ({ text, speedModified, duration, onChangeDuration }) => {
+  voice: string;
+}> = ({ text, speedModified, duration, onChangeDuration, voice }) => {
   const [open, set_open] = useStateIfMounted(false);
   const [preserve, set_preserve] = useStateIfMounted(speedModified);
   const input_ref = useRef<HTMLInputElement>();
@@ -33,9 +37,9 @@ export const PauseAddControl: Preact.FunctionComponent<{
 
   const dismiss = () => set_open(false);
   const add_pause = useCallback(() => {
-    const str = generate_pause(duration, preserve);
+    const str = generate_pause(duration, voice, preserve);
     return `${!preserve && !text.endsWith(" ") ? " " : ""}${str}`;
-  }, [duration, preserve, text, on_add_pause]);
+  }, [duration, preserve, text, on_add_pause, voice]);
 
   const on_right_click = useCallback(
     e => {

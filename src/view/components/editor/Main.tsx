@@ -33,7 +33,7 @@ export const EditorMain: Preact.FunctionComponent<{
   inputRef,
   listeners,
 }) => {
-  const { max_length, pause_duration } = useContext(EDITOR_STATE).value;
+  const { max_length, pause_duration, voice } = useContext(EDITOR_STATE).value;
   const bits_length = bits ? bits.length + 1 : 0;
   const on_change_text = useCallback(
     (text: string) => setState({ text }),
@@ -103,6 +103,7 @@ export const EditorMain: Preact.FunctionComponent<{
           text={text}
           duration={pause_duration}
           onChangeDuration={on_change_pause_duration}
+          voice={voice}
         />
       </div>
       <div className="row">
