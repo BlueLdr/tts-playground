@@ -46,4 +46,4 @@ jobs:
           body: >
             Deployed at: [https://blueldr.github.io/tts-playground](https://blueldr.github.io/tts-playground)
 
-            Download and run locally: [tts-playground.html](https://github.com/${{ env.GITHUB_REPOSITORY }}/releases/download/${{ env.TTS_TAG }}/tts-playground.html)
+            Download and run locally: [tts-playground.html](https://github.com/${{ env.GITHUB_REPOSITORY }}/releases/download/${{ env.TTS_TAG }}/tts-playground.html) (Note: Delete or rename the old version before downloading the new one.)
