@@ -227,6 +227,10 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
   useEffect(() => {
     if (editor_unsaved) {
       should_optimize.current = true;
+    } else if (!should_optimize.current) {
+      setTimeout(() => {
+        should_optimize.current = true;
+      }, 1000);
     }
   }, [editor_unsaved]);
   useOptimizeMessage(editor_settings, is_optimized, should_optimize);

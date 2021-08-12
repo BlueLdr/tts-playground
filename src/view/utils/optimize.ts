@@ -5,6 +5,7 @@ import {
   RESTORE_WHITESPACE_TRANSFORMS,
   SAFE_WHITESPACE_TRANSFORMS,
   TRANSFORMS,
+  WORD_CHARACTERS,
 } from "~/view/utils/optimize-transforms";
 
 const space_can_be_removed = (before: string, after: string) => {
@@ -86,7 +87,7 @@ const get_word_start = (text: string, index: number) => {
 };
 
 const parse_word = (text: string) => {
-  const index = text.search(/[^a-z0-9']/i);
+  const index = text.search(new RegExp(`[^${WORD_CHARACTERS}]`, "i"));
   if (index === -1) {
     return text;
   }
@@ -94,7 +95,7 @@ const parse_word = (text: string) => {
 };
 
 const parse_symbol = (text: string) => {
-  const index = text.search(/[a-z0-9']/i);
+  const index = text.search(new RegExp(`[${WORD_CHARACTERS}]`, "i"));
   if (index === -1) {
     return text;
   }
@@ -143,6 +144,9 @@ export const optimize_whitespace = (
         output += " ";
       }
       output += char;
+      if (char === ".") {
+        output += " ";
+      }
       continue;
     }
     if (!ignore_cursor && i + 1 === cursor_initial && cursor_space_left) {
@@ -221,7 +225,7 @@ export const optimize_message_words = (
       add_word(" ", " ");
       continue;
     }
-    if (!/^[a-z0-9']+$/i.test(word)) {
+    if (!new RegExp(`^[${WORD_CHARACTERS}]+$`, "i").test(word)) {
       let str = word;
       let cursor_in_this_word = cursor_word_start === i;
       let cursor_index_in_this_word = cursor_index_in_word;

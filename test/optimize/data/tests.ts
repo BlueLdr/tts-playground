@@ -379,7 +379,7 @@ const all_message =
   "none of that fluff. i know no fear. come at me bro. can't you see why you are a goob? " +
   "they've gotta go? YOU ARE WHY you are why yOu aRe whY You Are Why THEY've I'VE who'VE you'Ve we'vE " +
   "alrIGHT alRiGhT alRIght. NOT THE BEES. speedy fast boi. I'm not your mate, matey." +
-  "   reeeeaaaiiiiiiuiiiiglloooooyyyyy  ";
+  "þat sucks.   reeeeaaaiiiiiiuiiiiglloooooyyyyy  ";
 
 export const OPTIMIZE_LEVEL_TESTS = [
   {
@@ -391,8 +391,8 @@ export const OPTIMIZE_LEVEL_TESTS = [
       "you boysⓑaite. we make big cookie for to bring cuﬆomer back. foursome@ þe forefront. " +
       "none of þat ﬂuff. ⓘknow № fear. come@me bro. can't you see why you are a goob? " +
       "þey've gotta go?YOU ARE WHY you are why yOu aRe whY You Are Why ÞEY've I'VE who'VE you'Ve we'vE " +
-      "alrITE alRiTe alRIte. NOT ÞE B'S. speedy faﬆ boi. I'm not your mate,matey." +
-      " reeaaiiuiigllooyy",
+      "alrITE alRiTe alRIte. NOT ÞE B'S. speedy faﬆ boi. I'm not your mate,matey. " +
+      "þat sucks. reeaaiiuiigllooyy",
   },
   {
     input: all_message,
@@ -403,8 +403,8 @@ export const OPTIMIZE_LEVEL_TESTS = [
       "ⓤboysⓑaite. we make big cookie for to bring cuﬆomer back. foursome@ þe forefront. " +
       "nun of þat ﬂuff. ⓘ № № fear. come@me bro. can'tⓤⓒⓨⓤⓡa goob? " +
       "þeyve gotta go?ⓊⓇⓎⓤⓡⓨⓤⓡⓨⓊⓇⓎÞEYve IVE whoVE youVe wevE " +
-      "alrITE alRiTe alRIte. NOT ÞE B'S. speeⓓfaﬆ boi. I'm not your 􃎜8, 􃎜80." +
-      " reeaaiiuiigllooyy",
+      "alrITE alRiTe alRIte. NOT ÞE B'S. speeⓓfaﬆ boi. I'm not your 􃎜8, 􃎜80. " +
+      "þat sucks. reeaaiiuiigllooyy",
   },
   {
     input: all_message,
@@ -415,7 +415,7 @@ export const OPTIMIZE_LEVEL_TESTS = [
       "ⓤboysⓑaite. we make big cookie4 2bring cuﬆomer back. 4some@ þe4front. " +
       "nun of þat ﬂuff. ⓘ № № fear. come@me bro. can'tⓤⓒⓨⓤⓡⓐgoob? " +
       "þeyve gotta go?ⓊⓇⓎⓤⓡⓨⓤⓡⓨⓊⓇⓎÞEYve IVE whoVE youVe wevE " +
-      "alrITE alRiTe alRIte. NOT ÞE B'S. speeⓓfaﬆ boi. I'm not your 􃎜8, 􃎜80." +
-      " reeaaiiuiigllooyy",
+      "alrITE alRiTe alRIte. NOT ÞE B'S. speeⓓfaﬆ boi. I'm not your 􃎜8, 􃎜80. " +
+      "þat sucks. reeaaiiuiigllooyy",
   },
 ];

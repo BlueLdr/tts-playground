@@ -6,6 +6,8 @@ interface TextTransform {
   transform: string | ((value: string) => string);
 }
 
+export const WORD_CHARACTERS = "a-zþﬆﬂ0-9􃎜'";
+
 export const PLAIN_TRANSFORMS = {
   [OptimizeLevel.safe]: {
     too: "2",
@@ -40,6 +42,7 @@ export const PLAIN_TRANSFORMS = {
     know: "№",
     speedy: "speeⓓ",
     "speedy's": "speeⓓ's",
+    m8: "􃎜8",
     mate: "􃎜8",
     matey: "􃎜80",
   },
