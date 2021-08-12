@@ -23,8 +23,8 @@ export const PauseSpeedDemo: Preact.FunctionComponent = () => {
 
   const [text_normal, text_preserved] = useMemo(
     () => [
-      create_text(generate_pause(1.3, false)),
-      create_text(generate_pause(1.3, true)),
+      create_text(generate_pause(1.3, "Brian", false)),
+      create_text(generate_pause(1.3, "Brian", true)),
     ],
     []
   );

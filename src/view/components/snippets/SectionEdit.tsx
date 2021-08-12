@@ -6,12 +6,12 @@ import { ExportSnippetsSection } from "~/view/components/export/ExportSnippetSec
 import { useStateIfMounted } from "~/view/utils";
 
 export const SnippetsSectionModal: Preact.FunctionComponent<{
-  section: TTS.SnippetsSection;
+  section?: TTS.SnippetsSection;
   setName: (value: string) => void;
   deleteSection: () => void;
   dismiss: () => void;
 }> = ({ section, setName, deleteSection, dismiss }) => {
-  const { name } = section;
+  const name = section?.name;
   const input_ref = useRef<HTMLInputElement>();
   const [value, set_value] = useStateIfMounted(name);
   const on_click_delete = useCallback(() => {
@@ -54,7 +54,7 @@ export const SnippetsSectionModal: Preact.FunctionComponent<{
         <button className="btn" onClick={dismiss}>
           Cancel
         </button>
-        <ExportSnippetsSection section={section} />
+        {section && section.name && <ExportSnippetsSection section={section} />}
         <button
           className="btn btn-primary"
           onClick={() => {
