@@ -119,6 +119,11 @@ export const SAFE_WHITESPACE_TRANSFORMS = [
     reversible: true,
   },
   {
+    before: ".",
+    after: "[\n\r]",
+    reversible: true,
+  },
+  {
     before: "[?!]",
     after: "[ a-zⒶ-ⓩ]",
   },
