@@ -8,7 +8,7 @@ import {
   WORD_CHARACTERS,
 } from "~/view/utils/optimize-transforms";
 
-const WHITESPACE = "[^S\r\n]";
+const WHITESPACE = "[^\\S\r\n]";
 
 const space_can_be_removed = (before: string, after: string) => {
   // prevent forming urls, which will be removed in speech
@@ -66,22 +66,27 @@ const optimize_word = (
 };
 
 const get_first_char = (text: string, index: number = 0) => {
-  return (index === 0 ? text : text.slice(index)).search(/[^\s]/);
+  return (index === 0 ? text : text.slice(index)).search(/\S/);
 };
 const get_last_char = (text: string, index: number = text.length) => {
   const input = (index === text.length ? text : text.slice(0, index))
     .split("")
     .reverse()
     .join("");
-  const i = input.search(/[^\s]/);
+  const i = input.search(/\S/);
   return i === -1 ? i : text.length - i;
 };
 
 const get_word_start = (text: string, index: number) => {
-  if (index > text.length || index <= 0 || text[index - 1] === " ") {
+  if (
+    index > text.length ||
+    index <= 0 ||
+    text[index - 1] === " " ||
+    text[index - 1] === "\n"
+  ) {
     return -1;
   }
-  const i = text.slice(0, index).split("").reverse().join("").search(/\s/i);
+  const i = text.slice(0, index).split("").reverse().join("").search(/\s/);
   if (i === -1) {
     return 0;
   }
@@ -111,6 +116,7 @@ export const trim_excess_whitespace = (
   text: string,
   input_ref: preact.RefObject<HTMLTextAreaElement>
 ) => {
+  text = text.replace(new RegExp(WHITESPACE, "gi"), " ");
   let { selectionStart = -1, selectionEnd = -1 } = input_ref.current || {};
   if (
     selectionStart === -1 ||
@@ -118,7 +124,14 @@ export const trim_excess_whitespace = (
     (selectionStart === selectionEnd &&
       (selectionStart === 0 || selectionEnd === text.length))
   ) {
-    return [trim_duplicate_whitespace(text.trim()), -1, -1] as const;
+    const output = trim_duplicate_whitespace(text.trim());
+    if (selectionStart === -1 || selectionEnd === -1) {
+      return [output, -1, -1] as const;
+    }
+    if (selectionStart === 0) {
+      return [output, 0, 0] as const;
+    }
+    return [output, output.length, output.length] as const;
   }
 
   let start = trim_duplicate_whitespace(
@@ -128,12 +141,49 @@ export const trim_excess_whitespace = (
     text.slice(selectionStart, selectionEnd)
   );
   let end = trim_duplicate_whitespace(text.slice(selectionEnd).trimEnd());
+
+  if (end.length === 0) {
+    middle = middle.trimEnd();
+    if (middle.length === 0) {
+      start = start.trimEnd();
+    }
+  }
+
+  if (start.length === 0) {
+    middle = middle.trimStart();
+    if (middle.length === 0) {
+      end = end.trimStart();
+    }
+  }
+
   if (/\s$/i.test(start) && /^\s/i.test(middle)) {
-    middle = middle.slice(1);
+    if (middle[0] === "\n") {
+      start = start.slice(0, -1);
+    } else {
+      middle = middle.slice(1);
+    }
   }
   if (/\s$/i.test(middle) && /^\s/i.test(end)) {
-    middle = middle.slice(0, -1);
+    if (end[0] === "\n") {
+      middle = middle.slice(0, -1);
+    } else {
+      end = end.slice(1);
+    }
   }
+  if (selectionStart === selectionEnd) {
+    if (/\s$/i.test(start)) {
+      if (/^\s/i.test(end) || end.length === 0) {
+        if (end[0] === "\n" || end.length === 0) {
+          start = start.slice(0, -1);
+        } else {
+          end = end.slice(1);
+        }
+      }
+    } else if (/^\s/i.test(end) && start.length === 0) {
+      end = end.slice(1);
+    }
+  }
+
   return [
     `${start}${middle}${end}`,
     start.length,
@@ -153,18 +203,41 @@ export const optimize_whitespace = (
   }
   let cursor_initial = selectionStart;
 
-  let input = text.replace(/\s/g, " ");
+  let input = text.replace(new RegExp(WHITESPACE, "g"), " ");
   const first_non_space = get_first_char(input);
   const space_at_start = cursor_initial < first_non_space && !ignore_cursor;
+  const newline_at_start =
+    input
+      .slice(ignore_cursor ? 0 : cursor_initial, first_non_space)
+      .includes("\n") && !ignore_cursor;
   input = input.trimStart();
   cursor_initial = Math.max(cursor_initial - first_non_space, 0);
   const last_non_space = get_last_char(input);
   const space_at_end = cursor_initial > last_non_space && !ignore_cursor;
+  const newline_at_end =
+    input
+      .slice(last_non_space, ignore_cursor ? undefined : cursor_initial)
+      .includes("\n") && !ignore_cursor;
   input = input.trimEnd();
   cursor_initial = space_at_start ? 0 : Math.min(cursor_initial, input.length);
 
-  const cursor_space_left = input[cursor_initial - 1] === " " || space_at_end;
-  const cursor_space_right = input[cursor_initial] === " " || space_at_start;
+  let start = trim_duplicate_whitespace(
+    input.slice(0, cursor_initial).trimStart()
+  );
+  let end = trim_duplicate_whitespace(input.slice(cursor_initial).trimEnd());
+  cursor_initial = start.length;
+  input = `${start}${end}`;
+
+  const cursor_space_left =
+    space_at_end || /\s/.test(input[cursor_initial - 1]);
+  const cursor_newline_left = space_at_end
+    ? newline_at_end
+    : input[cursor_initial - 1] === "\n";
+
+  const cursor_space_right = space_at_start || /\s/.test(input[cursor_initial]);
+  const cursor_newline_right = space_at_start
+    ? newline_at_start
+    : input[cursor_initial] === "\n";
 
   let output = "";
   let cursor_final = -1;
@@ -173,31 +246,38 @@ export const optimize_whitespace = (
     if (cursor_initial === i && cursor_final === -1) {
       cursor_final = output.length;
     }
-    if (char !== " ") {
+    if (char !== " " && char !== "\n") {
       if (space_at_start && output.length === 0) {
-        output += " ";
+        output += newline_at_start ? "\n" : " ";
       }
       output += char;
-      if (char === ".") {
+      if (char === "." && input[i + 1] !== "\n") {
         output += " ";
       }
       continue;
     }
     if (!ignore_cursor && i + 1 === cursor_initial && cursor_space_left) {
-      output += char;
+      output += cursor_newline_left ? "\n" : " ";
       cursor_final = output.length;
     } else if (!ignore_cursor && i === cursor_initial && cursor_space_right) {
-      output += char;
+      output += cursor_newline_right ? "\n" : " ";
     } else {
       const before = output;
       const after = input.slice(i + 1);
-      if (!space_can_be_removed(before, after)) {
+      if (char === "\n") {
+        if (
+          (ignore_cursor || (i > 0 && i < input.length)) &&
+          before.slice(-1) !== "\n"
+        ) {
+          output += char;
+        }
+      } else if (!space_can_be_removed(before, after)) {
         output += char;
       }
     }
   }
   if (space_at_end) {
-    output += " ";
+    output += newline_at_end ? "\n" : " ";
   }
 
   if (cursor_final === -1 || space_at_end) {
@@ -230,7 +310,7 @@ export const optimize_message_words = (
   const cursor_index_in_word =
     cursor_word_start !== -1 ? cursor_initial - cursor_word_start : -1;
 
-  const words = input.split(" ");
+  const words = input.split(/( |(?=\n))/);
 
   let output = "";
   let cursor_final = cursor_initial === 0 ? 0 : -1;
@@ -247,7 +327,11 @@ export const optimize_message_words = (
     if (i === cursor_initial) {
       cursor_final = o;
     }
-    if (i !== 0 && output.slice(-1) !== " ") {
+    if (word.length === 0) {
+      continue;
+    }
+
+    if (i !== 0 && !/\s$/.test(output) && !/^\s/.test(word)) {
       add_word(" ", " ");
       i = rec_input.length;
       o = output.length;
@@ -255,10 +339,19 @@ export const optimize_message_words = (
         cursor_final = o;
       }
     }
-    if (word === "") {
-      add_word(" ", " ");
+    if (/^\s+$/.test(word)) {
+      add_word(word, word);
       continue;
+    } else if (word.startsWith("\n")) {
+      add_word("\n", "\n");
+      i = rec_input.length;
+      o = output.length;
+      if (i === cursor_initial) {
+        cursor_final = o;
+      }
+      word = word.slice(1);
     }
+
     if (!new RegExp(`^[${WORD_CHARACTERS}]+$`, "i").test(word)) {
       let str = word;
       let cursor_in_this_word = cursor_word_start === i;
@@ -338,8 +431,8 @@ export const optimize_selection = (
 ): readonly [string, number, number] => {
   let { selectionStart = -1, selectionEnd = -1 } = input_ref.current || {};
   const text_before = text.slice(0, selectionStart);
-  const input = text.slice(selectionStart, selectionEnd - 1);
-  const text_after = text.slice(selectionEnd - 1);
+  let input = text.slice(selectionStart, selectionEnd);
+  const text_after = text.slice(selectionEnd);
 
   const [text_trimmed] = optimize_message_words(
     input,
@@ -364,19 +457,35 @@ export const optimize_selection = (
     },
     trigger
   );
-  const space_before =
-    input.startsWith(" ") &&
-    (text_before.length === 0 ||
-      !space_can_be_removed(text_before.slice(-1), input[1]));
-  const space_after =
-    input.endsWith(" ") &&
-    (text_after.length === 0 ||
-      !space_can_be_removed(input.slice(-2, -1), text_after[0]));
 
-  const output_ = `${text_before}${space_before ? " " : ""}${output}${
-    space_after ? " " : ""
-  }`;
-  return [`${output_}${text_after}`, selectionStart, output_.length + 1];
+  input = trim_duplicate_whitespace(input);
+  const first_non_space = get_first_char(input);
+  const space_at_start = /^\s/i.test(input) && first_non_space > 0;
+  const newline_at_start = input.slice(0, first_non_space).includes("\n");
+
+  const last_non_space = get_last_char(input);
+  const space_at_end = /\s$/i.test(input) && last_non_space > 0;
+  const newline_at_end = input.slice(last_non_space).includes("\n");
+
+  const space_before =
+    space_at_start &&
+    (text_before.length === 0 ||
+      (newline_at_start
+        ? text_before.slice(-1) !== "\n"
+        : !space_can_be_removed(text_before, output)));
+  const newline_before = space_before && input[0] === "\n";
+  const space_after =
+    space_at_end &&
+    (text_after.length === 0 ||
+      (newline_at_end
+        ? text_after[0] !== "\n"
+        : !space_can_be_removed(text_trimmed, output)));
+  const newline_after = space_after && input.slice(-1) === "\n";
+
+  const output_ = `${text_before}${
+    space_before ? (newline_before ? "\n" : " ") : ""
+  }${output}${space_after ? (newline_after ? "\n" : " ") : ""}`;
+  return [`${output_}${text_after}`, selectionStart, output_.length];
 };
 
 export const optimize_message = (
@@ -389,23 +498,18 @@ export const optimize_message = (
   let { selectionStart = -1, selectionEnd = -1 } = input_ref.current || {};
   const should_optimize_words = trigger <= optimize_words;
   if (
-    (!trim_whitespace && !should_optimize_words) ||
+    !should_optimize_words ||
     !text ||
     (selectionStart !== selectionEnd && trigger !== OptimizeTrigger.manual)
   ) {
+    if (text && trim_whitespace && trigger <= OptimizeTrigger.blur) {
+      return trim_excess_whitespace(text, input_ref);
+    }
     return [text, selectionStart, selectionEnd] as const;
   }
 
   if (selectionStart !== selectionEnd) {
     return optimize_selection(text, input_ref, trigger, settings);
-  }
-
-  if (
-    trim_whitespace &&
-    !should_optimize_words &&
-    trigger <= OptimizeTrigger.blur
-  ) {
-    return trim_excess_whitespace(text, input_ref);
   }
 
   let [text_trimmed, cursor_start, cursor_end] = optimize_message_words(
