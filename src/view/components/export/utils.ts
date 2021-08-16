@@ -142,6 +142,7 @@ export const import_data = (
   let snippets_result;
   if (!Array.isArray(data)) {
     if (data.__type === "export-data") {
+      console.log(`data: `, data);
       const {
         settings: new_settings,
         messages: imp_messages,
@@ -182,11 +183,13 @@ export const import_data = (
       if (__type === "message") {
         process_message(d as TTS.Message);
       } else if (__type === "snippets-section") {
-        d.data.forEach(({ __type, ...snip }) =>
+        (d as TTS.ExportedSnippetsSection).data.forEach(({ __type, ...snip }) =>
           process_snippet(snip as TTS.Snippet, d as TTS.SnippetsSection)
         );
       } else if (__type === "snippet") {
         process_snippet(d as TTS.Snippet);
+      } else if (__type === "settings") {
+        settings_result = { ...settings, ...d };
       }
     });
   }
@@ -324,4 +327,59 @@ export const validate_import_data = (
   }
 
   return null;
+};
+
+export const import_multiple_files = (
+  ...data: TTS.AnyExportData[]
+): TTS.AnyExportData => {
+  const messages: TTS.ExportData["messages"] = [];
+  const snippets: TTS.ExportData["snippets"] = [];
+  let settings: TTS.ExportData["settings"];
+
+  const sort_item = item => {
+    if (item["__type"] === "export-data") {
+      if (!item["snippets"] && !item["messages"] && !item["settings"]) {
+        return;
+      }
+      if (item["settings"]) {
+        if (!settings) {
+          // @ts-expect-error:
+          settings = {};
+        }
+        settings = { ...settings, ...item["settings"] };
+      }
+
+      if (item["messages"]) {
+        messages.push(...item["messages"]);
+      }
+      if (item["snippets"]) {
+        snippets.push(...item["snippets"]);
+      }
+    } else if (item["__type"] === "settings") {
+      return {
+        __type: "settings",
+        ...conform_to_schema(data, SETTINGS_SCHEMA),
+      };
+    } else if (item["__type"] === "message") {
+      messages.push(item);
+    } else if (item["__type"] === "snippet") {
+      snippets.push(item);
+    } else if (item["__type"] === "snippets-section") {
+      snippets.push(item);
+    }
+  };
+
+  for (let file of data) {
+    if (Array.isArray(file)) {
+      file.forEach(sort_item);
+    } else {
+      sort_item(file);
+    }
+  }
+
+  const output: TTS.AnyExportData = [...messages, ...snippets];
+  if (settings) {
+    output.push(settings);
+  }
+  return output;
 };

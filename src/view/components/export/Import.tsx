@@ -3,13 +3,18 @@ import { useCallback, useEffect, useMemo, useRef } from "preact/hooks";
 import { EDITOR_SETTINGS, MESSAGES, SNIPPETS } from "~/model";
 import {
   import_data,
+  import_multiple_files,
   ImportDuplicateMessages,
   ImportDuplicateSnippets,
   ImportRenameMessages,
   ImportUncategorizedSnippets,
-  validate_import_data,
 } from "~/view/components";
-import { useContextState, useStateIfMounted, useStateRef } from "~/view/utils";
+import {
+  upload_file,
+  useContextState,
+  useStateIfMounted,
+  useStateRef,
+} from "~/view/utils";
 
 export const ImportForm: Preact.FunctionComponent<{
   dismiss: () => void;
@@ -234,44 +239,42 @@ export const ImportForm: Preact.FunctionComponent<{
 const ImportFileInput: Preact.FunctionComponent<{
   onChange: (data: TTS.AnyExportData) => void;
 }> = ({ onChange }) => {
-  const [bad_type, set_bad_type] = useStateIfMounted(false);
-  const [no_data, set_no_data] = useStateIfMounted(false);
   const [dragged, set_dragged] = useStateIfMounted(false);
 
   const input_ref = useRef<HTMLInputElement>();
   const form_ref = useRef<HTMLFormElement>();
 
-  const upload_file = useCallback(
-    (input_file, on_finish?: () => void) => {
-      if (input_file.type !== "application/json") {
-        set_bad_type(true);
-        return;
-      } else if (bad_type) {
-        set_bad_type(false);
-      }
-      const reader = new FileReader();
+  const [error, set_error] = useStateIfMounted<string | Error | undefined>(
+    undefined
+  );
 
-      reader.onload = ev => {
-        if (ev.target) {
-          try {
-            const new_data = JSON.parse(ev.target["result"] as string);
-            const validated = validate_import_data(new_data);
-            if (validated) {
-              set_no_data(false);
-              onChange(validated);
-            } else {
-              set_no_data(true);
-            }
-          } catch (err) {
-            console.error(`Failed to parse import file:`, err);
-            set_bad_type(true);
-          }
+  const on_select_files = useCallback(
+    (files: FileList, on_finish?: () => void) => {
+      if (files.length > 1) {
+        const loaded: Promise<TTS.AnyExportData>[] = [];
+        for (let i = 0; i < files.length; i++) {
+          loaded.push(upload_file(files.item(i)));
         }
-        on_finish?.();
-      };
-      reader.readAsText(input_file);
+        return Promise.all(loaded)
+          .then(data => {
+            on_finish?.();
+            onChange(import_multiple_files(...data));
+          })
+          .catch(err => {
+            if (typeof err === "string") {
+              set_error(err);
+            } else {
+              console.error(err);
+            }
+          });
+      }
+      const input_file = files[0];
+      if (!input_file) {
+        return Promise.resolve();
+      }
+      return upload_file(input_file).then(onChange).catch(set_error);
     },
-    [bad_type, onChange]
+    []
   );
 
   return (
@@ -294,11 +297,8 @@ const ImportFileInput: Preact.FunctionComponent<{
           e.preventDefault();
           e.stopPropagation();
           set_dragged(false);
-          const input_file = e.dataTransfer.files[0];
-          if (!input_file) {
-            return;
-          }
-          upload_file(input_file, e.dataTransfer.clearData);
+          on_select_files(e.dataTransfer.files);
+          e.dataTransfer.clearData();
         }}
         onDragLeave={() => set_dragged(false)}
         onDragExit={() => set_dragged(false)}
@@ -312,13 +312,7 @@ const ImportFileInput: Preact.FunctionComponent<{
             <span>Click to Browse</span>
           </div>
         </div>
-        {(bad_type || no_data) && (
-          <div className="tts-import-input-error">
-            {bad_type
-              ? "You must select a valid JSON file."
-              : "That file did not contain any data that could be imported."}
-          </div>
-        )}
+        {error && <div className="tts-import-input-error">{error}</div>}
       </div>
       <input
         ref={input_ref}
@@ -327,11 +321,7 @@ const ImportFileInput: Preact.FunctionComponent<{
         tabIndex={-1}
         onChange={e => {
           // @ts-expect-error:
-          const input_file = e.target.files[0];
-          if (!input_file) {
-            return;
-          }
-          upload_file(input_file);
+          on_select_files(e.target.files);
         }}
         accept="application/json"
       />
