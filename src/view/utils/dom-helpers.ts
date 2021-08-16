@@ -1,3 +1,5 @@
+import { validate_import_data } from "~/view/components";
+
 export const maybeClassName = (className?: string) =>
   className ? ` ${className}` : "";
 
@@ -39,3 +41,31 @@ export const getFirstFocusable = (
     FOCUSABLE_SELECTORS.map(s => `${prefix} ${s}`).join(", ")
   );
 };
+
+export const upload_file = input_file =>
+  new Promise<TTS.AnyExportData>((resolve, reject) => {
+    if (input_file.type !== "application/json") {
+      return reject("You must select a valid JSON file.");
+    }
+    const reader = new FileReader();
+
+    reader.onload = ev => {
+      if (ev.target) {
+        try {
+          const new_data = JSON.parse(ev.target["result"] as string);
+          const validated = validate_import_data(new_data);
+          if (validated) {
+            resolve(validated);
+          } else {
+            reject(
+              "That file did not contain any data that could be imported."
+            );
+          }
+        } catch (err) {
+          console.error(`Failed to parse import file:`, err);
+          reject("You must select a valid JSON file.");
+        }
+      }
+    };
+    reader.readAsText(input_file);
+  });

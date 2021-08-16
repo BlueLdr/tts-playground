@@ -130,6 +130,7 @@ declare global {
       data: string;
     }
 
+    type ExportedSettings = EditorSettings & { __type: "settings" };
     type ExportedMessage = Message & { __type: "message" };
     type ExportedSnippet = Snippet & { __type: "snippet" };
     type ExportedSnippetsSection = Omit<SnippetsSection, "data"> & {
@@ -139,7 +140,7 @@ declare global {
 
     interface ExportData {
       __type: "export-data";
-      settings?: EditorSettings & { __type: "settings" };
+      settings?: ExportedSettings;
       messages?: ExportedMessage[];
       snippets?: ExportedSnippetsSection[];
     }
@@ -151,7 +152,13 @@ declare global {
       | TTS.ExportData["snippets"]
       | TTS.ExportedMessage
       | TTS.ExportedSnippetsSection
-      | TTS.ExportedSnippet;
+      | TTS.ExportedSnippet
+      | (
+          | TTS.ExportedMessage
+          | TTS.ExportedSnippetsSection
+          | TTS.ExportedSnippet
+          | TTS.ExportedSettings
+        )[];
 
     interface ExportFile {
       name: string;
