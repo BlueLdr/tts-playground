@@ -6,13 +6,14 @@ export const ImportExportModal: Preact.FunctionComponent<{
   dismiss: () => void;
   importData?: any;
   exportData?: any;
-}> = ({ importData, dismiss }) => {
+  setImportData: (data: TTS.AnyExportData | null) => void;
+}> = ({ importData, setImportData, dismiss }) => {
   const [tab, set_tab] = useStateIfMounted<"import" | "export">(
     importData ? "import" : "export"
   );
 
   return (
-    <Modal className="tts-export-modal" dismiss={dismiss}>
+    <Modal id="tts-export-modal" className="tts-export-modal" dismiss={dismiss}>
       <div className="modal-header modal-header-tabs">
         <button
           className="modal-header-tab"
@@ -35,7 +36,11 @@ export const ImportExportModal: Preact.FunctionComponent<{
       {tab === "export" ? (
         <ExportForm dismiss={dismiss} />
       ) : (
-        <ImportForm dismiss={dismiss} />
+        <ImportForm
+          data={importData}
+          setData={setImportData}
+          dismiss={dismiss}
+        />
       )}
     </Modal>
   );

@@ -3,27 +3,27 @@ import { useCallback, useEffect, useMemo, useRef } from "preact/hooks";
 import { EDITOR_SETTINGS, MESSAGES, SNIPPETS } from "~/model";
 import {
   import_data,
-  import_multiple_files,
   ImportDuplicateMessages,
   ImportDuplicateSnippets,
   ImportRenameMessages,
   ImportUncategorizedSnippets,
 } from "~/view/components";
 import {
-  upload_file,
   useContextState,
+  useDragAndDrop,
   useStateIfMounted,
   useStateRef,
+  useUploadFiles,
 } from "~/view/utils";
 
 export const ImportForm: Preact.FunctionComponent<{
   dismiss: () => void;
-  initialData?: TTS.AnyExportData;
-}> = ({ dismiss, initialData }) => {
+  data?: TTS.AnyExportData;
+  setData: (data: TTS.AnyExportData | null) => void;
+}> = ({ dismiss, data, setData }) => {
   const [settings, set_settings] = useContextState(EDITOR_SETTINGS);
   const [messages, set_messages] = useContextState(MESSAGES);
   const [snippets, set_snippets] = useContextState(SNIPPETS);
-  const [data, set_data] = useStateIfMounted(initialData);
   const [step, set_step, step_ref] = useStateRef<number>(0);
   const parsed_data = useMemo(
     () => (data ? import_data(data, settings, messages, snippets) : null),
@@ -42,7 +42,7 @@ export const ImportForm: Preact.FunctionComponent<{
   const next_step = useCallback(() => set_step(step_ref.current + 1), []);
   const prev_step = useCallback(() => {
     if (step_ref.current === 0) {
-      set_data(undefined);
+      setData(undefined);
       set_messages_dupes_result(undefined);
       set_messages_final_result(undefined);
       set_snippets_dupes_result(undefined);
@@ -196,7 +196,7 @@ export const ImportForm: Preact.FunctionComponent<{
   if (!parsed_data) {
     return (
       <div className="modal-body tts-import-file" data-help="import-details">
-        <ImportFileInput onChange={set_data} />
+        <ImportFileInput onChange={setData} />
       </div>
     );
   }
@@ -214,7 +214,7 @@ export const ImportForm: Preact.FunctionComponent<{
           <button
             className="btn btn-large"
             onClick={() => {
-              set_data(undefined);
+              setData(undefined);
               set_messages_dupes_result(undefined);
               set_messages_final_result(undefined);
               set_snippets_dupes_result(undefined);
@@ -239,43 +239,13 @@ export const ImportForm: Preact.FunctionComponent<{
 const ImportFileInput: Preact.FunctionComponent<{
   onChange: (data: TTS.AnyExportData) => void;
 }> = ({ onChange }) => {
-  const [dragged, set_dragged] = useStateIfMounted(false);
-
   const input_ref = useRef<HTMLInputElement>();
   const form_ref = useRef<HTMLFormElement>();
 
-  const [error, set_error] = useStateIfMounted<string | Error | undefined>(
-    undefined
-  );
+  const [error, set_error] = useStateIfMounted<string | undefined>(undefined);
 
-  const on_select_files = useCallback(
-    (files: FileList, on_finish?: () => void) => {
-      if (files.length > 1) {
-        const loaded: Promise<TTS.AnyExportData>[] = [];
-        for (let i = 0; i < files.length; i++) {
-          loaded.push(upload_file(files.item(i)));
-        }
-        return Promise.all(loaded)
-          .then(data => {
-            on_finish?.();
-            onChange(import_multiple_files(...data));
-          })
-          .catch(err => {
-            if (typeof err === "string") {
-              set_error(err);
-            } else {
-              console.error(err);
-            }
-          });
-      }
-      const input_file = files[0];
-      if (!input_file) {
-        return Promise.resolve();
-      }
-      return upload_file(input_file).then(onChange).catch(set_error);
-    },
-    []
-  );
+  const upload_file = useUploadFiles(onChange, set_error, form_ref);
+  const [dragged, drag_listeners] = useDragAndDrop(upload_file);
 
   return (
     <form ref={form_ref}>
@@ -283,26 +253,7 @@ const ImportFileInput: Preact.FunctionComponent<{
         data-dragged={`${dragged}`}
         className="tts-import-input"
         onClick={() => input_ref.current?.click()}
-        onDragOver={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          set_dragged(true);
-        }}
-        onDragEnter={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          set_dragged(true);
-        }}
-        onDrop={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          set_dragged(false);
-          on_select_files(e.dataTransfer.files);
-          e.dataTransfer.clearData();
-        }}
-        onDragLeave={() => set_dragged(false)}
-        onDragExit={() => set_dragged(false)}
-        onDragEnd={() => set_dragged(false)}
+        {...drag_listeners}
       >
         <div className="tts-import-input-main">
           <i className="fas fa-file-upload" />
@@ -316,12 +267,14 @@ const ImportFileInput: Preact.FunctionComponent<{
       </div>
       <input
         ref={input_ref}
+        id="tts-import-input"
         className="invisible"
         type="file"
         tabIndex={-1}
+        multiple={true}
         onChange={e => {
           // @ts-expect-error:
-          on_select_files(e.target.files);
+          upload_file(e.target.files);
         }}
         accept="application/json"
       />

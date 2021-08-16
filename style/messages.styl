@@ -150,6 +150,32 @@
     .tts-message-item-controls
       height 100%
 
+
+.tts-messages
+  .tts-import-input-main
+    color $Gray160
+    background-color rgba($Gray72, 0.9)
+    border 6px dashed $Gray128
+    border-radius 0.75rem
+    display none
+    flex-direction column
+    justify-content center
+    align-items center
+    padding 3rem 1rem
+    margin 1rem 0.5rem 1rem 0
+    cursor pointer
+    position absolute
+    top 0
+    left 0
+    height 100%
+    width 100%
+    .fa-file-upload
+      font-size 5rem
+  &[data-dragged="true"]
+    .tts-import-input-main
+      display flex
+      z-index 3
+
 /*
 .tts-message-item[data-open="true"]
   background-color #444444

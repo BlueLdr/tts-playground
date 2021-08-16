@@ -142,7 +142,6 @@ export const import_data = (
   let snippets_result;
   if (!Array.isArray(data)) {
     if (data.__type === "export-data") {
-      console.log(`data: `, data);
       const {
         settings: new_settings,
         messages: imp_messages,

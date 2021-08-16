@@ -25,13 +25,18 @@ export const Modal: Preact.FunctionComponent<
 }) => {
   const modal_ref = useRef<HTMLDivElement>();
   const mounted = useRef(false);
+  const silent = useRef(false);
   const on_focus = useCallback(e => {
     if (
       mounted.current &&
       (!(e.target instanceof Node) || !modal_ref.current?.contains(e.target))
     ) {
       e.stopPropagation();
-      getFirstFocusable(modal_ref.current)?.focus();
+      if (!silent.current) {
+        silent.current = true;
+        getFirstFocusable(modal_ref.current)?.focus();
+        silent.current = false;
+      }
     }
   }, []);
 
