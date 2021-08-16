@@ -42,7 +42,13 @@ const snippet_section_two = conform_to_schema(
 );
 
 test("successfully import array of mixed data", t => {
-  const input = [MESSAGE_ONE, SNIPPET_TWO, SNIPPET_SECTION_TWO];
+  const { skip_tutorials, ...some_settings } = settings;
+  const settings_input = {
+    __type: "settings",
+    ...some_settings,
+    trim_whitespace: !settings.trim_whitespace,
+  };
+  const input = [MESSAGE_ONE, SNIPPET_TWO, SNIPPET_SECTION_TWO, settings_input];
   const [
     settings_result,
     messages_result,
@@ -53,7 +59,12 @@ test("successfully import array of mixed data", t => {
     uncategorized_snippets,
   ] = import_data(input, settings, messages_list, snippets_list);
 
-  t.is(settings_result, undefined);
+  const settings_output = {
+    ...settings,
+    trim_whitespace: !settings.trim_whitespace,
+  };
+
+  t.deepEqual(settings_result, settings_output);
   t.deepEqual(messages_result, [...messages_list, message_one]);
   t.deepEqual(snippets_result, [...snippets_list, snippet_section_two]);
   t.deepEqual(dup_messages, []);

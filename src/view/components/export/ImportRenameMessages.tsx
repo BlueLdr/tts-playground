@@ -169,7 +169,7 @@ export const ImportRenameMessages: Preact.FunctionComponent<{
             <tbody>
               {result.map(r => (
                 <ImportMessageRenameItem
-                  key={r.message.name}
+                  key={r.message.id}
                   {...r}
                   onChangeName={on_change_name}
                   onChangeDiscard={on_change_discard}

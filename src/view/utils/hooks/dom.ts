@@ -1,7 +1,14 @@
 import * as Preact from "preact";
 import { createPortal } from "preact/compat";
+import { useCallback, useMemo } from "preact/hooks";
 import * as hooks from "preact/hooks";
-import { useStateRef, useValueRef } from "~/view/utils";
+import { import_multiple_files } from "~/view/components";
+import {
+  upload_file,
+  useStateIfMounted,
+  useStateRef,
+  useValueRef,
+} from "~/view/utils";
 
 const window_listener_options = { once: true };
 export const useHoldClick = (
@@ -170,4 +177,80 @@ export const useDebounce = <T extends any[]>(
   }, [callback]);
 
   return [cb, cancel] as const;
+};
+
+export const useDragAndDrop = (on_drop: (files: FileList) => Promise<void>) => {
+  const [dragged, set_dragged] = useStateIfMounted(false);
+  const on_start = useCallback(e => {
+    e.preventDefault();
+    e.stopPropagation();
+    set_dragged(true);
+  }, []);
+  const on_finish = useCallback(() => set_dragged(false), []);
+  const on_drop_ = useCallback(
+    e => {
+      e.preventDefault();
+      e.stopPropagation();
+      set_dragged(false);
+      on_drop(e.dataTransfer.files);
+      e.dataTransfer.clearData();
+    },
+    [on_drop]
+  );
+
+  return [
+    dragged,
+    useMemo(
+      () => ({
+        onDragOver: on_start,
+        onDragEnter: on_start,
+        onDrop: on_drop_,
+        onDragLeave: on_finish,
+        onDragExit: on_finish,
+        onDragEnd: on_finish,
+      }),
+      [on_start, on_finish, on_drop_]
+    ),
+  ] as const;
+};
+
+export const useUploadFiles = (
+  on_finish: (data: TTS.AnyExportData) => void,
+  on_error?: (err: string) => void,
+  form_ref?: Preact.RefObject<HTMLFormElement>
+) => {
+  return useCallback(
+    (files: FileList) =>
+      (() => {
+        if (files.length > 1) {
+          const loaded: Promise<TTS.AnyExportData>[] = [];
+          for (let i = 0; i < files.length; i++) {
+            loaded.push(upload_file(files.item(i)));
+          }
+          return Promise.all(loaded).then(data => {
+            return import_multiple_files(...data);
+          });
+        }
+        const input_file = files[0];
+        if (!input_file) {
+          return Promise.resolve();
+        }
+        return upload_file(input_file);
+      })()
+        .catch(err => {
+          if (typeof err === "string") {
+            on_error?.(err);
+          } else {
+            console.error(err);
+          }
+          return null;
+        })
+        .then(data => {
+          form_ref?.current?.reset();
+          if (data) {
+            return on_finish(data);
+          }
+        }),
+    [on_finish, on_error]
+  );
 };
