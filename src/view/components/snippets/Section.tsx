@@ -2,6 +2,7 @@ import * as Preact from "preact";
 import { useCallback, useContext, useEffect } from "preact/hooks";
 import { ADD_SNIPPET_CALLBACK } from "~/model";
 import { SnippetsRow, SnippetsRowEdit } from "~/view/components";
+import { Category } from "~/view/components/common/Category";
 import { useModal, useStateIfMounted } from "~/view/utils";
 
 export const SnippetsSection: Preact.FunctionComponent<{
@@ -28,30 +29,20 @@ export const SnippetsSection: Preact.FunctionComponent<{
   const [edit_target, set_edit_target] = useStateIfMounted(undefined);
 
   return (
-    <div className="tts-snippets-section" data-open={`${open}`}>
-      <div className="tts-snippets-section-header" data-help="snippets-group">
-        <div
-          className="tts-snippets-section-title"
-          onClick={() => set_open(!open)}
+    <Category
+      className="tts-snippets-section"
+      title={section.name}
+      open={open}
+      setOpen={set_open}
+      controls={
+        <button
+          className="icon-button tts-snippets-section-edit"
+          onClick={onClickEdit}
         >
-          <div className="tts-snippets-section-expand">
-            {open ? (
-              <i className="fas fa-chevron-down" />
-            ) : (
-              <i className="fas fa-chevron-right" />
-            )}
-          </div>
-          <span>{section.name}</span>
-        </div>
-        {open && (
-          <button
-            className="icon-button tts-snippets-section-edit"
-            onClick={onClickEdit}
-          >
-            <i className="fas fa-edit" />
-          </button>
-        )}
-      </div>
+          <i className="fas fa-edit" />
+        </button>
+      }
+    >
       <ul>
         {section.data?.map((r, i) => (
           <SnippetsRow
@@ -85,6 +76,6 @@ export const SnippetsSection: Preact.FunctionComponent<{
             isNew={edit_target === section.data?.length}
           />
         )}
-    </div>
+    </Category>
   );
 };

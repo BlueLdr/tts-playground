@@ -3,6 +3,12 @@ import { validate_import_data } from "~/view/components";
 export const maybeClassName = (className?: string) =>
   className ? ` ${className}` : "";
 
+export const classNamesWithSuffix = (suffix: string, ...names: string[]) =>
+  names
+    .filter(n => !!n)
+    .map(n => `${n}${suffix}`)
+    .join(" ");
+
 export const silence_event: EventListener = e => {
   e.preventDefault();
   e.stopPropagation();
