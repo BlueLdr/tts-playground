@@ -82,7 +82,57 @@
         padding 0
 
 
-.tts-message
+  &-list &-category-content
+    li
+      &, &:nth-child(odd)
+        background-color $Gray72
+      &:nth-child(even)
+        background-color $Gray64
+      &:first-child,
+      &:first-child .tts-message-item-header
+        border-top-right-radius 4px
+        border-top-left-radius 4px
+
+      &:last-child,
+      &:last-child .tts-message-item-header
+        border-bottom-right-radius 4px
+        border-bottom-left-radius 4px
+
+      &:nth-child(even)
+      &:nth-child(odd)
+        &:hover
+          background-color $Gray96
+
+  &-category
+    &-edit
+      opacity 0.2
+      transition-property color, opacity
+      .tts-col-messages:focus-within &,
+      .tts-col-messages:hover &
+        opacity 1
+
+    &-modal .modal-body
+      display flex
+      justify-content space-between
+      align-items flex-end
+
+    &-modal-input
+      display flex
+      flex-direction column
+      justify-content flex-end
+      align-items flex-start
+      span
+        margin-bottom 0.5rem
+
+    &-empty
+      color #999
+      border 1px dashed #555
+      border-radius 6px
+      padding 0.25rem 0.75rem
+      width calc(100% - 1rem)
+      margin 0.5rem
+      text-align center
+
   &-item
     border 1px solid transparent
     display flex
@@ -91,25 +141,6 @@
     position relative
     padding 0
     transition background-color 150ms ease
-
-    &, &:nth-child(odd)
-      background-color $Gray72
-    &:nth-child(even)
-      background-color $Gray64
-    &:first-child,
-    &:first-child &-header
-      border-top-right-radius 4px
-      border-top-left-radius 4px
-
-    &:last-child,
-    &:last-child &-header
-      border-bottom-right-radius 4px
-      border-bottom-left-radius 4px
-
-    &:nth-child(even)
-    &:nth-child(odd)
-      &:hover
-        background-color $Gray96
 
     &[data-active="true"]
       background-color $BlueG

@@ -27,7 +27,7 @@ export type SchemaProp<T extends object, K extends keyof T> = T[K] extends
   : T[K] extends (infer F)[]
   ? F extends object
     ? { type: SchemaOf<F>; default: {} | null }
-    : never
+    : { type: F; default: readonly [] | null }
   : T[K] extends object
   ? { type: SchemaOf<T[K]>; default: {} | null }
   : never;
@@ -84,6 +84,12 @@ export const MESSAGE_SCHEMA: SchemaOf<TTS.Message> = {
     default: {},
   },
 };
+
+export const MESSAGE_CATEGORY_SCHEMA: SchemaOf<TTS.MessageCategory> = {
+  name: { type: "string" },
+  open: { type: "boolean", default: false },
+  data: { type: "string", default: [] },
+} as const;
 
 export const HISTORY_CURSOR_SCHEMA: SchemaOf<TTS.EditorHistory["cursor"]> = {
   start: { type: "number" },

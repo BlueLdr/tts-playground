@@ -8,11 +8,13 @@ import {
 } from "~/common";
 import {
   AudioPlayer,
+  CategoryField,
   ClipboardButton,
   ExportMessage,
   Modal,
   ModalHeader,
   StatusIndicator,
+  useCategoryField,
 } from "~/view/components";
 import {
   useMessageFullText,
@@ -29,8 +31,11 @@ const MESSAGE_MODAL_REQUEST: TTS.TTSRequest = {
 export const MessageModal: Preact.FunctionComponent<{
   message: TTS.Message;
   loadMessage: () => void;
-  updateMessage: (message: TTS.Message) => boolean;
-  deleteMessage: () => void;
+  updateMessage: (
+    message: TTS.Message,
+    category: string | undefined
+  ) => boolean;
+  deleteMessage: (category: string) => void;
   dismiss: () => void;
   isNew?: boolean;
 }> = ({
@@ -44,6 +49,7 @@ export const MessageModal: Preact.FunctionComponent<{
   const { name = "", options } = message || {};
   const text = useMessageFullText(message);
   const [value, set_value] = useStateIfMounted(name);
+  const [category, set_category, initial_category] = useCategoryField(message);
 
   const saved = useRef(false);
   useEffect(() => {
@@ -57,7 +63,7 @@ export const MessageModal: Preact.FunctionComponent<{
       "Are you sure you want to delete this message?"
     );
     if (should_delete) {
-      deleteMessage();
+      deleteMessage(initial_category);
       dismiss();
     }
   }, []);
@@ -71,6 +77,8 @@ export const MessageModal: Preact.FunctionComponent<{
       message={message}
       name={value}
       setName={set_value}
+      category={category}
+      setCategory={set_category}
       dismiss={dismiss}
     >
       {isNew ? (
@@ -122,19 +130,22 @@ export const MessageModal: Preact.FunctionComponent<{
             console.error("couldn't save due to missing id");
           }
           if (
-            updateMessage({
-              id: message.id,
-              name: value,
-              text: message.text,
-              options,
-            })
+            updateMessage(
+              {
+                id: message.id,
+                name: value,
+                text: message.text,
+                options,
+              },
+              category || undefined
+            )
           ) {
             dismiss();
           } else {
             saved.current = false;
           }
         }}
-        disabled={!value || value === name}
+        disabled={!value || (value === name && category === initial_category)}
       >
         Save
       </button>
@@ -146,9 +157,20 @@ export const MessageModalBase: Preact.FunctionComponent<{
   message: TTS.Message;
   name: string;
   setName: (value: string) => void;
+  category: string;
+  setCategory: (value: string) => void;
   dismiss: () => void;
   isNew?: boolean;
-}> = ({ message, name, setName, dismiss, isNew, children }) => {
+}> = ({
+  message,
+  name,
+  setName,
+  category,
+  setCategory,
+  dismiss,
+  isNew,
+  children,
+}) => {
   const input_ref = useRef<HTMLInputElement>();
   const {
     options: {
@@ -195,6 +217,7 @@ export const MessageModalBase: Preact.FunctionComponent<{
               onInput={e => setName((e.target as HTMLInputElement).value)}
             />
           </label>
+          <CategoryField category={category} setCategory={setCategory} />
         </div>
         <div className="tts-message-modal-preview tts-text">{text}</div>
         <div className="tts-message-modal-player">

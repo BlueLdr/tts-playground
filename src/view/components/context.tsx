@@ -16,6 +16,7 @@ import {
   INITIAL_STATE,
   IS_OPTIMIZED,
   LOADED_MESSAGE,
+  MESSAGE_CATEGORIES,
   MESSAGES,
   OPTIMIZE_MESSAGE_CALLBACK,
   SNIPPETS,
@@ -55,6 +56,10 @@ const CONTEXTS = {
   MESSAGES: {
     context: MESSAGES,
     initialValue: INITIAL_STATE.messages,
+  },
+  MESSAGE_CATEGORIES: {
+    context: MESSAGE_CATEGORIES,
+    initialValue: INITIAL_STATE.message_categories,
   },
   SNIPPETS: {
     context: SNIPPETS,
@@ -158,6 +163,7 @@ export class WithGlobalContexts extends PureComponent {
 
 export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
   const messages = hooks.useContext(MESSAGES).value;
+  const categories = hooks.useContext(MESSAGE_CATEGORIES).value;
   const snippets = hooks.useContext(SNIPPETS).value;
   const volume = hooks.useContext(VOLUME_CTX).value;
   const editor_state = hooks.useContext(EDITOR_STATE).value;
@@ -213,6 +219,10 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
   useEffect(() => {
     storage.set_stored_messages(messages);
   }, [messages]);
+
+  useEffect(() => {
+    storage.set_stored_message_categories(categories);
+  }, [categories]);
 
   useEffect(() => {
     storage.set_stored_snippets(snippets);

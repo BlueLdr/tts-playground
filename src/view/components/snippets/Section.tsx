@@ -1,8 +1,7 @@
 import * as Preact from "preact";
 import { useCallback, useContext, useEffect } from "preact/hooks";
 import { ADD_SNIPPET_CALLBACK } from "~/model";
-import { SnippetsRow, SnippetsRowEdit } from "~/view/components";
-import { Category } from "~/view/components/common/Category";
+import { SnippetsRow, SnippetsRowEdit, Category } from "~/view/components";
 import { useModal, useStateIfMounted } from "~/view/utils";
 
 export const SnippetsSection: Preact.FunctionComponent<{
@@ -34,9 +33,10 @@ export const SnippetsSection: Preact.FunctionComponent<{
       title={section.name}
       open={open}
       setOpen={set_open}
+      data-help="snippets-group"
       controls={
         <button
-          className="icon-button tts-snippets-section-edit"
+          className="icon-button category-edit tts-snippets-section-edit"
           onClick={onClickEdit}
         >
           <i className="fas fa-edit" />

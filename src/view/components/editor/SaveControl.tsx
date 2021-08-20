@@ -2,7 +2,7 @@ import * as Preact from "preact";
 import { useContext, useEffect, useRef } from "preact/hooks";
 import { generate_id } from "~/common";
 import { MESSAGES } from "~/model";
-import { MessageModalBase } from "~/view/components";
+import { MessageModalBase, useCategoryField } from "~/view/components";
 import { useLoadedMessage, useModal, useStateIfMounted } from "~/view/utils";
 
 export const SaveMessage: Preact.FunctionComponent<{
@@ -34,11 +34,16 @@ export const SaveMessage: Preact.FunctionComponent<{
 
 export const SaveMessageModal: Preact.FunctionComponent<{
   message: TTS.Message;
-  updateMessages: (id: string | null, value: TTS.Message) => boolean;
+  updateMessages: (
+    id: string | null,
+    value: TTS.Message,
+    category: string | undefined
+  ) => boolean;
   dismiss: () => void;
 }> = ({ message, updateMessages, dismiss }) => {
   const messages = useContext(MESSAGES).value;
   const [loaded_message, loaded_id] = useLoadedMessage(messages);
+  const [category, set_category, initial_category] = useCategoryField(message);
 
   const { name } = message;
   const [value, set_value] = useStateIfMounted(name);
@@ -56,6 +61,8 @@ export const SaveMessageModal: Preact.FunctionComponent<{
       message={message}
       name={value}
       setName={set_value}
+      category={category}
+      setCategory={set_category}
       dismiss={dismiss}
       isNew={!loaded_message}
     >
@@ -71,18 +78,24 @@ export const SaveMessageModal: Preact.FunctionComponent<{
             }
             saved.current = true;
             if (
-              updateMessages(null, {
-                ...message,
-                id: generate_id(new_name),
-                name: new_name,
-              })
+              updateMessages(
+                null,
+                {
+                  ...message,
+                  id: generate_id(new_name),
+                  name: new_name,
+                },
+                category || undefined
+              )
             ) {
               dismiss();
             } else {
               saved.current = false;
             }
           }}
-          disabled={!new_name || new_name === name}
+          disabled={
+            !new_name || (new_name === name && category === initial_category)
+          }
         >
           Save As New...
         </button>
@@ -95,11 +108,15 @@ export const SaveMessageModal: Preact.FunctionComponent<{
           }
           saved.current = true;
           if (
-            updateMessages(loaded_id, {
-              ...message,
-              id: !!loaded_message ? message.id : generate_id(new_name),
-              name: new_name,
-            })
+            updateMessages(
+              loaded_id,
+              {
+                ...message,
+                id: !!loaded_message ? message.id : generate_id(new_name),
+                name: new_name,
+              },
+              category || undefined
+            )
           ) {
             dismiss();
           } else {

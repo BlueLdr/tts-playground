@@ -6,9 +6,15 @@ import {
   useMemo,
   useRef,
 } from "preact/hooks";
-import { EDITOR_SETTINGS, MESSAGES, SNIPPETS } from "~/model";
+import {
+  EDITOR_SETTINGS,
+  MESSAGE_CATEGORIES,
+  MESSAGES,
+  SNIPPETS,
+} from "~/model";
 import {
   ExpandableChecklist,
+  export_message_categories,
   export_messages,
   export_snippets,
   generate_file,
@@ -23,6 +29,7 @@ export const ExportForm: Preact.FunctionComponent<{ dismiss: () => void }> = ({
 }) => {
   const settings = useContext(EDITOR_SETTINGS).value;
   const messages = useContext(MESSAGES).value;
+  const categories = useContext(MESSAGE_CATEGORIES).value;
   const snippets = useContext(SNIPPETS).value;
   const link_ref = useRef<HTMLAnchorElement>();
 
@@ -58,9 +65,17 @@ export const ExportForm: Preact.FunctionComponent<{ dismiss: () => void }> = ({
     const export_data: TTS.ExportData = { __type: "export-data" };
     if (exp_messages.length > 0) {
       export_data.messages = export_messages(exp_messages);
-      if (!no_snippets_selected && !exp_settings) {
+      export_data.messageCategories = export_message_categories(
+        categories
+          .map(c => ({
+            ...c,
+            data: c.data.filter(id => exp_messages.some(m => m.id === id)),
+          }))
+          .filter(c => c.data.length > 0)
+      );
+      if (no_snippets_selected && !exp_settings) {
         set_filename(`tts-data-messages`);
-        set_exp_data(generate_file(export_data.messages));
+        set_exp_data(generate_file(export_data));
         return;
       }
     }
@@ -104,6 +119,7 @@ export const ExportForm: Preact.FunctionComponent<{ dismiss: () => void }> = ({
           <ul>
             <li>
               <ExportMessageTree
+                categories={categories}
                 messages={messages}
                 selection={exp_messages}
                 setSelection={set_exp_messages}
@@ -167,26 +183,40 @@ export const ExportForm: Preact.FunctionComponent<{ dismiss: () => void }> = ({
   );
 };
 
-const RenderLabel = ({ data }: { data: TTS.SnippetsSection | TTS.Message }) => (
+const RenderLabel = <T extends { name: string }>({ data }: { data: T }) => (
   <Preact.Fragment>{data.name}</Preact.Fragment>
 );
 
 export const ExportMessageTree: Preact.FunctionComponent<{
+  categories: TTS.MessageCategory[];
   messages: TTS.Message[];
   selection: TTS.Message[];
   setSelection: (items: TTS.Message[]) => void;
-}> = ({ messages, selection, setSelection }) => {
-  const checklist_items_initial = useMemo(
+}> = ({ categories, messages, selection, setSelection }) => {
+  const checklist_items_initial = useMemo<
+    ExpandableChecklistItem<TTS.MessageCategoryPopulated>[]
+  >(
     () =>
-      messages.map(
-        m =>
-          ({
-            data: m,
-            key: m.id,
-            selected: !!selection.find(msg => msg.id === m.id),
-            Render: RenderLabel,
-          } as ExpandableChecklistItem<TTS.Message>)
-      ),
+      categories.map(c => {
+        const cat_selected = !!selection.find(msg => c.data.includes(msg.id));
+        return {
+          // @ts-expect-error:
+          data: c as TTS.MessageCategoryPopulated,
+          key: c.name,
+          selected: cat_selected
+            ? messages.map(
+                m =>
+                  ({
+                    data: m,
+                    key: m.id,
+                    selected: !!selection.find(msg => msg.id === m.id),
+                    Render: RenderLabel,
+                  } as ExpandableChecklistItem<TTS.Message>)
+              )
+            : [],
+          Render: RenderLabel,
+        };
+      }),
     []
   );
 
@@ -200,7 +230,13 @@ export const ExportMessageTree: Preact.FunctionComponent<{
       first_render.current = false;
       return;
     }
-    setSelection(checklist_items.filter(i => i.selected).map(i => i.data));
+    setSelection(
+      checklist_items.reduce(
+        (items, c) =>
+          items.concat(c.selected.filter(i => i.selected).map(i => i.data)),
+        [] as TTS.Message[]
+      )
+    );
   }, [checklist_items]);
 
   return (
