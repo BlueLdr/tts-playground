@@ -1,9 +1,17 @@
+import { useCallback } from "preact/hooks";
 import * as hooks from "preact/hooks";
-import { deep_equals, do_alert } from "~/common";
+import {
+  deep_equals,
+  do_alert,
+  remove_item_from,
+  replace_item_in,
+  UNCATEGORIZED_GROUP_NAME,
+} from "~/common";
 import {
   EDITOR_STATE,
   EDITOR_UNSAVED,
   LOADED_MESSAGE,
+  MESSAGE_CATEGORIES,
   MESSAGES,
 } from "~/model";
 import {
@@ -76,8 +84,75 @@ export const useLoadedMessage = (messages: TTS.Message[]) => {
   return [loaded as TTS.Message | null, loaded_id, set_loaded_id] as const;
 };
 
+export const useSaveMessageInCategory = () => {
+  const [categories, set_categories] = useContextState(MESSAGE_CATEGORIES);
+  const categories_ref = useValueRef(categories);
+  const update_in_category = useCallback((name: string, message_id: string) => {
+    const cat = categories_ref.current.find(c => c.name === name) ?? {
+      name,
+      open: true,
+      data: [],
+    };
+    if (cat.data.includes(message_id)) {
+      return;
+    }
+    const cats = categories_ref.current.map(c => ({
+      ...c,
+      data:
+        c.name === name
+          ? c.data
+          : remove_item_from(c.data, id => id === message_id),
+    }));
+    set_categories(
+      replace_item_in(
+        cats,
+        c => c.name === name,
+        {
+          ...cat,
+          data: replace_item_in(
+            cat.data,
+            id => id === message_id,
+            message_id,
+            "end"
+          ),
+        },
+        "end"
+      )
+    );
+  }, []);
+
+  const remove_from_category = useCallback((message_id: string) => {
+    set_categories(
+      categories_ref.current.map(c => ({
+        ...c,
+        data: remove_item_from(c.data, id => id === message_id),
+      }))
+    );
+  }, []);
+
+  return useCallback(
+    (
+      id: string | null,
+      value: TTS.Message | undefined,
+      category: string = UNCATEGORIZED_GROUP_NAME
+    ) => {
+      if ((value && !value.id) || (id && value && value.id !== id)) {
+        return;
+      }
+      if (!value) {
+        remove_from_category(id);
+      } else {
+        update_in_category(category, value.id);
+      }
+    },
+    []
+  );
+};
+
 export const useSaveMessage = () => {
   const [messages, set_messages] = useContextState(MESSAGES);
+
+  const update_in_categories = useSaveMessageInCategory();
   const [loaded_message, loaded_id, set_loaded_id] = useLoadedMessage(messages);
   const {
     value: { text, speed, speed_char, max_length, bits, voice },
@@ -103,7 +178,11 @@ export const useSaveMessage = () => {
   const messages_ref = useValueRef(messages);
   const loaded_ref = useValueRef(loaded_id);
   const update_messages = hooks.useCallback(
-    (id: string | null, value: TTS.Message | undefined): boolean => {
+    (
+      id: string | null,
+      value: TTS.Message | undefined,
+      category: string = UNCATEGORIZED_GROUP_NAME
+    ): boolean => {
       if (value && !value.id) {
         do_alert("couldn't save due to missing id");
         console.error("couldn't save due to missing id");
@@ -128,6 +207,7 @@ export const useSaveMessage = () => {
         value;
       const new_messages = data.filter(r => !!r);
       set_messages(new_messages);
+      update_in_categories(id, value, category);
       if (id === loaded_ref.current) {
         if (!value) {
           load_when_unsaved_reset.current = null;

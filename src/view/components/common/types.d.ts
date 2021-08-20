@@ -44,9 +44,9 @@ interface ExpandableChecklistProps<T> {
 interface ExpandableChecklistItem<T> {
   data: T;
   key: string | number;
-  selected: T extends (infer F)[]
+  selected: T extends { data: (infer F)[] }
     ? ExpandableChecklistItem<F>[]
-    : T extends { data: (infer F)[] }
+    : T extends (infer F)[]
     ? ExpandableChecklistItem<F>[]
     : boolean;
   Render: preact.ComponentType<{ data: T }>;

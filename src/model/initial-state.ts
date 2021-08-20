@@ -45,12 +45,15 @@ const initial_state: TTS.AppState = {
 };
 
 const messages: TTS.Message[] = common.get_stored_messages() ?? [];
+const message_categories: TTS.MessageCategory[] =
+  common.get_stored_message_categories() ?? [];
 const snippets: TTS.SnippetsSection[] = common.get_stored_snippets() ?? [];
 const help: TTS.HelpCompletedMap = common.get_stored_help() ?? {};
 
 export const INITIAL_STATE = {
   ...initial_state,
   messages,
+  message_categories,
   snippets,
   help,
 } as const;

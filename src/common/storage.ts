@@ -5,6 +5,9 @@ import {
   DEFAULT_VOICE,
   do_confirm,
   generate_id,
+  sample_message_categories,
+  sample_messages,
+  sample_snippets,
 } from "~/common";
 import { OptimizeLevel, OptimizeTrigger } from "~/model/types";
 
@@ -39,6 +42,11 @@ export const get_stored_messages = (): TTS.Message[] =>
 export const set_stored_messages = (value: TTS.Message[]) =>
   localStorage.setItem("tts-messages", JSON.stringify(value));
 
+export const get_stored_message_categories = (): TTS.MessageCategory[] =>
+  load_storage_or("tts-message-categories", sample_message_categories);
+export const set_stored_message_categories = (value: TTS.MessageCategory[]) =>
+  localStorage.setItem("tts-message-categories", JSON.stringify(value));
+
 export const get_stored_state = (): TTS.AppState =>
   load_storage_or("tts-state", DEFAULT_STATE);
 export const set_stored_state = (value: TTS.AppState) =>
@@ -53,6 +61,7 @@ export const reset_all_storage = (clear_help?: boolean) => {
   if (do_confirm("Are you REALLY sure you wanna do this?")) {
     localStorage.setItem("tts-state", "");
     localStorage.setItem("tts-messages", "");
+    localStorage.setItem("tts-message-categories", "");
     localStorage.setItem("tts-snippets", "");
     clear_help && localStorage.setItem("tts-help", "");
     window.location.reload();
@@ -80,95 +89,3 @@ export const DEFAULT_STATE: TTS.AppState = {
     voice: DEFAULT_VOICE,
   },
 };
-
-const sample_snippets: TTS.SnippetsSection[] = [
-  {
-    name: "Sample Snippets",
-    open: true,
-    data: [
-      {
-        text: "VB",
-        options: {
-          prefix: "a",
-          suffix: "",
-          default_count: 5,
-          space_after: false,
-          space_before: true,
-        },
-      },
-      {
-        text: "brur",
-        options: {
-          prefix: "ur",
-          suffix: "?^",
-          default_count: 2,
-          space_after: true,
-          space_before: true,
-        },
-      },
-    ],
-  },
-  {
-    name: "Sprinkler Noises",
-    open: false,
-    data: [
-      {
-        text: "PX",
-        options: {
-          prefix: "y",
-          suffix: "",
-          default_count: 5,
-          space_after: false,
-          space_before: true,
-        },
-      },
-      {
-        text: "HJ",
-        options: {
-          prefix: "a",
-          suffix: "",
-          default_count: 5,
-          space_after: false,
-          space_before: true,
-        },
-      },
-      {
-        text: "ﬆ",
-        options: {
-          prefix: "",
-          suffix: "",
-          default_count: 5,
-          space_after: false,
-          space_before: true,
-        },
-      },
-    ],
-  },
-];
-
-const sample_messages: TTS.Message[] = [
-  {
-    id: "sample-message-1",
-    name: "Sample Message",
-    text: "This is a sample message. No silly noises here boink",
-    options: {
-      bits: "",
-      speed: false,
-      max_length: 255,
-      speed_char: DEFAULT_SPEED_CHAR,
-      voice: DEFAULT_VOICE,
-    },
-  },
-  {
-    id: "sample-message-2",
-    name: "Silly Message",
-    text: "This is a silly message. Do not send this message to the streamer. OOHOO HOO ᴾᴾᴾ HE DOESN'T KNOW LMAO ᴾᴾᴾᴾᴾᴾ HE LACKS CRITICAL INFORMATION OMEGA LAUGHING ᴾᴾᴾᴾᴾᴾᴾ",
-    options: {
-      bits: "",
-      speed: true,
-      max_length: 255,
-      speed_char: DEFAULT_SPEED_CHAR,
-      voice: DEFAULT_VOICE,
-    },
-  },
-];

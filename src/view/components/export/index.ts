@@ -1,5 +1,6 @@
 export * from "./Export";
 export * from "./ExportMessage";
+export * from "./ExportMessageCategory";
 export * from "./ExportSnippet";
 export * from "./Import";
 export * from "./ImportDuplicateMessages";

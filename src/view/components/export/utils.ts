@@ -1,6 +1,7 @@
 import { deep_equals, generate_id } from "~/common";
 import {
   conform_to_schema,
+  MESSAGE_CATEGORY_SCHEMA,
   MESSAGE_SCHEMA,
   SETTINGS_SCHEMA,
   SNIPPET_SCHEMA,
@@ -25,6 +26,20 @@ export const export_messages = (
     __type: "message",
   }));
 };
+
+export const export_message_category = (
+  data: TTS.MessageCategory
+): TTS.ExportedMessageCategory => {
+  return {
+    ...conform_to_schema(data, MESSAGE_CATEGORY_SCHEMA),
+    __type: "message-category",
+  };
+};
+
+export const export_message_categories = (
+  data: TTS.MessageCategory[]
+): TTS.ExportData["messageCategories"] => data.map(export_message_category);
+
 export const export_snippets = (
   data: TTS.SnippetsSection[]
 ): TTS.ExportData["snippets"] => {
@@ -59,9 +74,11 @@ export const import_data = (
   data: TTS.AnyExportData,
   settings: TTS.EditorSettings,
   messages: TTS.Message[],
+  categories: TTS.MessageCategory[],
   snippets: TTS.SnippetsSection[]
 ) => {
   let new_messages: TTS.Message[] = [];
+  let new_categories: TTS.MessageCategory[] = [];
   let new_snippets: TTS.SnippetsSection[] = [];
 
   const dup_messages: TTS.Message[] = [];
@@ -86,6 +103,14 @@ export const import_data = (
     } else {
       new_messages.push(msg);
     }
+  };
+
+  const process_message_category = (
+    cat: TTS.MessageCategory | TTS.MessageCategoryPopulated
+  ) => {
+    const existing =
+      categories.find(c => c.name === cat.name) ||
+      new_categories.find(c => c.name == cat.name);
   };
 
   const process_snippet_section = (section: TTS.SnippetsSection) => {
@@ -254,7 +279,10 @@ export const validate_import_data = (
       .map(d => validate_import_data(d, depth + 1, expected_type))
       .filter(d => !!d);
     // if (validated.length > 0 && validated.every((v) => !!v)) {
-    return validated as TTS.ExportData["messages"] | TTS.ExportData["snippets"];
+    return validated as
+      | TTS.ExportData["messages"]
+      | TTS.ExportData["snippets"]
+      | TTS.ExportData["messageCategories"];
     // }
     // return null;
   }
@@ -268,7 +296,12 @@ export const validate_import_data = (
   }
 
   if (data["__type"] === "export-data") {
-    if (!data["snippets"] && !data["messages"] && !data["settings"]) {
+    if (
+      !data["snippets"] &&
+      !data["messages"] &&
+      !data["settings"] &&
+      !data["messageCategories"]
+    ) {
       return null;
     }
     const output: TTS.ExportData = { __type: "export-data" };
@@ -284,6 +317,16 @@ export const validate_import_data = (
         depth + 1,
         "message"
       ) as TTS.ExportData["messages"];
+    }
+    if (data["messageCategories"]) {
+      const v_categories = validate_import_data(
+        data["messageCategories"],
+        depth + 1,
+        "message-category"
+      ) as TTS.ExportData["messageCategories"];
+      if (v_categories) {
+        output.messageCategories = v_categories;
+      }
     }
     if (data["snippets"]) {
       output.snippets = validate_import_data(
@@ -304,6 +347,34 @@ export const validate_import_data = (
       data["id"] = generate_id(data["name"]);
     }
     return { __type: "message", ...conform_to_schema(data, MESSAGE_SCHEMA) };
+  }
+
+  if (data["__type"] === "message-category") {
+    const { data: msgs, ...category } = data as TTS.ExportedMessageCategory;
+    // if category.data contains a mix of ids and messages, throw it out
+    // @ts-expect-error:
+    const data_type = msgs.reduce((cur, d) => {
+      const this_type = typeof d === "string" ? "string" : "message";
+      return !cur || cur === this_type ? this_type : "";
+    }, "");
+    if (data_type === "string") {
+      return {
+        __type: "message-category",
+        ...conform_to_schema(data, MESSAGE_CATEGORY_SCHEMA),
+      };
+    }
+    if (data_type === "message") {
+      return {
+        __type: "message-category",
+        ...conform_to_schema(
+          { ...category, data: [] },
+          MESSAGE_CATEGORY_SCHEMA
+        ),
+        data: (msgs as TTS.ExportedMessage[])
+          .filter(m => !!m)
+          .map(m => validate_import_data(m, depth + 1, "message")),
+      } as TTS.ExportedMessageCategory;
+    }
   }
 
   if (data["__type"] === "snippet") {
@@ -331,6 +402,7 @@ export const validate_import_data = (
 export const import_multiple_files = (
   ...data: TTS.AnyExportData[]
 ): TTS.AnyExportData => {
+  const categories: TTS.ExportData["messageCategories"] = [];
   const messages: TTS.ExportData["messages"] = [];
   const snippets: TTS.ExportData["snippets"] = [];
   let settings: TTS.ExportData["settings"];
@@ -351,6 +423,10 @@ export const import_multiple_files = (
       if (item["messages"]) {
         messages.push(...item["messages"]);
       }
+
+      if (item["messageCategories"]) {
+        categories.push(...item["messageCategories"]);
+      }
       if (item["snippets"]) {
         snippets.push(...item["snippets"]);
       }
@@ -361,6 +437,8 @@ export const import_multiple_files = (
       };
     } else if (item["__type"] === "message") {
       messages.push(item);
+    } else if (item["__type"] === "message-category") {
+      categories.push(item);
     } else if (item["__type"] === "snippet") {
       snippets.push(item);
     } else if (item["__type"] === "snippets-section") {

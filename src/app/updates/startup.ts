@@ -2,8 +2,11 @@ import {
   DEFAULT_SPEED_CHAR,
   DEFAULT_VOICE,
   get_stored_messages,
+  set_stored_message_categories,
   set_stored_messages,
+  UNCATEGORIZED_GROUP_NAME,
 } from "~/common";
+import { sample_messages } from "~/common/sample-data";
 
 const prev_version = localStorage.getItem("tts-loaded-version");
 const cur_version = process.env.TTS_VERSION;
@@ -26,8 +29,37 @@ const add_props_to_messages = async () => {
   set_stored_messages(messages);
 };
 
+const add_messages_to_categories = async () => {
+  let messages: TTS.Message[] = get_stored_messages() ?? [];
+  const samples: TTS.MessageCategory = {
+    name: "Sample Messages",
+    open: true,
+    data: [],
+  };
+  const uncategorized: TTS.MessageCategory = {
+    name: UNCATEGORIZED_GROUP_NAME,
+    open: false,
+    data: [],
+  };
+
+  messages.forEach(m => {
+    if (
+      sample_messages.some(
+        sm => sm.id === m.id || (sm.name === m.name && sm.text === m.text)
+      )
+    ) {
+      samples.data.push(m.id);
+    } else {
+      uncategorized.data.push(m.id);
+    }
+  });
+
+  set_stored_message_categories([samples, uncategorized]);
+};
+
 const UPDATES: { [key: string]: (() => Promise<void>)[] } = {
   "v1.1.0": [add_props_to_messages],
+  "v1.2.0": [add_messages_to_categories],
 };
 
 const perform_updates = async (todo: (() => Promise<void>)[]) => {

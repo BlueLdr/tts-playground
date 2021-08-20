@@ -18,6 +18,8 @@ export const PAUSE_CHAR_SPEED_MODIFIED = "ᴾ";
 
 export const DEFAULT_BITS_STRING = "uni300";
 
+export const UNCATEGORIZED_GROUP_NAME = "Not Categorized";
+
 export const DEFAULT_HISTORY_STEPS_LIMIT = 256;
 
 export const REPOSITORY_URL = "https://www.github.com/BlueLdr/tts-playground";

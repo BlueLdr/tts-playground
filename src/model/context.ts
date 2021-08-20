@@ -77,6 +77,11 @@ export const MESSAGES = createNamedContext<TTS.Message[]>(
   INITIAL_STATE.messages,
   "MESSAGES"
 );
+
+export const MESSAGE_CATEGORIES = createNamedContext<TTS.MessageCategory[]>(
+  INITIAL_STATE.message_categories,
+  "MESSAGE_CATEGORIES"
+);
 export const SNIPPETS = createNamedContext<TTS.SnippetsSection[]>(
   INITIAL_STATE.snippets,
   "SNIPPETS"

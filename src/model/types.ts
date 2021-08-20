@@ -38,6 +38,18 @@ declare global {
       passive?: boolean;
     }>;
 
+    interface MessageCategory {
+      name: string;
+      open: boolean;
+      data: string[];
+    }
+
+    interface MessageCategoryPopulated {
+      name: string;
+      open: boolean;
+      data: TTS.Message[];
+    }
+
     interface Snippet {
       text: string;
       options: SnippetOptions;
@@ -132,6 +144,10 @@ declare global {
 
     type ExportedSettings = EditorSettings & { __type: "settings" };
     type ExportedMessage = Message & { __type: "message" };
+    type ExportedMessageCategory = Omit<MessageCategory, "data"> & {
+      __type: "message-category";
+      data: string[] | TTS.ExportedMessage[];
+    };
     type ExportedSnippet = Snippet & { __type: "snippet" };
     type ExportedSnippetsSection = Omit<SnippetsSection, "data"> & {
       __type: "snippets-section";
@@ -143,6 +159,7 @@ declare global {
       settings?: ExportedSettings;
       messages?: ExportedMessage[];
       snippets?: ExportedSnippetsSection[];
+      messageCategories?: ExportedMessageCategory[];
     }
 
     type AnyExportData =
@@ -151,10 +168,12 @@ declare global {
       | TTS.ExportData["messages"]
       | TTS.ExportData["snippets"]
       | TTS.ExportedMessage
+      | TTS.ExportedMessageCategory
       | TTS.ExportedSnippetsSection
       | TTS.ExportedSnippet
       | (
           | TTS.ExportedMessage
+          | TTS.ExportedMessageCategory
           | TTS.ExportedSnippetsSection
           | TTS.ExportedSnippet
           | TTS.ExportedSettings
