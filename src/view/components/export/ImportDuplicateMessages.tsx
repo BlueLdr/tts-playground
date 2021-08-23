@@ -230,7 +230,7 @@ export const ImportMessageCompareItem: Preact.FunctionComponent<{
         </div>
       </div>
       <div className="tts-import-compare-row-bottom">
-        <div className="tts-import-compare-message-text">{text}</div>
+        <div className="tts-import-compare-message-text tts-text">{text}</div>
       </div>
     </div>
   );

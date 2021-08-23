@@ -45,7 +45,7 @@ export const SnippetAddDemo: Preact.FunctionComponent = ({}) => {
       <div className="help-demo-snippet-add-content">
         <textarea
           ref={input_ref}
-          className="tts-textarea-input"
+          className="tts-textarea-input tts-text"
           value={text}
           rows={4}
           cols={40}

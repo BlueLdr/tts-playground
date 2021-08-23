@@ -23,17 +23,17 @@ export const SnippetTextDemo: Preact.FunctionComponent = () => {
         </div>
         {data.options.prefix && (
           <div className="snippet-prefix">
-            <span>{data.options.prefix}</span>
+            <span className="tts-text">{data.options.prefix}</span>
             <div className="help-demo-snippet-text-label">Prefix</div>
           </div>
         )}
         <div className="snippet-text">
-          <span>{data.text}</span>
+          <span className="tts-text">{data.text}</span>
           <div className="help-demo-snippet-text-label">Main Text</div>
         </div>
         {data.options.suffix && (
           <div className="snippet-suffix">
-            <span>{data.options.suffix}</span>
+            <span className="tts-text">{data.options.suffix}</span>
             <div className="help-demo-snippet-text-label">Suffix</div>
           </div>
         )}

@@ -57,7 +57,7 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
         <h3>{!row.text ? "Create New" : "Edit"} Snippet</h3>
       </ModalHeader>
       <div className="modal-body">
-        <div className="row tts-snippets-modal-text">
+        <div className="row tts-snippets-modal-text tts-text">
           <label
             className="tts-snippets-modal-prefix"
             title="Some snippets need to start with a different string than the repeated characters (e.g. the 'y' in yDRDRDR)."

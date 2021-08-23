@@ -7,7 +7,7 @@ export const Snippet: Preact.FunctionComponent<{
   showRepeats?: boolean;
 }> = ({ data, className, showRepeats }) => {
   return (
-    <div className={`snippet${maybeClassName(className)}`}>
+    <div className={`snippet tts-text${maybeClassName(className)}`}>
       <div
         className="snippet-space-before"
         data-show={`${data.options.space_before}`}
