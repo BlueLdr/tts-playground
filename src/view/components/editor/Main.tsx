@@ -185,14 +185,13 @@ export const TTSTextArea: Preact.FunctionComponent<
     end += ` ${bitsString}`;
   }
   return (
-    <div className="tts-textarea">
+    <div className="tts-textarea tts-text">
       <textarea
         id={id}
         ref={inputRef}
         className="tts-textarea-input"
         value={value}
         rows={12}
-        cols={82}
         maxLength={maxLength}
         onInput={e => {
           onChange?.bind(e.target)?.(e);

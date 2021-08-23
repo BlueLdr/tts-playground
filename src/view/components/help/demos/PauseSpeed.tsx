@@ -34,7 +34,9 @@ export const PauseSpeedDemo: Preact.FunctionComponent = () => {
       <h4 className="help-demo-prompt">Try it out:</h4>
       <div className="help-demo-pause-top">
         <div className="help-demo-pause-item">
-          <div className="help-demo-pause-item-text">{text_normal}</div>
+          <div className="help-demo-pause-item-text tts-text">
+            {text_normal}
+          </div>
           <button
             className="help-demo-pause-item-button icon-button"
             onClick={() => preview_tts(text_normal)}
@@ -43,7 +45,9 @@ export const PauseSpeedDemo: Preact.FunctionComponent = () => {
           </button>
         </div>
         <div className="help-demo-pause-item">
-          <div className="help-demo-pause-item-text">{text_preserved}</div>
+          <div className="help-demo-pause-item-text tts-text">
+            {text_preserved}
+          </div>
           <button
             className="help-demo-pause-item-button icon-button"
             onClick={() => preview_tts(text_preserved)}

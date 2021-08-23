@@ -484,8 +484,8 @@ export const HELP_DATA = help_data_type({
         <h3>Important Tips</h3>
         <ul>
           <li>
-            The speed modifier will not affect any text that follows
-            punctuation. For example, in the message{" "}
+            Any text that is followed by punctuation will not be affected by the
+            speed modifier. For example, in the message{" "}
             <code>Hey you, get off my lawn{DEFAULT_SPEED_CHAR.repeat(10)}</code>
             , <code>Hey you</code> will be spoken normally, and{" "}
             <code>get off my lawn</code> will be sped up.

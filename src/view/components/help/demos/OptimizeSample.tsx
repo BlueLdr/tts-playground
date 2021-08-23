@@ -17,11 +17,11 @@ export const OptimizeSampleDemo: Preact.FunctionComponent = () => {
   return (
     <div className="help-demo help-demo-optimize-sample">
       For example, the message
-      <div className="help-demo-optimize-sample-text">
+      <div className="help-demo-optimize-sample-text tts-text">
         "{optimize_sample}" ({optimize_sample.length} chars)
       </div>
       would be transformed into the following after optimization:
-      <div className="help-demo-optimize-sample-text">
+      <div className="help-demo-optimize-sample-text tts-text">
         "{optimize_sample_after}" ({optimize_sample_after.length} chars)
       </div>
     </div>

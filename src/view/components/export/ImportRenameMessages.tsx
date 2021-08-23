@@ -216,7 +216,9 @@ export const ImportMessageRenameItem: Preact.FunctionComponent<
   return (
     <tr className="tts-import-rename-row">
       <td className="tts-import-rename-message">
-        <div className="tts-import-compare-message-text">{message.text}</div>
+        <div className="tts-import-compare-message-text tts-text">
+          {message.text}
+        </div>
       </td>
       <td className="tts-import-rename-name">
         <input

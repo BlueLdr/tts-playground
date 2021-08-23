@@ -196,7 +196,7 @@ export const MessageModalBase: Preact.FunctionComponent<{
             />
           </label>
         </div>
-        <div className="tts-message-modal-preview">{text}</div>
+        <div className="tts-message-modal-preview tts-text">{text}</div>
         <div className="tts-message-modal-player">
           <AudioPlayer data={data} id="message-modal-player" onPlay={on_play} />
           <StatusIndicator status={status} />
