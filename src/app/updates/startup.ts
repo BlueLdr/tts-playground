@@ -4,7 +4,6 @@ import {
   get_stored_messages,
   set_stored_message_categories,
   set_stored_messages,
-  UNCATEGORIZED_GROUP_NAME,
 } from "~/common";
 import { sample_messages } from "~/common/sample-data";
 
@@ -36,11 +35,6 @@ const add_messages_to_categories = async () => {
     open: true,
     data: [],
   };
-  const uncategorized: TTS.MessageCategory = {
-    name: UNCATEGORIZED_GROUP_NAME,
-    open: false,
-    data: [],
-  };
 
   messages.forEach(m => {
     if (
@@ -49,12 +43,10 @@ const add_messages_to_categories = async () => {
       )
     ) {
       samples.data.push(m.id);
-    } else {
-      uncategorized.data.push(m.id);
     }
   });
 
-  set_stored_message_categories([samples, uncategorized]);
+  set_stored_message_categories([samples]);
 };
 
 const UPDATES: { [key: string]: (() => Promise<void>)[] } = {

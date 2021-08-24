@@ -74,8 +74,8 @@ export const import_data = (
   data: TTS.AnyExportData,
   settings: TTS.EditorSettings,
   messages: TTS.Message[],
-  categories: TTS.MessageCategory[],
-  snippets: TTS.SnippetsSection[]
+  snippets: TTS.SnippetsSection[],
+  categories: TTS.MessageCategory[]
 ) => {
   let new_messages: TTS.Message[] = [];
   let new_categories: TTS.MessageCategory[] = [];
@@ -83,6 +83,7 @@ export const import_data = (
 
   const dup_messages: TTS.Message[] = [];
   const rename_messages: TTS.Message[] = [];
+  const merge_categories: TTS.MessageCategory[] = [];
   const uncategorized_snippets: TTS.Snippet[] = [];
   const dup_snippets_in_section: TTS.SnippetsSection[] = [];
   const merge_snippet_sections: TTS.SnippetsSection[] = [];
@@ -100,17 +101,49 @@ export const import_data = (
       new_messages.find(m => m.name === msg.name)
     ) {
       rename_messages.push(msg);
+    } else if (
+      messages.find(m => m.id === msg.id) ||
+      new_messages.find(m => m.id === msg.id)
+    ) {
+      const new_id = generate_id(msg.name);
+      new_messages.push({
+        ...msg,
+        id: new_id,
+      });
+      return new_id;
     } else {
       new_messages.push(msg);
     }
+    return msg.id;
   };
 
   const process_message_category = (
     cat: TTS.MessageCategory | TTS.MessageCategoryPopulated
   ) => {
-    const existing =
-      categories.find(c => c.name === cat.name) ||
-      new_categories.find(c => c.name == cat.name);
+    const existing = new_categories.find(c => c.name == cat.name);
+
+    const category = existing ??
+      categories.find(c => c.name === cat.name) ?? {
+        ...cat,
+        data: [],
+      };
+
+    const all_cats = categories.concat(new_categories);
+    cat.data.forEach(m => {
+      let id: string = m;
+      if (typeof m !== "string") {
+        const { __type, ...msg } = m;
+        id = process_message(msg);
+      }
+      if (!all_cats.find(c => c.data.includes(id))) {
+        category.data.push(id);
+      }
+    });
+
+    if (!existing) {
+      new_categories.push(category);
+    }
+    return category;
   };
 
   const process_snippet_section = (section: TTS.SnippetsSection) => {
@@ -162,14 +195,16 @@ export const import_data = (
     }
   };
 
-  let settings_result;
-  let messages_result;
-  let snippets_result;
+  let settings_result: TTS.EditorSettings | undefined;
+  let messages_result: TTS.Message[] | undefined;
+  let categories_result: TTS.MessageCategory[] | undefined;
+  let snippets_result: TTS.SnippetsSection[] | undefined;
   if (!Array.isArray(data)) {
     if (data.__type === "export-data") {
       const {
         settings: new_settings,
         messages: imp_messages,
+        messageCategories: imp_categories,
         snippets: imp_snippets,
       } = data;
 
@@ -180,6 +215,11 @@ export const import_data = (
       imp_messages.forEach(({ __type, ...m }) => {
         if (__type === "message") {
           process_message(m);
+        }
+      });
+      imp_categories?.forEach(({ __type, ...c }) => {
+        if (__type === "message-category") {
+          process_message_category(c as TTS.MessageCategory);
         }
       });
       imp_snippets.forEach(({ __type, ...s }) => {
@@ -193,6 +233,10 @@ export const import_data = (
     } else if (data.__type === "message") {
       const { __type, ...new_message } = data;
       process_message(new_message);
+    } else if (data.__type === "message-category") {
+      const { __type, ...new_category } = data;
+      // @ts-expect-error:
+      process_message_category(new_category);
     } else if (data.__type === "snippets-section") {
       const { __type, ...new_section } = data;
       new_section.data.forEach(({ __type, ...snip }) =>
@@ -206,6 +250,8 @@ export const import_data = (
     data.forEach(({ __type, ...d }) => {
       if (__type === "message") {
         process_message(d as TTS.Message);
+      } else if (__type === "message-category") {
+        process_message_category(d as TTS.MessageCategory);
       } else if (__type === "snippets-section") {
         (d as TTS.ExportedSnippetsSection).data.forEach(({ __type, ...snip }) =>
           process_snippet(snip as TTS.Snippet, d as TTS.SnippetsSection)
@@ -220,6 +266,55 @@ export const import_data = (
 
   if (new_messages.length > 0) {
     messages_result = messages.concat(new_messages);
+  }
+
+  new_categories = new_categories
+    .map(c => ({
+      ...c,
+      data: c.data.filter(m =>
+        (messages_result ?? messages)
+          .concat(dup_messages)
+          .concat(rename_messages)
+          .find(
+            msg =>
+              msg.id === (typeof m === "string" ? m : (m as TTS.Message).id)
+          )
+      ),
+    }))
+    .filter(nc => {
+      if (nc.data.length === 0 || categories.find(c => c.name === nc.name)) {
+        if (nc.data.length > 0) {
+          merge_categories.push(nc);
+        }
+        return false;
+      }
+      return true;
+    });
+  if (merge_categories.length > 0) {
+    categories_result = categories.map(c => {
+      const new_data = merge_categories.find(nc => nc.name === c.name);
+      if (!new_data) {
+        return c;
+      }
+      return {
+        ...c,
+        data: c.data.concat(
+          new_data.data
+            .map(m => (typeof m === "string" ? m : (m as TTS.Message).id))
+            .filter(m => !c.data.includes(m))
+        ),
+      };
+    });
+  }
+  if (new_categories.length > 0) {
+    categories_result = (categories_result ?? categories).concat(
+      new_categories.map(c => ({
+        ...c,
+        data: c.data.map(m =>
+          typeof m === "string" ? m : (m as TTS.Message).id
+        ),
+      }))
+    );
   }
 
   new_snippets = new_snippets.filter(ns => {
@@ -249,6 +344,7 @@ export const import_data = (
     settings_result,
     messages_result,
     snippets_result,
+    categories_result,
     dup_messages,
     rename_messages,
     dup_snippets_in_section,

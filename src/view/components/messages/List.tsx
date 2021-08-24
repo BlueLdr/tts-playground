@@ -6,6 +6,7 @@ import {
   CategoryModal,
   MessageCategoryListItem,
   MessageModal,
+  UncategorizedMessages,
 } from "~/view/components";
 import {
   useContextState,
@@ -91,6 +92,7 @@ export const MessagesList: Preact.FunctionComponent<{
             onClickEditMessage={set_edit_target}
           />
         ))}
+        <UncategorizedMessages onClickEditMessage={set_edit_target} />
       </div>
       {edit_target != null &&
         useModal(

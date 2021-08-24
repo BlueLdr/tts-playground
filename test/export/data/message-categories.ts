@@ -4,7 +4,8 @@ import {
   MESSAGE_ONE,
   MESSAGE_THREE,
   MESSAGE_TWO,
-} from "./messages";
+  // @ts-expect-error:
+} from "./messages.ts";
 
 export const MESSAGE_CATEGORY_ONE: TTS.ExportedMessageCategory = {
   name: "Test message category 1",

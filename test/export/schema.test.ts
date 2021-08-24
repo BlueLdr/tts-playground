@@ -5,7 +5,10 @@ import {
   SNIPPET_SCHEMA,
   SNIPPET_SECTION_SCHEMA,
   conform_to_schema,
+  MESSAGE_CATEGORY_SCHEMA,
 } from "~/model";
+// @ts-expect-error:
+import { MESSAGE_CATEGORY_THREE } from "./data/message-categories.ts";
 
 // @ts-expect-error:
 import { MESSAGE_ONE } from "./data/messages.ts";
@@ -237,4 +240,37 @@ test("conform settings with missing property", t => {
     ...settings,
     history_steps: SETTINGS_SCHEMA.history_steps.default,
   });
+});
+
+test("conform valid message category", t => {
+  const { __type, ...cat } = MESSAGE_CATEGORY_THREE;
+  const conformed = conform_to_schema(cat, MESSAGE_CATEGORY_SCHEMA);
+  t.deepEqual(conformed, cat);
+});
+
+test("conform message category with extra property", t => {
+  const { __type, ...cat } = MESSAGE_CATEGORY_THREE;
+  const conformed = conform_to_schema(
+    { ...cat, extra: true },
+    MESSAGE_CATEGORY_SCHEMA
+  );
+  t.deepEqual(conformed, cat);
+});
+
+test("conform message category with missing optional property", t => {
+  const { __type, open, ...cat } = MESSAGE_CATEGORY_THREE;
+  const conformed = conform_to_schema(cat, MESSAGE_CATEGORY_SCHEMA);
+  t.deepEqual(conformed, { ...cat, open: false });
+});
+
+test("conform message category with missing multi property", t => {
+  const { __type, data, ...cat } = MESSAGE_CATEGORY_THREE;
+  const conformed = conform_to_schema(cat, MESSAGE_CATEGORY_SCHEMA);
+  t.deepEqual(conformed, { ...cat, data: [] });
+});
+
+test("reject message category with missing required property", t => {
+  const { __type, name, ...cat } = MESSAGE_CATEGORY_THREE;
+  const conformed = conform_to_schema(cat, MESSAGE_CATEGORY_SCHEMA);
+  t.deepEqual(conformed, null);
 });

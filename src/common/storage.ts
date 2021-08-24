@@ -76,6 +76,7 @@ export const DEFAULT_STATE: TTS.AppState = {
     optimize_level: OptimizeLevel.normal,
     history_steps: DEFAULT_HISTORY_STEPS_LIMIT,
     skip_tutorials: false,
+    uncategorized_msgs_open: true,
   },
   message: null,
   volume: 0.5,

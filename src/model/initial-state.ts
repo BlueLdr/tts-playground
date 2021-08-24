@@ -26,6 +26,9 @@ const initial_state: TTS.AppState = {
     skip_tutorials:
       stored_state?.settings?.skip_tutorials ??
       common.DEFAULT_STATE.settings.skip_tutorials,
+    uncategorized_msgs_open:
+      stored_state?.settings?.uncategorized_msgs_open ??
+      common.DEFAULT_STATE.settings.uncategorized_msgs_open,
   },
   editor: {
     text: stored_state?.editor?.text ?? common.DEFAULT_STATE.editor.text,

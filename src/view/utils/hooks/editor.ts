@@ -5,7 +5,6 @@ import {
   do_alert,
   remove_item_from,
   replace_item_in,
-  UNCATEGORIZED_GROUP_NAME,
 } from "~/common";
 import {
   EDITOR_STATE,
@@ -131,17 +130,13 @@ export const useSaveMessageInCategory = () => {
   }, []);
 
   return useCallback(
-    (
-      id: string | null,
-      value: TTS.Message | undefined,
-      category: string = UNCATEGORIZED_GROUP_NAME
-    ) => {
+    (id: string | null, value: TTS.Message | undefined, category?: string) => {
       if ((value && !value.id) || (id && value && value.id !== id)) {
         return;
       }
       if (!value) {
         remove_from_category(id);
-      } else {
+      } else if (category) {
         update_in_category(category, value.id);
       }
     },
@@ -181,7 +176,7 @@ export const useSaveMessage = () => {
     (
       id: string | null,
       value: TTS.Message | undefined,
-      category: string = UNCATEGORIZED_GROUP_NAME
+      category?: string
     ): boolean => {
       if (value && !value.id) {
         do_alert("couldn't save due to missing id");

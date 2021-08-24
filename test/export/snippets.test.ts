@@ -35,16 +35,18 @@ test("import one snippet", t => {
     settings_result,
     messages_result,
     snippets_result,
+    categories_result,
     dup_messages,
     rename_messages,
     dup_snippets,
     uncategorized_snippets,
-  ] = import_data(SNIPPET_ONE, settings, [], snippets_list);
+  ] = import_data(SNIPPET_ONE, settings, [], snippets_list, []);
   t.deepEqual(uncategorized_snippets, [snippet_one]);
 
   t.is(settings_result, undefined);
   t.is(messages_result, undefined);
   t.is(snippets_result, undefined);
+  t.is(categories_result, undefined);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);
@@ -56,16 +58,18 @@ test("import one snippet in array", t => {
     settings_result,
     messages_result,
     snippets_result,
+    categories_result,
     dup_messages,
     rename_messages,
     dup_snippets,
     uncategorized_snippets,
-  ] = import_data([SNIPPET_ONE], settings, [], snippets_list);
+  ] = import_data([SNIPPET_ONE], settings, [], snippets_list, []);
   t.deepEqual(uncategorized_snippets, [snippet_one]);
 
   t.is(settings_result, undefined);
   t.is(messages_result, undefined);
   t.is(snippets_result, undefined);
+  t.is(categories_result, undefined);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);
@@ -79,6 +83,7 @@ test("import many snippets", t => {
     settings_result,
     messages_result,
     snippets_result,
+    categories_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -87,7 +92,8 @@ test("import many snippets", t => {
     [SNIPPET_ONE, SNIPPET_TWO, SNIPPET_THREE],
     settings,
     [],
-    snippets_list
+    snippets_list,
+    []
   );
   t.deepEqual(uncategorized_snippets, [
     snippet_one,
@@ -98,6 +104,7 @@ test("import many snippets", t => {
   t.is(settings_result, undefined);
   t.is(messages_result, undefined);
   t.is(snippets_result, undefined);
+  t.is(categories_result, undefined);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);

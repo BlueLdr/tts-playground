@@ -1,6 +1,11 @@
 import * as Preact from "preact";
 import { useCallback, useEffect, useMemo, useRef } from "preact/hooks";
-import { EDITOR_SETTINGS, MESSAGES, SNIPPETS } from "~/model";
+import {
+  EDITOR_SETTINGS,
+  MESSAGE_CATEGORIES,
+  MESSAGES,
+  SNIPPETS,
+} from "~/model";
 import {
   import_data,
   ImportDuplicateMessages,
@@ -22,11 +27,13 @@ export const ImportForm: Preact.FunctionComponent<{
   setData: (data: TTS.AnyExportData | null) => void;
 }> = ({ dismiss, data, setData }) => {
   const [settings, set_settings] = useContextState(EDITOR_SETTINGS);
+  const [categories, set_categories] = useContextState(MESSAGE_CATEGORIES);
   const [messages, set_messages] = useContextState(MESSAGES);
   const [snippets, set_snippets] = useContextState(SNIPPETS);
   const [step, set_step, step_ref] = useStateRef<number>(0);
   const parsed_data = useMemo(
-    () => (data ? import_data(data, settings, messages, snippets) : null),
+    () =>
+      data ? import_data(data, settings, messages, snippets, categories) : null,
     [data]
   );
 
@@ -56,6 +63,7 @@ export const ImportForm: Preact.FunctionComponent<{
     settings_result,
     messages_result_initial,
     snippets_result_initial,
+    categories_result_initial,
     dup_messages = [],
     rename_messages = [],
     dup_snippets = [],
@@ -74,8 +82,28 @@ export const ImportForm: Preact.FunctionComponent<{
     if (snippets_final_result) {
       set_snippets(snippets_final_result);
     }
+    if (categories_result_initial) {
+      const categories_final = categories_result_initial
+        .map(c => ({
+          ...c,
+          data: c.data.filter(id =>
+            (messages_final_result ?? messages).find(m => m.id === id)
+          ),
+        }))
+        .filter(
+          c => categories.find(ca => ca.name === c.name) || c.data.length > 0
+        );
+      set_categories(categories_final);
+    }
     set_success(true);
-  }, [settings_result, messages_final_result, snippets_final_result]);
+  }, [
+    settings_result,
+    messages_final_result,
+    snippets_final_result,
+    categories_result_initial,
+    categories,
+    messages,
+  ]);
 
   useEffect(() => {
     if (!parsed_data) {
@@ -96,6 +124,9 @@ export const ImportForm: Preact.FunctionComponent<{
       }
       if (snippets_result_initial) {
         set_snippets(snippets_result_initial);
+      }
+      if (categories_result_initial) {
+        set_categories(categories_result_initial);
       }
       set_success(true);
     }
