@@ -251,7 +251,7 @@ export const optimize_whitespace = (
         output += newline_at_start ? "\n" : " ";
       }
       output += char;
-      if (char === "." && input[i + 1] !== "\n") {
+      if (char === "." && input[i + 1] !== "\n" && input[i + 1] !== " ") {
         output += " ";
       }
       continue;

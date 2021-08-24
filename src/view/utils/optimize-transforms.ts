@@ -138,4 +138,8 @@ export const RESTORE_WHITESPACE_TRANSFORMS = [
     before: /[$￡￥￦€₩₹]\d+(\.\d+)?$/i,
     after: /^[^Ⓐ-ⓩ]/i,
   },
+  {
+    before: /'[a-z]+$/i,
+    after: /^[^Ⓐ-ⓩ]/i,
+  },
 ];
