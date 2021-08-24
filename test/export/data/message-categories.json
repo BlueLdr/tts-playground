@@ -3,65 +3,17 @@
     "name": "Extra message category 1",
     "open": false,
     "data": [
-      {
-        "id": "5b824821170bd1573d3f1c7f560c16db",
-        "text": "extra message 1 text",
-        "name": "Extra Message 1",
-        "options": {
-          "max_length": 255,
-          "speed": true,
-          "bits": false,
-          "speed_char": "¡",
-          "voice": "Brian"
-        }
-      },
-      {
-        "id": "508b4c21170bd1573d3f1c7f560c2e1a",
-        "text": "extra message 2 text",
-        "name": "Extra Message 2",
-        "options": {
-          "max_length": 256,
-          "speed": true,
-          "bits": false,
-          "speed_char": "¡",
-          "voice": "Brian"
-        }
-      }
-    ]
-  },
-  {
-    "name": "Extra message category 2",
-    "open": false,
-    "data": [
-      {
-        "id": "5c8a4d21170bd1573d3f1c7f560c3c11",
-        "text": "extra message 3 text",
-        "name": "Extra Message 3",
-        "options": {
-          "max_length": 257,
-          "speed": true,
-          "bits": false,
-          "speed_char": "¡",
-          "voice": "Brian"
-        }
-      }
-    ]
-  },
-  {
-    "name": "Extra message category 3",
-    "open": false,
-    "data": [
       "5b824821170bd1573d3f1c7f560c16db",
       "508b4c21170bd1573d3f1c7f560c2e1a"
     ]
   },
   {
-    "name": "Extra message category 4",
+    "name": "Extra message category 2",
     "open": false,
     "data": ["5c8a4d21170bd1573d3f1c7f560c3c11"]
   },
   {
-    "name": "Extra message category 5",
+    "name": "Extra message category 3",
     "open": false,
     "data": []
   }

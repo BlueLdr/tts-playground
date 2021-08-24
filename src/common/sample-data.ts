@@ -1,8 +1,4 @@
-import {
-  DEFAULT_SPEED_CHAR,
-  DEFAULT_VOICE,
-  UNCATEGORIZED_GROUP_NAME,
-} from "~/common/constants";
+import { DEFAULT_SPEED_CHAR, DEFAULT_VOICE } from "~/common/constants";
 
 export const sample_snippets: TTS.SnippetsSection[] = [
   {
@@ -101,10 +97,5 @@ export const sample_message_categories: TTS.MessageCategory[] = [
     name: "Sample Messages",
     open: true,
     data: ["sample-message-1", "sample-message-2"],
-  },
-  {
-    name: UNCATEGORIZED_GROUP_NAME,
-    open: false,
-    data: [],
   },
 ];

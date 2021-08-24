@@ -17,19 +17,20 @@ export type TypeString<T extends boolean | string | number> = T extends boolean
 export type SchemaOfProperty<T extends boolean | string | number> = {
   type: TypeString<T>;
   default?: T;
+  multi?: boolean;
 };
 
 export type SchemaProp<T extends object, K extends keyof T> = T[K] extends
   | boolean
   | string
   | number
-  ? SchemaOfProperty<T[K]>
+  ? SchemaOfProperty<T[K]> & { multi?: false }
   : T[K] extends (infer F)[]
   ? F extends object
-    ? { type: SchemaOf<F>; default: {} | null }
-    : { type: F; default: readonly [] | null }
+    ? { type: SchemaOf<F>; default?: {}; multi: true }
+    : { type: F; default: readonly [] | null; multi: true }
   : T[K] extends object
-  ? { type: SchemaOf<T[K]>; default: {} | null }
+  ? { type: SchemaOf<T[K]>; default?: {}; multi?: false }
   : never;
 
 export type SchemaOf<T extends object> = {
@@ -43,6 +44,7 @@ export const SETTINGS_SCHEMA: SchemaOf<TTS.EditorSettings> = {
   bits_string: { type: "string", default: DEFAULT_BITS_STRING },
   history_steps: { type: "number", default: DEFAULT_HISTORY_STEPS_LIMIT },
   skip_tutorials: { type: "boolean", default: false },
+  uncategorized_msgs_open: { type: "boolean", default: false },
 };
 
 export const SNIPPET_OPTIONS_SCHEMA: SchemaOf<TTS.SnippetOptions> = {
@@ -55,16 +57,13 @@ export const SNIPPET_OPTIONS_SCHEMA: SchemaOf<TTS.SnippetOptions> = {
 
 export const SNIPPET_SCHEMA: SchemaOf<TTS.Snippet> = {
   text: { type: "string" },
-  options: {
-    type: SNIPPET_OPTIONS_SCHEMA,
-    default: {},
-  },
+  options: { type: SNIPPET_OPTIONS_SCHEMA },
 } as const;
 
 export const SNIPPET_SECTION_SCHEMA: SchemaOf<TTS.SnippetsSection> = {
   name: { type: "string" },
   open: { type: "boolean", default: false },
-  data: { type: SNIPPET_SCHEMA, default: null },
+  data: { type: SNIPPET_SCHEMA, default: [], multi: true },
 } as const;
 
 export const MESSAGE_OPTIONS_SCHEMA: SchemaOf<TTS.MessageOptions> = {
@@ -79,16 +78,13 @@ export const MESSAGE_SCHEMA: SchemaOf<TTS.Message> = {
   id: { type: "string" },
   name: { type: "string" },
   text: { type: "string" },
-  options: {
-    type: MESSAGE_OPTIONS_SCHEMA,
-    default: {},
-  },
+  options: { type: MESSAGE_OPTIONS_SCHEMA },
 };
 
 export const MESSAGE_CATEGORY_SCHEMA: SchemaOf<TTS.MessageCategory> = {
   name: { type: "string" },
   open: { type: "boolean", default: false },
-  data: { type: "string", default: [] },
+  data: { type: "string", default: [], multi: true },
 } as const;
 
 export const HISTORY_CURSOR_SCHEMA: SchemaOf<TTS.EditorHistory["cursor"]> = {
@@ -107,12 +103,9 @@ export const HISTORY_SCHEMA: SchemaOf<TTS.EditorHistory> = {
       pause_duration: { type: "number", default: 1 },
       speed_char: { type: "string", default: DEFAULT_SPEED_CHAR },
     },
-    default: null,
+    default: {},
   },
-  cursor: {
-    type: HISTORY_CURSOR_SCHEMA,
-    default: null,
-  },
+  cursor: { type: HISTORY_CURSOR_SCHEMA },
   cursor_before: {
     type: HISTORY_CURSOR_SCHEMA,
     default: {},
@@ -122,7 +115,8 @@ export const HISTORY_SCHEMA: SchemaOf<TTS.EditorHistory> = {
 export const HISTORY_STORAGE_SCHEMA: SchemaOf<TTS.EditorHistoryStorage> = {
   data: {
     type: HISTORY_SCHEMA,
-    default: null,
+    default: [],
+    multi: true,
   },
   index: {
     type: "number",
@@ -136,12 +130,27 @@ export const conform_to_schema = <T extends object, K extends object>(
   // @ts-expect-error:
   const output: K = {};
   let failed = false;
+  if (!data) {
+    return null;
+  }
   Object.entries(schema).forEach(<PK extends keyof K>([key, type]) => {
     if (failed) {
       return;
     }
-    if (typeof type.type !== "string") {
-      if (Array.isArray(data[key])) {
+    const is_present = key in data;
+    const is_complex = typeof type.type !== "string";
+    const is_array = is_present && Array.isArray(data[key]);
+    const multi_matches = !!type.multi === is_array;
+    if (!is_present || !multi_matches) {
+      if (!("default" in type)) {
+        failed = true;
+      } else if (!is_complex || type.multi) {
+        output[key] = type.default;
+      }
+    }
+
+    if (is_complex) {
+      if (is_array) {
         const arr = [];
         data[key].forEach(d => {
           const conformed = conform_to_schema(d, type.type);
@@ -150,21 +159,26 @@ export const conform_to_schema = <T extends object, K extends object>(
           }
         });
         output[key] = arr;
-      } else if (key in data) {
+      } else {
         const conformed = conform_to_schema(data[key], type.type);
         if (conformed) {
           output[key] = conformed;
-        } else if (!!type.default) {
+        } else if (!type.default) {
           failed = true;
         }
       }
-    } else if (!(key in data) || typeof data[key] !== type.type) {
-      if (!("default" in type)) {
-        failed = true;
-      }
-      output[key] = type.default;
     } else {
-      output[key] = data[key];
+      const valid = is_array
+        ? data[key].every(i => typeof i === type.type)
+        : typeof data[key] === type.type;
+      if (!valid) {
+        if (!("default" in type)) {
+          failed = true;
+        }
+        output[key] = type.default;
+      } else {
+        output[key] = data[key];
+      }
     }
   });
   return failed ? null : output;

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "uncat-message-1",
+    "text": "Uncategorized message 1 text",
+    "name": "Uncategorized Message 1",
+    "options": {
+      "max_length": 255,
+      "speed": true,
+      "bits": false,
+      "speed_char": "¡",
+      "voice": "Brian"
+    }
+  },
+  {
+    "id": "uncat-message-2",
+    "text": "Uncategorized message 2 text",
+    "name": "Uncategorized Message 2",
+    "options": {
+      "max_length": 256,
+      "speed": true,
+      "bits": false,
+      "speed_char": "¡",
+      "voice": "Brian"
+    }
+  },
+  {
+    "id": "uncat-message-3",
+    "text": "Uncategorized message 3 text",
+    "name": "Uncategorized Message 3",
+    "options": {
+      "max_length": 257,
+      "speed": true,
+      "bits": false,
+      "speed_char": "¡",
+      "voice": "Brian"
+    }
+  }
+]
