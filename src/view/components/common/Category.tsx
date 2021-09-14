@@ -7,6 +7,7 @@ export const Category: Preact.FunctionComponent<
     controls?: Preact.ComponentChildren;
     open: boolean;
     setOpen: (value: boolean) => void;
+    toggleOnClickTitle?: boolean;
   } & Omit<HTMLDivProps, "title" | "controls" | "open">
 > = ({
   title,
@@ -16,22 +17,36 @@ export const Category: Preact.FunctionComponent<
   className,
   onClick,
   children,
+  toggleOnClickTitle = true,
   ...props
 }) => {
+  const toggle = e => {
+    setOpen(!open);
+    // @ts-expect-error:
+    onClick?.(e);
+  };
   const class_names = (suffix: string) =>
-    classNamesWithSuffix(suffix, "category", className);
+    classNamesWithSuffix(suffix, "category", ...className.split(" "));
   return (
     <div className={class_names("")} data-open={`${open}`}>
       <div className={class_names("-header")} {...props}>
         <div
           className={class_names("-title")}
-          onClick={e => {
-            setOpen(!open);
-            // @ts-expect-error:
-            onClick?.(e);
-          }}
+          data-toggle={`${toggleOnClickTitle}`}
+          onClick={toggleOnClickTitle ? toggle : undefined}
         >
-          <div className={class_names("-expand")}>
+          <div
+            className={class_names("-expand")}
+            onClick={toggleOnClickTitle ? undefined : toggle}
+            onMouseDown={
+              toggleOnClickTitle
+                ? undefined
+                : e => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                  }
+            }
+          >
             {open ? (
               <i className="fas fa-chevron-down" />
             ) : (

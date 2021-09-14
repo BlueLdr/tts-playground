@@ -1,6 +1,7 @@
 export type ArrayInsertPosSpecifier<T> =
   | "start"
   | "end"
+  | number
   | ((a: T, b: T) => -1 | 0 | 1);
 
 // helper functions to manipulate arrays without mutating the original copy
@@ -18,8 +19,8 @@ export const add_item_to = <T>(
   if (list.length === 0) {
     return [item];
   }
+  let index = typeof pos === "number" ? pos : -1;
   if (typeof pos === "function") {
-    let index = -1;
     let i = 0;
     while (i < list.length && index < 0) {
       const comp = pos(item, list[i]);
@@ -29,10 +30,10 @@ export const add_item_to = <T>(
         index = i;
       }
     }
-    if (index !== 0 && index !== list.length - 1) {
-      return [...list.slice(0, index), item, ...list.slice(index)];
-    }
-
+  }
+  if (index > 0 && index < list.length) {
+    return [...list.slice(0, index), item, ...list.slice(index)];
+  } else if (typeof pos !== "string") {
     pos = index === 0 ? "start" : "end";
   }
   return pos === "start" ? [item].concat(list) : list.concat([item]);
