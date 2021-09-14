@@ -80,6 +80,17 @@ export const useModal = (
   return null;
 };
 
+export const useRenderPropsFunc = <T extends object>(
+  render: (props: Preact.RenderableProps<T>) => Preact.VNode | null,
+  inputs: any[],
+  name: string
+): Preact.ComponentType<T> => {
+  const comp = useCallback(render, inputs);
+  // @ts-expect-error:
+  comp.displayName = name;
+  return comp;
+};
+
 export const useTempAnimation = (duration: number, delay?: number) => {
   const timer = hooks.useRef<any>();
   const [active, set_active, active_ref] = useStateRef<boolean>(false);

@@ -51,3 +51,73 @@ interface ExpandableChecklistItem<T> {
     : boolean;
   Render: preact.ComponentType<{ data: T }>;
 }
+
+interface MaybeClass {
+  className?: string;
+}
+
+interface OrganizerSectionSpec<T> {
+  name: string;
+  open: boolean;
+  data: T[];
+}
+
+interface OrganizerHeaderProps {
+  className: string;
+  buttons: preact.ComponentChildren;
+  reorderEnabled: boolean;
+}
+
+interface OrganizerSectionHeaderControlsProps<T> {
+  section: OrganizerSectionSpec<T>;
+  index: number;
+}
+
+interface OrganizerSectionExtrasProps<T> {
+  section: OrganizerSectionSpec<T>;
+  id: string | number;
+}
+
+interface OrganizerItemProps<T> {
+  data: T;
+  buttons: preact.ComponentChildren;
+  reorderEnabled: boolean;
+}
+
+interface OrganizerProps<T> extends MaybeClass {
+  RenderHeader: preact.ComponentType<OrganizerHeaderProps>;
+  RenderSectionHeaderControls: preact.ComponentType<
+    OrganizerSectionHeaderControlsProps<T>
+  >;
+  RenderSectionExtras?: preact.ComponentType<OrganizerSectionExtrasProps<T>>;
+  RenderItem: preact.ComponentType<OrganizerItemProps<T>>;
+  getSectionHeaderProps: (section: OrganizerSectionSpec<T>) => HTMLDivProps;
+  getItemKey: (
+    section: OrganizerSectionSpec<T>,
+    item: T,
+    index: number
+  ) => string | number;
+  sections: OrganizerSectionSpec<T>[];
+  reorderEnabled: boolean;
+  setReorderEnabled: (val: boolean) => void;
+  updateSections: (val: OrganizerSectionSpec<T>[]) => void;
+}
+
+interface OrganizerBaseProps<T> extends MaybeClass, OrganizerProps<T> {
+  openSections: { [key: string]: boolean };
+  setOpen: (name: string, open: boolean) => void;
+}
+
+interface OrganizerGrabbedItem<T> {
+  type: "item" | "section";
+  value: T;
+  item_index: number | null;
+  section_index: number;
+}
+
+type OrganizerGrabbedSection<T> = OrganizerGrabbedItem<OrganizerSectionSpec<T>>;
+
+interface OrganizerIndex {
+  section: number;
+  item: number;
+}

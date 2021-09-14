@@ -107,8 +107,8 @@
     &-edit
       opacity 0.2
       transition-property color, opacity
-      .tts-col-messages:focus-within &,
-      .tts-col-messages:hover &
+      .category:focus-within &,
+      .category:hover &
         opacity 1
 
     &-modal .modal-body
@@ -139,6 +139,7 @@
     justify-content space-between
     align-items center
     position relative
+    width 100%
     padding 0
     transition background-color 150ms ease
 
@@ -181,6 +182,9 @@
     .tts-message-item-controls
       height 100%
 
+.organizer-list[data-reorder="true"] .tts-message
+  &-item
+    border none
 
 .tts-messages
   .tts-import-input-main

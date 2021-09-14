@@ -1,0 +1,164 @@
+.organizer
+  &-list[data-reorder="true"] &
+    &-section
+      &-header,
+      &-title
+      &-item
+        cursor grab
+        &:active
+          cursor grabbing
+      &-header
+        position relative
+        &[data-disable-reorder="true"]
+          &, .organizer-section-title
+            cursor default
+          .organizer-section-reorder-button
+            display none
+        &[data-drop-target="true"]
+          background-color $BlueG
+          outline 2px solid $BlueG
+      &-expand
+        cursor pointer
+      &-item,
+      &-header
+        &[data-insert-before="true"]
+          border-top 3px solid $BlueL
+        &[data-insert-after="true"]
+          border-bottom 3px solid $BlueL
+      &-title
+        line-height normal
+        margin 0
+      &-item
+        position relative
+        border 1px solid transparent
+        > *
+          pointer-events none
+          &.organizer-reorder-area
+            pointer-events auto
+
+  &-section
+    &-item
+      display flex
+      justify-content space-between
+      align-items center
+      position relative
+      padding 0
+      transition background-color 150ms ease
+
+      &[data-active="true"]
+        background-color $BlueG
+
+      &[data-grabbed="true"]
+        opacity 0.6
+
+      &-header
+        display flex
+        justify-content space-between
+        align-items center
+        width 100%
+        & > *
+          padding 0.5rem 0.75rem
+
+      &-title
+        padding 0.5rem 0.75rem
+        flex 1 1 100%
+        cursor pointer
+        white-space nowrap
+        text-overflow ellipsis
+        overflow hidden
+
+      &, &:nth-child(odd)
+        background-color $Gray72
+      &:nth-child(even)
+        background-color $Gray64
+      &:first-child,
+      &:first-child .tts-message-item-header
+        border-top-right-radius 4px
+        border-top-left-radius 4px
+
+      &:last-child,
+      &:last-child .tts-message-item-header
+        border-bottom-right-radius 4px
+        border-bottom-left-radius 4px
+
+      &:nth-child(even)
+      &:nth-child(odd)
+        &:hover
+          background-color $Gray96
+
+    &-container
+      .category
+        &, &-header
+          border-radius 0
+
+      &:first-child .category
+        &, &-header
+          border-top-right-radius 4px
+          border-top-left-radius 4px
+
+      &:last-child .category
+        &, &-header
+          border-bottom-right-radius 4px
+          border-bottom-left-radius 4px
+
+  &-reorder
+    &-button
+      width 2rem
+      height @width
+
+    &-area
+      //display none
+      position absolute
+      height 100%
+      width 100%
+      top 0
+      left 0
+      transform translateY(50%)
+      z-index 10
+
+      .organizer-list-section-item:last-child &,
+      .organizer-list-section-item &[data-before="true"]
+        height 60%
+        background-color rgba($statusGreen, 0.3)
+        opacity 1
+      &[data-before="true"]
+        transform translateY(-50%)
+
+      &::after
+        content " "
+        box-shadow 0 0 3px $BlueL
+        border-bottom 2px solid $BlueL
+        opacity 0
+        position absolute
+        width 100%
+        height 3px
+        top 50%
+        left 0
+        transform translateY(-50%)
+        transition 80ms ease opacity
+
+      .organizer-list[data-item-grabbed="false"] &
+        pointer-events none
+        z-index -10
+
+      .organizer-list[data-item-grabbed="true"] &
+        display block
+
+      &[data-type="section"]
+        z-index 11
+
+      .organizer-list[data-grabbed-type="section"] &[data-type="item"]::after,
+      .organizer-list[data-grabbed-type="item"] &[data-type="section"]::after,
+      .organizer-list-section-item[data-grabbed="true"] &::after
+        display none
+
+      .organizer-list[data-grabbed-type="item"] &[data-type="section"]
+        transform translateY(0)
+        top 5%
+        height 90%
+        z-index 11
+
+      &[data-active="true"]
+        &::after
+          opacity 1
+

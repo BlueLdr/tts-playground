@@ -41,6 +41,8 @@
     align-items center
     flex 1 1 auto
     cursor pointer
+    line-height 2.375rem
+    margin -0.5rem 0
 
     span
       color #f6f6f6
@@ -52,11 +54,14 @@
     transition color 100ms ease
     width 2rem
 
-  &-title:hover &-expand
+  &-title[data-toggle="true"]:hover &-expand,
+  &-title[data-toggle="false"] &-expand:hover
     color #999
-  &-title:active &-expand
+  &-title[data-toggle="true"]:active &-expand,
+  &-title[data-toggle="false"] &-expand:active
     color #777
 
-  &-title:disabled &-expand
+  &-title[data-toggle="true"]:disabled &-expand,
+  &-title[data-toggle="false"] &-expand:disabled
     pointer-events none
     color #444
