@@ -54,3 +54,17 @@ export const MESSAGE_FOUR: TTS.ExportedMessage = {
   },
   __type: "message",
 };
+
+export const MESSAGE_FIVE: TTS.ExportedMessage = {
+  id: "c4a5831470bde5a3e3b197a57025f0de",
+  text: "Test message 5 text",
+  name: "Test message 5 name",
+  options: {
+    max_length: 259,
+    speed: true,
+    bits: "",
+    speed_char: DEFAULT_SPEED_CHAR,
+    voice: "Brian",
+  },
+  __type: "message",
+};

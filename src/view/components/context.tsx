@@ -20,9 +20,16 @@ import {
   MESSAGES,
   OPTIMIZE_MESSAGE_CALLBACK,
   SNIPPETS,
+  UNCATEGORIZED_MESSAGES,
   VOLUME_CTX,
 } from "~/model";
-import { useOptimizeMessage, useStateRef, useValueRef } from "~/view/utils";
+import {
+  get_uncategorized_messages,
+  useContextState,
+  useOptimizeMessage,
+  useStateRef,
+  useValueRef,
+} from "~/view/utils";
 
 const CONTEXTS = {
   VOLUME_CTX: {
@@ -60,6 +67,10 @@ const CONTEXTS = {
   MESSAGE_CATEGORIES: {
     context: MESSAGE_CATEGORIES,
     initialValue: INITIAL_STATE.message_categories,
+  },
+  UNCATEGORIZED_MESSAGES: {
+    context: UNCATEGORIZED_MESSAGES,
+    initialValue: INITIAL_STATE.uncategorized_msgs,
   },
   SNIPPETS: {
     context: SNIPPETS,
@@ -164,6 +175,9 @@ export class WithGlobalContexts extends PureComponent {
 export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
   const messages = hooks.useContext(MESSAGES).value;
   const categories = hooks.useContext(MESSAGE_CATEGORIES).value;
+  const [uncategorized, set_uncat_msgs] = useContextState(
+    UNCATEGORIZED_MESSAGES
+  );
   const snippets = hooks.useContext(SNIPPETS).value;
   const volume = hooks.useContext(VOLUME_CTX).value;
   const editor_state = hooks.useContext(EDITOR_STATE).value;
@@ -202,9 +216,30 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
     },
     []
   );
-  const ctx_value = hooks.useMemo(
+  const loaded_msg_ctx_value = hooks.useMemo(
     () => new ImmutableContextValue(loaded_id, load_message),
     [load_message, loaded_id]
+  );
+
+  const msgs_ref = useValueRef(messages);
+  const cats_ref = useValueRef(categories);
+  const uncat_ref = useValueRef(uncategorized);
+  const set_uncat_messages = hooks.useCallback(
+    (uncat: TTS.MessageCategory, new_categories?: TTS.MessageCategory[]) => {
+      const new_value = get_uncategorized_messages(
+        msgs_ref.current,
+        new_categories ?? cats_ref.current,
+        uncat
+      );
+      if (JSON.stringify(new_value) !== JSON.stringify(uncat_ref.current)) {
+        set_uncat_msgs(new_value);
+      }
+    },
+    [set_uncat_msgs]
+  );
+  const uncat_ctx_value = hooks.useMemo(
+    () => new ImmutableContextValue(uncategorized, set_uncat_messages),
+    [uncategorized, set_uncat_messages]
   );
 
   useEffect(() => {
@@ -217,12 +252,18 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
   }, [volume, editor_state, loaded_id, editor_settings]);
 
   useEffect(() => {
+    set_uncat_messages(uncat_ref.current);
     storage.set_stored_messages(messages);
   }, [messages]);
 
   useEffect(() => {
+    set_uncat_messages(uncat_ref.current);
     storage.set_stored_message_categories(categories);
   }, [categories]);
+
+  useEffect(() => {
+    storage.set_stored_uncategorized_messages(uncategorized);
+  }, [uncategorized]);
 
   useEffect(() => {
     storage.set_stored_snippets(snippets);
@@ -246,10 +287,12 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
   useOptimizeMessage(editor_settings, is_optimized, should_optimize);
 
   return (
-    <IS_OPTIMIZED.Provider value={get_is_optimized}>
-      <LOADED_MESSAGE.Provider value={ctx_value}>
-        {children}
-      </LOADED_MESSAGE.Provider>
-    </IS_OPTIMIZED.Provider>
+    <UNCATEGORIZED_MESSAGES.Provider value={uncat_ctx_value}>
+      <IS_OPTIMIZED.Provider value={get_is_optimized}>
+        <LOADED_MESSAGE.Provider value={loaded_msg_ctx_value}>
+          {children}
+        </LOADED_MESSAGE.Provider>
+      </IS_OPTIMIZED.Provider>
+    </UNCATEGORIZED_MESSAGES.Provider>
   );
 };

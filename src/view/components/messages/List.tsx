@@ -2,10 +2,10 @@ import * as Preact from "preact";
 import { useCallback, useContext, useMemo } from "preact/hooks";
 import { replace_item_in, UNCATEGORIZED_GROUP_NAME } from "~/common";
 import {
-  EDITOR_SETTINGS,
   LOADED_MESSAGE,
   MESSAGE_CATEGORIES,
   MESSAGES,
+  UNCATEGORIZED_MESSAGES,
 } from "~/model";
 import {
   CategoryModal,
@@ -41,10 +41,12 @@ export const MessagesList: Preact.FunctionComponent<{
     category: string | undefined
   ) => boolean;
 }> = ({ updateMessages }) => {
-  const [settings, set_settings] = useContextState(EDITOR_SETTINGS);
   const [messages, set_messages] = useContextState(MESSAGES);
   const messages_ref = useValueRef(messages);
   const [categories, set_categories] = useContextState(MESSAGE_CATEGORIES);
+  const [uncategorized_msgs, set_uncat_msgs] = useContextState(
+    UNCATEGORIZED_MESSAGES
+  );
   const set_loaded_id = useContext(LOADED_MESSAGE).setValue;
   const [edit_target, set_edit_target] = useStateIfMounted<string | null>(null);
   const [cat_edit_target, set_cat_edit_target] = useStateIfMounted<
@@ -95,21 +97,24 @@ export const MessagesList: Preact.FunctionComponent<{
       m => !categories.find(c => c.data.includes(m.id))
     );
     if (uncat.length > 0) {
+      const uncat_sorted = uncategorized_msgs.data
+        .filter(id => uncat.find(m => m.id === id))
+        .map(id => messages.find(m => m.id === id))
+        .concat(uncat.filter(m => !uncategorized_msgs.data.includes(m.id)));
       categories_with_data.push({
-        name: UNCATEGORIZED_GROUP_NAME,
-        open: settings.uncategorized_msgs_open,
-        data: uncat,
+        ...uncategorized_msgs,
+        data: uncat_sorted,
       });
     }
     return categories_with_data;
-  }, [categories, messages, settings.uncategorized_msgs_open]);
+  }, [categories, messages, uncategorized_msgs]);
   const set_sections = useCallback(
     (sections_: TTS.MessageCategoryPopulated[]) => {
       const results: TTS.MessageCategory[] = [];
-      let uncat_open = null;
+      let uncat = null;
       for (let section of sections_) {
         if (section.name === UNCATEGORIZED_GROUP_NAME) {
-          uncat_open = section.open;
+          uncat = section;
         } else {
           results.push({
             ...section,
@@ -118,11 +123,14 @@ export const MessagesList: Preact.FunctionComponent<{
         }
       }
       set_categories(results);
-      if (uncat_open != null) {
-        set_settings(prev => ({
-          ...prev,
-          uncategorized_msgs_open: uncat_open,
-        }));
+      if (uncat != null) {
+        set_uncat_msgs(
+          {
+            ...uncat,
+            data: uncat.data.map(m => m.id),
+          },
+          results
+        );
       }
     },
     []
@@ -139,14 +147,15 @@ export const MessagesList: Preact.FunctionComponent<{
   const RenderSectionHeaderControls = useRenderPropsFunc<
     OrganizerSectionHeaderControlsProps<TTS.Message>
   >(
-    ({ section }) => (
-      <button
-        className="icon-button category-edit tts-message-category-edit"
-        onClick={() => set_cat_edit_target(section.name)}
-      >
-        <i className="fas fa-edit" />
-      </button>
-    ),
+    ({ section }) =>
+      section.name !== UNCATEGORIZED_GROUP_NAME && (
+        <button
+          className="icon-button category-edit tts-message-category-edit"
+          onClick={() => set_cat_edit_target(section.name)}
+        >
+          <i className="fas fa-edit" />
+        </button>
+      ),
     [],
     "MessageCategoryHeaderControls"
   );
@@ -227,9 +236,8 @@ export const MessagesHeader: Preact.FunctionComponent<{
       className={`row tts-col-header tts-messages-header${maybeClassName(
         className
       )}`}
-      data-help="messages-overview"
     >
-      <h4>Messages</h4>
+      <h4 data-help="messages-overview">Messages</h4>
       <div className="tts-col-header-controls">
         {buttons}
         {!reorderEnabled && (

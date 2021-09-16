@@ -346,6 +346,18 @@ export const HELP_DATA = help_data_type({
     ),
   },
 
+  "messages-group": {
+    key: "messages-group",
+    name: "Message Group",
+    content: () => (
+      <p>
+        Message Groups help keep your messages organized. Click on the group to
+        expand/hide the messages inside. Click the Edit button (
+        <i className="fas fa-edit" />) to rename or delete the group.
+      </p>
+    ),
+  },
+
   "messages-export": {
     key: "messages-export",
     name: "Export Message",
@@ -655,6 +667,19 @@ export const HELP_DATA = help_data_type({
   /* ======================================
    * =============== OTHER ================
      ====================================== */
+
+  organize: {
+    key: "organize",
+    name: "Organize Groups and Items",
+    content: () => (
+      <Preact.Fragment>
+        Clicking the reorganize button (<i class="fas fa-sort" />) will enable
+        control over the order and grouping of the items in the list. You can
+        reorder items inside groups, reorder groups, and move items from one
+        group to another.
+      </Preact.Fragment>
+    ),
+  },
 
   "help-docs": {
     key: "help-docs",

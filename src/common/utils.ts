@@ -66,6 +66,29 @@ export const replace_item_in = <T>(
     .concat(list.slice(index + 1));
 };
 
+export const union_arrays = <T>(
+  arr1: T[],
+  arr2: T[],
+  is_equal?: keyof T | ((a: T, b: T) => boolean)
+) =>
+  arr1.concat(
+    arr2.filter(b => {
+      if (arr1.length === 0) {
+        return arr2;
+      }
+      if (arr2.length === 0) {
+        return arr1;
+      }
+      if (is_equal != null) {
+        if (typeof is_equal === "function") {
+          return !arr1.some(a => is_equal(b, a));
+        }
+        return !arr1.some(a => a[is_equal] === b[is_equal]);
+      }
+      return !arr1.includes(b);
+    })
+  );
+
 export const deep_equals = (
   a: any,
   b: any,

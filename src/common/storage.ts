@@ -8,6 +8,7 @@ import {
   sample_message_categories,
   sample_messages,
   sample_snippets,
+  UNCATEGORIZED_GROUP_NAME,
 } from "~/common";
 import { OptimizeLevel, OptimizeTrigger } from "~/model/types";
 
@@ -47,6 +48,11 @@ export const get_stored_message_categories = (): TTS.MessageCategory[] =>
 export const set_stored_message_categories = (value: TTS.MessageCategory[]) =>
   localStorage.setItem("tts-message-categories", JSON.stringify(value));
 
+export const get_stored_uncategorized_messages = (): TTS.MessageCategory =>
+  load_storage_or("tts-uncat-messages", DEFAULT_UNCAT_MESSAGES);
+export const set_stored_uncategorized_messages = (value: TTS.MessageCategory) =>
+  localStorage.setItem("tts-uncat-messages", JSON.stringify(value));
+
 export const get_stored_state = (): TTS.AppState =>
   load_storage_or("tts-state", DEFAULT_STATE);
 export const set_stored_state = (value: TTS.AppState) =>
@@ -68,6 +74,12 @@ export const reset_all_storage = (clear_help?: boolean) => {
   }
 };
 
+export const DEFAULT_UNCAT_MESSAGES: TTS.MessageCategory = {
+  name: UNCATEGORIZED_GROUP_NAME,
+  open: false,
+  data: [],
+};
+
 export const DEFAULT_STATE: TTS.AppState = {
   settings: {
     bits_string: DEFAULT_BITS_STRING,
@@ -76,7 +88,6 @@ export const DEFAULT_STATE: TTS.AppState = {
     optimize_level: OptimizeLevel.normal,
     history_steps: DEFAULT_HISTORY_STEPS_LIMIT,
     skip_tutorials: false,
-    uncategorized_msgs_open: true,
   },
   message: null,
   volume: 0.5,

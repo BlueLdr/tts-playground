@@ -162,6 +162,8 @@ const OrganizerBase = <T extends any>({
   updateSections,
   reorderEnabled,
   setReorderEnabled,
+  cancel,
+  save,
   openSections,
   setOpen,
   className,
@@ -205,17 +207,20 @@ const OrganizerBase = <T extends any>({
         className={class_names("-header")}
         buttons={
           reorderEnabled ? (
-            <button
-              className="btn btn-primary"
-              onClick={() => setReorderEnabled(false)}
-            >
-              Save
-            </button>
+            <Preact.Fragment>
+              <button className="btn" onClick={cancel}>
+                Cancel
+              </button>
+              <button className="btn btn-primary" onClick={save}>
+                Save
+              </button>
+            </Preact.Fragment>
           ) : (
             <button
               className="icon-button organizer-reorder-button"
               onClick={() => setReorderEnabled(true)}
               title="Organize this list"
+              data-help="organize"
             >
               <i class="fas fa-sort" />
             </button>
@@ -331,7 +336,7 @@ const OrganizerBase = <T extends any>({
 export const Organizer = <T extends any>(
   props: Preact.RenderableProps<OrganizerProps<T>>
 ): Preact.VNode | null => {
-  const { sections, updateSections, reorderEnabled } = props;
+  const { sections, updateSections, reorderEnabled, setReorderEnabled } = props;
   const [state, set_state] = useStateIfMounted(sections);
   const opened = useMemo(() => {
     let opened_: { [key: string]: boolean } = {};
@@ -345,11 +350,15 @@ export const Organizer = <T extends any>(
     set_vis_open({ ...vis_open_ref.current, [name]: open });
   }, []);
 
-  useEffect(() => {
-    if (!reorderEnabled) {
-      updateSections(state);
-    }
-  }, [reorderEnabled]);
+  const cancel = useCallback(() => {
+    set_state(sections);
+    setReorderEnabled(false);
+  }, [sections]);
+
+  const save = useCallback(() => {
+    updateSections(state);
+    setReorderEnabled(false);
+  }, [state, updateSections]);
 
   useEffect(() => {
     set_state(sections);
@@ -363,6 +372,8 @@ export const Organizer = <T extends any>(
       updateSections={reorderEnabled ? set_state : updateSections}
       setOpen={set_section_open}
       openSections={vis_open}
+      cancel={cancel}
+      save={save}
     />
   );
 };

@@ -1,4 +1,5 @@
 import test from "ava";
+import { UNCATEGORIZED_GROUP_NAME } from "~/common";
 import TTS from "~/model/types";
 import {
   import_data,
@@ -12,6 +13,12 @@ const settings = require("./data/settings.json");
 
 const messages_list = [...messages_list_, ...uncat_messages_list];
 
+const uncat_category = {
+  name: UNCATEGORIZED_GROUP_NAME,
+  open: false,
+  data: uncat_messages_list.map(m => m.id),
+};
+
 import {
   MESSAGE_CATEGORY_ONE,
   MESSAGE_CATEGORY_TWO,
@@ -21,6 +28,7 @@ import {
   // @ts-expect-error:
 } from "./data/message-categories.ts";
 import {
+  MESSAGE_FIVE,
   MESSAGE_FOUR,
   MESSAGE_ONE,
   MESSAGE_THREE,
@@ -110,6 +118,7 @@ test("import one message category", t => {
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -119,7 +128,8 @@ test("import one message category", t => {
     settings,
     messages_list,
     [],
-    categories_list
+    categories_list,
+    uncat_category
   );
   t.deepEqual(messages_result, [
     ...messages_list,
@@ -142,6 +152,7 @@ test("import one message category", t => {
 
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);
@@ -158,6 +169,7 @@ test("import one message category in array", t => {
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -167,7 +179,8 @@ test("import one message category in array", t => {
     settings,
     messages_list,
     [],
-    categories_list
+    categories_list,
+    uncat_category
   );
   t.deepEqual(messages_result, [
     ...messages_list,
@@ -190,6 +203,7 @@ test("import one message category in array", t => {
 
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);
@@ -208,6 +222,7 @@ test("import many message categories in array", t => {
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -217,7 +232,8 @@ test("import many message categories in array", t => {
     settings,
     messages_list,
     [],
-    categories_list
+    categories_list,
+    uncat_category
   );
 
   t.deepEqual(messages_result, [
@@ -247,6 +263,7 @@ test("import many message categories in array", t => {
 
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);
@@ -259,6 +276,7 @@ test("reject empty message category", t => {
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -268,13 +286,15 @@ test("reject empty message category", t => {
     settings,
     messages_list,
     [],
-    categories_list
+    categories_list,
+    uncat_category
   );
 
   t.is(messages_result, undefined);
   t.is(categories_result, undefined);
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);
@@ -292,6 +312,7 @@ test("import category that already exists with existing categorized message", t 
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -305,13 +326,15 @@ test("import category that already exists with existing categorized message", t 
       ...categories_list,
       { ...category_one, data: [] },
       { ...category_four, data: category_one.data.map(m => m.id) },
-    ]
+    ],
+    uncat_category
   );
 
   t.is(messages_result, undefined);
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
   t.is(categories_result, undefined);
+  t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);
@@ -334,6 +357,7 @@ test("import categories with duplicate messages", t => {
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -343,7 +367,8 @@ test("import categories with duplicate messages", t => {
     settings,
     messages_list,
     [],
-    categories_list
+    categories_list,
+    uncat_category
   );
 
   t.deepEqual(messages_result, [
@@ -361,6 +386,7 @@ test("import categories with duplicate messages", t => {
 
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);
@@ -377,6 +403,7 @@ test("import category that already exists with existing uncategorized message", 
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -389,7 +416,11 @@ test("import category that already exists with existing uncategorized message", 
     [
       ...categories_list,
       { ...category_one, data: category_one.data.map(d => d.id).slice(0, 2) },
-    ]
+    ],
+    {
+      ...uncat_category,
+      data: uncat_category.data.concat([message_three.id]),
+    }
   );
 
   t.deepEqual(categories_result, [
@@ -399,6 +430,8 @@ test("import category that already exists with existing uncategorized message", 
       data: category_one.data.map(({ __type, ...m }) => m.id),
     },
   ]);
+
+  t.deepEqual(uncat_result, uncat_category);
 
   t.is(messages_result, undefined);
   t.is(settings_result, undefined);
@@ -420,6 +453,7 @@ test("import new category with existing categorized message(s)", t => {
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -432,13 +466,15 @@ test("import new category with existing categorized message(s)", t => {
     [
       ...categories_list,
       { ...category_four, data: category_one.data.map(m => m.id) },
-    ]
+    ],
+    uncat_category
   );
 
   t.is(messages_result, undefined);
   t.is(categories_result, undefined);
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);
@@ -447,6 +483,7 @@ test("import new category with existing categorized message(s)", t => {
 
 test("import new category with existing uncategorized message(s)", t => {
   const { __type: _a, ...category_one } = MESSAGE_CATEGORY_ONE;
+  const { __type: _b, ...category_three } = MESSAGE_CATEGORY_THREE;
   const { __type: _1, ...message_one } = MESSAGE_ONE;
   const { __type: _2, ...message_two } = MESSAGE_TWO;
   const { __type: _3, ...message_three } = MESSAGE_THREE;
@@ -455,6 +492,7 @@ test("import new category with existing uncategorized message(s)", t => {
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -464,13 +502,20 @@ test("import new category with existing uncategorized message(s)", t => {
     settings,
     [...messages_list, message_one, message_two, message_three],
     [],
-    [...categories_list, { ...category_one, data: [message_one.id] }]
+    [...categories_list, { ...category_three, data: [message_one.id] }],
+    {
+      ...uncat_category,
+      data: uncat_category.data.concat([message_two.id, message_three.id]),
+    }
   );
 
   t.deepEqual(categories_result, [
     ...categories_list,
-    { ...category_one, data: category_one.data.map(m => m.id) },
+    { ...category_three, data: [message_one.id] },
+    { ...category_one, data: category_one.data.map(m => m.id).slice(1) },
   ]);
+
+  t.deepEqual(uncat_result, uncat_category);
 
   t.is(messages_result, undefined);
   t.is(settings_result, undefined);
@@ -488,21 +533,27 @@ test("import mix of new/existing categories with mix of new/categorized/uncatego
   const { __type: _2, ...message_two } = MESSAGE_TWO;
   const { __type: _3, ...message_three } = MESSAGE_THREE;
   const { __type: _4, ...message_four } = MESSAGE_FOUR;
+  const { __type: _5, ...message_five } = MESSAGE_FIVE;
   const [
     settings_result,
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
     uncategorized_snippets,
   ] = import_data(
-    [MESSAGE_CATEGORY_ONE, MESSAGE_CATEGORY_TWO],
+    [MESSAGE_CATEGORY_ONE, MESSAGE_CATEGORY_TWO, MESSAGE_FIVE],
     settings,
     [...messages_list, message_one, message_four],
     [],
-    [...categories_list, { ...category_one, data: [message_one.id] }]
+    [...categories_list, { ...category_one, data: [message_one.id] }],
+    {
+      ...uncat_category,
+      data: uncat_category.data.concat([message_four.id]),
+    }
   );
 
   t.deepEqual(categories_result, [
@@ -516,7 +567,13 @@ test("import mix of new/existing categories with mix of new/categorized/uncatego
     message_four,
     message_two,
     message_three,
+    message_five,
   ]);
+
+  t.deepEqual(uncat_result, {
+    ...uncat_category,
+    data: uncat_category.data.concat([message_five.id]),
+  });
 
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
@@ -532,6 +589,7 @@ test("reject category with ids but no message records", t => {
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -541,13 +599,15 @@ test("reject category with ids but no message records", t => {
     settings,
     messages_list,
     [],
-    categories_list
+    categories_list,
+    uncat_category
   );
 
   t.is(messages_result, undefined);
   t.is(categories_result, undefined);
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);

@@ -1,5 +1,6 @@
 import test from "ava";
 import TTS from "~/model/types";
+import { UNCATEGORIZED_GROUP_NAME } from "~/common";
 import {
   import_data,
   validate_import_data,
@@ -14,6 +15,12 @@ import {
   SNIPPET_SECTION_THREE,
   // @ts-expect-error:
 } from "./data/snippets.ts";
+
+const uncat_category = {
+  name: UNCATEGORIZED_GROUP_NAME,
+  open: false,
+  data: [],
+};
 
 test("validate one snippet section", t => {
   const initial = SNIPPET_SECTION_ONE;
@@ -50,11 +57,19 @@ test("import one snippet section", t => {
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
     uncategorized_snippets,
-  ] = import_data(SNIPPET_SECTION_ONE, settings, [], snippets_section_list, []);
+  ] = import_data(
+    SNIPPET_SECTION_ONE,
+    settings,
+    [],
+    snippets_section_list,
+    [],
+    uncat_category
+  );
   t.deepEqual(snippets_result, [
     ...snippets_section_list,
     { ...section_one, data: section_one.data.map(({ __type: _, ...d }) => d) },
@@ -63,6 +78,7 @@ test("import one snippet section", t => {
   t.is(settings_result, undefined);
   t.is(messages_result, undefined);
   t.is(categories_result, undefined);
+  t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);
@@ -76,6 +92,7 @@ test("import one snippet section in array", t => {
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -85,7 +102,8 @@ test("import one snippet section in array", t => {
     settings,
     [],
     snippets_section_list,
-    []
+    [],
+    uncat_category
   );
   t.deepEqual(snippets_result, [
     ...snippets_section_list,
@@ -95,6 +113,7 @@ test("import one snippet section in array", t => {
   t.is(settings_result, undefined);
   t.is(messages_result, undefined);
   t.is(categories_result, undefined);
+  t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);
@@ -110,6 +129,7 @@ test("import many snippet sections", t => {
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -119,7 +139,8 @@ test("import many snippet sections", t => {
     settings,
     [],
     snippets_section_list,
-    []
+    [],
+    uncat_category
   );
   t.deepEqual(snippets_result, [
     ...snippets_section_list,
@@ -134,6 +155,7 @@ test("import many snippet sections", t => {
   t.is(settings_result, undefined);
   t.is(messages_result, undefined);
   t.is(categories_result, undefined);
+  t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);

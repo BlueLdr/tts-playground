@@ -353,6 +353,7 @@ export const Editor: Preact.FunctionComponent<{
         voice={voice}
         setVoice={set_voice}
         reset={reset}
+        message={new_message}
       />
       <EditorMain
         inputRef={input_ref}

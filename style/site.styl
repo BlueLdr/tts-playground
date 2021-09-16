@@ -37,14 +37,25 @@
       margin 0.75rem 0
     h4
       margin 0
+      line-height 2.5rem
+      flex 1 1 auto
     &-controls
       display flex
       justify-content flex-end
       align-items center
+      .icon-button
+        width 2.5rem
+        height 2.5rem
       > *
-        margin-left 1rem
+        margin-left 0.5rem
         &:first-child
           margin-left 0
+
+    [data-help-active="true"] &
+      position static
+      [data-help]
+        background-color rgba($Gray160, 0.2)
+
 
 .tts-messages, .tts-snippets
   overflow auto
