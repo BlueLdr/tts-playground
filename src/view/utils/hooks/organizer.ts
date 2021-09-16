@@ -93,8 +93,6 @@ export const useDragReorder = <T extends any>(
         grabbed_ref.current.type === "item" &&
         grabbed_ref.current.section_index === section
       ) {
-        console.log(`grabbed_ref: `, grabbed_ref);
-        console.log(`section: `, section);
         set_target_index(null);
         return;
       }

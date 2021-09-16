@@ -11,6 +11,7 @@ import {
   MESSAGE_CATEGORIES,
   MESSAGES,
   SNIPPETS,
+  UNCATEGORIZED_MESSAGES,
 } from "~/model";
 import {
   ExpandableChecklist,
@@ -30,6 +31,7 @@ export const ExportForm: Preact.FunctionComponent<{ dismiss: () => void }> = ({
   const settings = useContext(EDITOR_SETTINGS).value;
   const messages = useContext(MESSAGES).value;
   const categories = useContext(MESSAGE_CATEGORIES).value;
+  const uncat_msgs = useContext(UNCATEGORIZED_MESSAGES).value;
   const snippets = useContext(SNIPPETS).value;
   const link_ref = useRef<HTMLAnchorElement>();
 
@@ -67,6 +69,7 @@ export const ExportForm: Preact.FunctionComponent<{ dismiss: () => void }> = ({
       export_data.messages = export_messages(exp_messages);
       export_data.messageCategories = export_message_categories(
         categories
+          .concat(uncat_msgs)
           .map(c => ({
             ...c,
             data: c.data.filter(id => exp_messages.some(m => m.id === id)),
@@ -97,7 +100,15 @@ export const ExportForm: Preact.FunctionComponent<{ dismiss: () => void }> = ({
     }
     set_filename(`tts-data`);
     set_exp_data(generate_file(export_data));
-  }, [messages, snippets, settings, exp_messages, exp_snippets, exp_settings]);
+  }, [
+    messages,
+    uncat_msgs,
+    snippets,
+    settings,
+    exp_messages,
+    exp_snippets,
+    exp_settings,
+  ]);
 
   useEffect(() => {
     if (exp_data && filename) {
@@ -123,6 +134,7 @@ export const ExportForm: Preact.FunctionComponent<{ dismiss: () => void }> = ({
                 messages={messages}
                 selection={exp_messages}
                 setSelection={set_exp_messages}
+                uncategorizedMessages={uncat_msgs}
               />
             </li>
             <li>
@@ -189,36 +201,61 @@ const RenderLabel = <T extends { name: string }>({ data }: { data: T }) => (
 
 export const ExportMessageTree: Preact.FunctionComponent<{
   categories: TTS.MessageCategory[];
+  uncategorizedMessages: TTS.MessageCategory;
   messages: TTS.Message[];
   selection: TTS.Message[];
   setSelection: (items: TTS.Message[]) => void;
-}> = ({ categories, messages, selection, setSelection }) => {
+}> = ({
+  categories,
+  messages,
+  selection,
+  setSelection,
+  uncategorizedMessages,
+}) => {
   const checklist_items_initial = useMemo<
     ExpandableChecklistItem<TTS.MessageCategoryPopulated>[]
-  >(
-    () =>
-      categories.map(c => {
-        const cat_selected = !!selection.find(msg => c.data.includes(msg.id));
-        return {
-          // @ts-expect-error:
-          data: c as TTS.MessageCategoryPopulated,
-          key: c.name,
-          selected: cat_selected
-            ? messages.map(
-                m =>
-                  ({
-                    data: m,
-                    key: m.id,
-                    selected: !!selection.find(msg => msg.id === m.id),
-                    Render: RenderLabel,
-                  } as ExpandableChecklistItem<TTS.Message>)
-              )
-            : [],
+  >(() => {
+    const cats = categories.map(c => ({
+      // @ts-expect-error:
+      data: c as TTS.MessageCategoryPopulated,
+      key: c.name,
+      selected: c.data.map(
+        id =>
+          ({
+            data: messages.find(m => m.id === id),
+            key: id,
+            selected: !!selection.find(msg => msg.id === id),
+            Render: RenderLabel,
+          } as ExpandableChecklistItem<TTS.Message>)
+      ),
+      Render: RenderLabel,
+    }));
+
+    const uncat = messages.filter(
+      m => !categories.find(c => c.data.includes(m.id))
+    );
+    if (uncat.length > 0) {
+      const uncat_sorted = uncategorizedMessages.data
+        .filter(id => uncat.find(m => m.id === id))
+        .map(id => messages.find(m => m.id === id))
+        .concat(uncat.filter(m => !uncategorizedMessages.data.includes(m.id)));
+
+      return cats.concat({
+        data: {
+          ...uncategorizedMessages,
+          data: uncat_sorted,
+        },
+        key: uncategorizedMessages.name,
+        selected: uncat_sorted.map(m => ({
+          data: m,
+          key: m.id,
+          selected: !!selection.find(msg => msg.id == m.id),
           Render: RenderLabel,
-        };
-      }),
-    []
-  );
+        })),
+        Render: RenderLabel,
+      });
+    }
+  }, []);
 
   const [checklist_items, set_checklist_items] = useStateIfMounted(
     checklist_items_initial

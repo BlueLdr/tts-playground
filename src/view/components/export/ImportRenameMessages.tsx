@@ -221,6 +221,11 @@ export const ImportMessageRenameItem: Preact.FunctionComponent<
         </div>
       </td>
       <td className="tts-import-rename-name">
+        <p>
+          <div>Previous Name:</div>
+          <strong>{message.name}</strong>
+        </p>
+        <div>New Name:</div>
         <input
           type="text"
           value={value}

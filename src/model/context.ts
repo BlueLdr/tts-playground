@@ -82,6 +82,16 @@ export const MESSAGE_CATEGORIES = createNamedContext<TTS.MessageCategory[]>(
   INITIAL_STATE.message_categories,
   "MESSAGE_CATEGORIES"
 );
+
+export const UNCATEGORIZED_MESSAGES = createNamedContext<TTS.MessageCategory>(
+  INITIAL_STATE.uncategorized_msgs,
+  "UNCATEGORIZED_MESSAGES"
+) as Preact.Context<
+  ImmutableContextValue<
+    TTS.MessageCategory,
+    (uncat: TTS.MessageCategory, new_categories?: TTS.MessageCategory[]) => void
+  >
+>;
 export const SNIPPETS = createNamedContext<TTS.SnippetsSection[]>(
   INITIAL_STATE.snippets,
   "SNIPPETS"

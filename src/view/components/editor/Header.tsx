@@ -10,7 +10,8 @@ export const EditorHeader: Preact.FunctionComponent<{
   setMaxLength: (value: number) => void;
   voice: string;
   setVoice: (value: string) => void;
-}> = ({ maxLength, setMaxLength, voice, setVoice, reset }) => {
+  message: TTS.Message;
+}> = ({ maxLength, setMaxLength, voice, setVoice, reset, message }) => {
   const optimize_message = useContext(OPTIMIZE_MESSAGE_CALLBACK).value;
   const refocus_target = useRef<HTMLElement | null>();
 
@@ -26,7 +27,7 @@ export const EditorHeader: Preact.FunctionComponent<{
     <Preact.Fragment>
       <div className="tts-header">
         <div className="tts-header-top tts-col-header">
-          <h4>TTS Message</h4>
+          <h4>Editor: {message.name || "New Message"}</h4>
           <div className="tts-header-controls">
             <button
               className="btn btn-with-icon icon-only btn-negative tts-options-reset"

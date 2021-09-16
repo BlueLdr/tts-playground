@@ -7,6 +7,7 @@ import {
   SNIPPET_SCHEMA,
   SNIPPET_SECTION_SCHEMA,
 } from "~/model";
+import { get_uncategorized_messages } from "~/view/utils";
 
 const MAX_TYPE_CHECK_DEPTH = 6;
 export const MESSAGE_DUPE_PROPS: readonly (keyof TTS.MessageOptions)[] = [
@@ -75,11 +76,16 @@ export const import_data = (
   settings: TTS.EditorSettings,
   messages: TTS.Message[],
   snippets: TTS.SnippetsSection[],
-  categories: TTS.MessageCategory[]
+  categories: TTS.MessageCategory[],
+  uncategorized_msgs: TTS.MessageCategory
 ) => {
   let new_messages: TTS.Message[] = [];
   let new_categories: TTS.MessageCategory[] = [];
   let new_snippets: TTS.SnippetsSection[] = [];
+  let new_uncategorized_msgs: TTS.MessageCategory = {
+    ...uncategorized_msgs,
+    data: [...uncategorized_msgs.data],
+  };
 
   const dup_messages: TTS.Message[] = [];
   const rename_messages: TTS.Message[] = [];
@@ -92,25 +98,27 @@ export const import_data = (
     const dupe =
       messages.find(m => is_duplicate_message(m, msg)) ||
       new_messages.find(m => is_duplicate_message(m, msg));
+    const name_taken =
+      messages.find(m => m.name === msg.name) ||
+      new_messages.find(m => m.name === msg.name);
     if (dupe) {
-      if (dupe.name !== msg.name) {
+      if (dupe.name !== msg.name && !name_taken) {
         dup_messages.push(msg);
       }
-    } else if (
-      messages.find(m => m.name === msg.name) ||
-      new_messages.find(m => m.name === msg.name)
-    ) {
-      rename_messages.push(msg);
-    } else if (
+      return msg.id;
+    }
+
+    if (
       messages.find(m => m.id === msg.id) ||
       new_messages.find(m => m.id === msg.id)
     ) {
-      const new_id = generate_id(msg.name);
-      new_messages.push({
+      msg = {
         ...msg,
-        id: new_id,
-      });
-      return new_id;
+        id: generate_id(msg.name),
+      };
+    }
+    if (name_taken) {
+      rename_messages.push(msg);
     } else {
       new_messages.push(msg);
     }
@@ -120,6 +128,31 @@ export const import_data = (
   const process_message_category = (
     cat: TTS.MessageCategory | TTS.MessageCategoryPopulated
   ) => {
+    const all_cats = categories.concat(new_categories);
+
+    if (cat.name === uncategorized_msgs.name) {
+      const category = {
+        ...uncategorized_msgs,
+        data: [...uncategorized_msgs.data],
+      };
+      cat.data.forEach(m => {
+        let id: string = m;
+        if (typeof m !== "string") {
+          const { __type, ...msg } = m;
+          id = process_message(msg);
+        }
+        if (
+          !all_cats.find(c => c.data.includes(id)) &&
+          !uncategorized_msgs.data.includes(id)
+        ) {
+          category.data.push(id);
+        }
+      });
+      new_uncategorized_msgs = category;
+
+      return;
+    }
+
     const existing = new_categories.find(c => c.name == cat.name);
 
     const category = existing ??
@@ -128,7 +161,6 @@ export const import_data = (
         data: [],
       };
 
-    const all_cats = categories.concat(new_categories);
     cat.data.forEach(m => {
       let id: string = m;
       if (typeof m !== "string") {
@@ -198,6 +230,7 @@ export const import_data = (
   let settings_result: TTS.EditorSettings | undefined;
   let messages_result: TTS.Message[] | undefined;
   let categories_result: TTS.MessageCategory[] | undefined;
+  let uncategorized_msgs_result: TTS.MessageCategory | undefined;
   let snippets_result: TTS.SnippetsSection[] | undefined;
   if (!Array.isArray(data)) {
     if (data.__type === "export-data") {
@@ -212,7 +245,7 @@ export const import_data = (
         const { __type, ...new_settings_ } = new_settings;
         settings_result = { ...settings, ...new_settings_ };
       }
-      imp_messages.forEach(({ __type, ...m }) => {
+      imp_messages?.forEach(({ __type, ...m }) => {
         if (__type === "message") {
           process_message(m);
         }
@@ -222,7 +255,7 @@ export const import_data = (
           process_message_category(c as TTS.MessageCategory);
         }
       });
-      imp_snippets.forEach(({ __type, ...s }) => {
+      imp_snippets?.forEach(({ __type, ...s }) => {
         if (__type === "snippets-section") {
           s.data.forEach(({ __type, ...snip }) => process_snippet(snip, s));
         }
@@ -317,6 +350,15 @@ export const import_data = (
     );
   }
 
+  uncategorized_msgs_result = {
+    ...uncategorized_msgs,
+    data: get_uncategorized_messages(
+      messages_result ?? messages,
+      categories_result ?? categories,
+      new_uncategorized_msgs
+    ).data,
+  };
+
   new_snippets = new_snippets.filter(ns => {
     if (snippets.find(s => s.name === ns.name)) {
       if (ns.data.length > 0) {
@@ -345,6 +387,7 @@ export const import_data = (
     messages_result,
     snippets_result,
     categories_result,
+    uncategorized_msgs_result,
     dup_messages,
     rename_messages,
     dup_snippets_in_section,

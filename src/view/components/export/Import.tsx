@@ -5,6 +5,7 @@ import {
   MESSAGE_CATEGORIES,
   MESSAGES,
   SNIPPETS,
+  UNCATEGORIZED_MESSAGES,
 } from "~/model";
 import {
   import_data,
@@ -14,6 +15,7 @@ import {
   ImportUncategorizedSnippets,
 } from "~/view/components";
 import {
+  get_uncategorized_messages,
   useContextState,
   useDragAndDrop,
   useStateIfMounted,
@@ -28,12 +30,22 @@ export const ImportForm: Preact.FunctionComponent<{
 }> = ({ dismiss, data, setData }) => {
   const [settings, set_settings] = useContextState(EDITOR_SETTINGS);
   const [categories, set_categories] = useContextState(MESSAGE_CATEGORIES);
+  const [uncat_msgs, set_uncat_msgs] = useContextState(UNCATEGORIZED_MESSAGES);
   const [messages, set_messages] = useContextState(MESSAGES);
   const [snippets, set_snippets] = useContextState(SNIPPETS);
   const [step, set_step, step_ref] = useStateRef<number>(0);
   const parsed_data = useMemo(
     () =>
-      data ? import_data(data, settings, messages, snippets, categories) : null,
+      data
+        ? import_data(
+            data,
+            settings,
+            messages,
+            snippets,
+            categories,
+            uncat_msgs
+          )
+        : null,
     [data]
   );
 
@@ -64,6 +76,7 @@ export const ImportForm: Preact.FunctionComponent<{
     messages_result_initial,
     snippets_result_initial,
     categories_result_initial,
+    uncat_result,
     dup_messages = [],
     rename_messages = [],
     dup_snippets = [],
@@ -82,18 +95,28 @@ export const ImportForm: Preact.FunctionComponent<{
     if (snippets_final_result) {
       set_snippets(snippets_final_result);
     }
+    let categories_final: TTS.MessageCategory[] | undefined;
     if (categories_result_initial) {
-      const categories_final = categories_result_initial
+      categories_final = categories_result_initial
         .map(c => ({
           ...c,
           data: c.data.filter(id =>
-            (messages_final_result ?? messages).find(m => m.id === id)
+            (messages_final_result ?? messages).some(m => m.id === id)
           ),
         }))
         .filter(
-          c => categories.find(ca => ca.name === c.name) || c.data.length > 0
+          c => categories.some(ca => ca.name === c.name) || c.data.length > 0
         );
       set_categories(categories_final);
+    }
+    if (uncat_result) {
+      set_uncat_msgs(
+        get_uncategorized_messages(
+          messages_final_result ?? messages,
+          categories_final ?? categories,
+          uncat_result
+        )
+      );
     }
     set_success(true);
   }, [
@@ -127,6 +150,16 @@ export const ImportForm: Preact.FunctionComponent<{
       }
       if (categories_result_initial) {
         set_categories(categories_result_initial);
+      }
+      if (uncat_result) {
+        set_uncat_msgs(
+          get_uncategorized_messages(
+            messages_result_initial ?? messages,
+            categories_result_initial ?? categories,
+            uncat_result
+          ),
+          categories_result_initial ?? categories
+        );
       }
       set_success(true);
     }

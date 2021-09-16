@@ -1,4 +1,5 @@
 import test from "ava";
+import { UNCATEGORIZED_GROUP_NAME } from "~/common";
 import {
   conform_to_schema,
   MESSAGE_CATEGORY_SCHEMA,
@@ -75,6 +76,11 @@ const category_five = conform_to_schema(
 );
 
 const initial_messages = [...messages_list, ...uncat_messages_list];
+const uncat_category = {
+  name: UNCATEGORIZED_GROUP_NAME,
+  open: false,
+  data: uncat_messages_list.map(m => m.id),
+};
 
 test("successfully import array of mixed data", t => {
   const { skip_tutorials, ...some_settings } = settings;
@@ -99,6 +105,7 @@ test("successfully import array of mixed data", t => {
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -108,7 +115,8 @@ test("successfully import array of mixed data", t => {
     settings,
     [...initial_messages, message_two, message_four],
     snippets_list,
-    [...categories_list, category_five]
+    [...categories_list, category_five],
+    uncat_category
   );
 
   const settings_output = {
@@ -131,6 +139,7 @@ test("successfully import array of mixed data", t => {
     category_two,
   ]);
   t.deepEqual(snippets_result, [...snippets_list, snippet_section_two]);
+  t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);
@@ -200,6 +209,7 @@ test("successfully import array of mixed data with duplicates", t => {
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -209,7 +219,8 @@ test("successfully import array of mixed data with duplicates", t => {
     settings,
     messages_before,
     snippets_before,
-    categories_before
+    categories_before,
+    uncat_category
   );
 
   const { __type, ...duplicate_s_one_after } = duplicate_s_one;
@@ -235,6 +246,7 @@ test("successfully import array of mixed data with duplicates", t => {
   t.deepEqual(dup_snippets, [
     { ...snippet_section_one, data: [duplicate_s_one_after] },
   ]);
+  t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(uncategorized_snippets, []);
 });
 
@@ -309,6 +321,7 @@ test("successfully import ExportData object", t => {
     messages_result,
     snippets_result,
     categories_result,
+    uncat_result,
     dup_messages,
     rename_messages,
     dup_snippets,
@@ -318,7 +331,8 @@ test("successfully import ExportData object", t => {
     settings,
     messages_before,
     snippets_before,
-    categories_before
+    categories_before,
+    uncat_category
   );
 
   const { __type, ...duplicate_s_one_after } = duplicate_s_one;
@@ -347,5 +361,6 @@ test("successfully import ExportData object", t => {
   t.deepEqual(dup_snippets, [
     { ...snippet_section_one, data: [duplicate_s_one_after] },
   ]);
+  t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(uncategorized_snippets, []);
 });

@@ -106,6 +106,8 @@ interface OrganizerProps<T> extends MaybeClass {
 interface OrganizerBaseProps<T> extends MaybeClass, OrganizerProps<T> {
   openSections: { [key: string]: boolean };
   setOpen: (name: string, open: boolean) => void;
+  cancel: () => void;
+  save: () => void;
 }
 
 interface OrganizerGrabbedItem<T> {

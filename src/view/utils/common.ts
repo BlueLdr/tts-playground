@@ -1,3 +1,5 @@
+import { UNCATEGORIZED_GROUP_NAME, union_arrays } from "~/common";
+
 export const ensure_number = (value: any, def: number) => {
   let num = value;
   if (typeof value === "string") {
@@ -74,4 +76,28 @@ export const match_case = (
   }
 
   return result;
+};
+
+export const get_uncategorized_messages = (
+  messages: TTS.Message[],
+  categories: TTS.MessageCategory[],
+  uncategorized?: TTS.MessageCategory
+): TTS.MessageCategory => {
+  const uncat_msgs = messages
+    .filter(m => !categories.some(c => c.data.includes(m.id)))
+    .map(m => m.id);
+
+  let data = union_arrays(
+    uncategorized?.data.filter(
+      id =>
+        messages.some(m => m.id === id) &&
+        !categories.some(c => c.data.includes(id))
+    ) ?? [],
+    uncat_msgs
+  );
+
+  return {
+    ...(uncategorized ?? { name: UNCATEGORIZED_GROUP_NAME, open: false }),
+    data,
+  };
 };

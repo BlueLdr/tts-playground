@@ -26,9 +26,6 @@ const initial_state: TTS.AppState = {
     skip_tutorials:
       stored_state?.settings?.skip_tutorials ??
       common.DEFAULT_STATE.settings.skip_tutorials,
-    uncategorized_msgs_open:
-      stored_state?.settings?.uncategorized_msgs_open ??
-      common.DEFAULT_STATE.settings.uncategorized_msgs_open,
   },
   editor: {
     text: stored_state?.editor?.text ?? common.DEFAULT_STATE.editor.text,
@@ -50,6 +47,8 @@ const initial_state: TTS.AppState = {
 const messages: TTS.Message[] = common.get_stored_messages() ?? [];
 const message_categories: TTS.MessageCategory[] =
   common.get_stored_message_categories() ?? [];
+const uncategorized_msgs: TTS.MessageCategory =
+  common.get_stored_uncategorized_messages() ?? common.DEFAULT_UNCAT_MESSAGES;
 const snippets: TTS.SnippetsSection[] = common.get_stored_snippets() ?? [];
 const help: TTS.HelpCompletedMap = common.get_stored_help() ?? {};
 
@@ -57,6 +56,7 @@ export const INITIAL_STATE = {
   ...initial_state,
   messages,
   message_categories,
+  uncategorized_msgs,
   snippets,
   help,
 } as const;

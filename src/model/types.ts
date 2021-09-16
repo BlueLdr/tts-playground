@@ -104,7 +104,6 @@ declare global {
       bits_string: string;
       history_steps: number;
       skip_tutorials: boolean;
-      uncategorized_msgs_open: boolean;
     }
 
     type OptimizeTriggerName = Exclude<keyof typeof OptimizeTrigger, "blur">;
