@@ -51,6 +51,7 @@ declare global {
     }
 
     interface Snippet {
+      id: string;
       text: string;
       options: SnippetOptions;
     }
@@ -64,6 +65,12 @@ declare global {
     }
 
     interface SnippetsSection {
+      name: string;
+      open: boolean;
+      data: string[];
+    }
+
+    interface SnippetsSectionPopulated {
       name: string;
       open: boolean;
       data: Snippet[];
@@ -151,15 +158,16 @@ declare global {
     type ExportedSnippet = Snippet & { __type: "snippet" };
     type ExportedSnippetsSection = Omit<SnippetsSection, "data"> & {
       __type: "snippets-section";
-      data: ExportedSnippet[];
+      data: string[] | ExportedSnippet[];
     };
 
     interface ExportData {
       __type: "export-data";
       settings?: ExportedSettings;
       messages?: ExportedMessage[];
-      snippets?: ExportedSnippetsSection[];
+      snippets?: ExportedSnippet[];
       messageCategories?: ExportedMessageCategory[];
+      snippetsSections?: ExportedSnippetsSection[];
     }
 
     type AnyExportData =

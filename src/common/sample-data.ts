@@ -1,67 +1,73 @@
 import { DEFAULT_SPEED_CHAR, DEFAULT_VOICE } from "~/common/constants";
 
-export const sample_snippets: TTS.SnippetsSection[] = [
+export const sample_snippets: TTS.Snippet[] = [
+  {
+    id: "sample-snippet-1",
+    text: "VB",
+    options: {
+      prefix: "a",
+      suffix: "",
+      default_count: 5,
+      space_after: false,
+      space_before: true,
+    },
+  },
+  {
+    id: "sample-snippet-2",
+    text: "brur",
+    options: {
+      prefix: "ur",
+      suffix: "?^",
+      default_count: 2,
+      space_after: true,
+      space_before: true,
+    },
+  },
+  {
+    id: "sample-snippet-3",
+    text: "PX",
+    options: {
+      prefix: "y",
+      suffix: "",
+      default_count: 5,
+      space_after: false,
+      space_before: true,
+    },
+  },
+  {
+    id: "sample-snippet-4",
+    text: "HJ",
+    options: {
+      prefix: "a",
+      suffix: "",
+      default_count: 5,
+      space_after: false,
+      space_before: true,
+    },
+  },
+  {
+    id: "sample-snippet-5",
+    text: "ﬆ",
+    options: {
+      prefix: "",
+      suffix: "",
+      default_count: 5,
+      space_after: false,
+      space_before: true,
+    },
+  },
+];
+
+export const sample_snippets_sections: TTS.SnippetsSection[] = [
   {
     name: "Sample Snippets",
     open: true,
-    data: [
-      {
-        text: "VB",
-        options: {
-          prefix: "a",
-          suffix: "",
-          default_count: 5,
-          space_after: false,
-          space_before: true,
-        },
-      },
-      {
-        text: "brur",
-        options: {
-          prefix: "ur",
-          suffix: "?^",
-          default_count: 2,
-          space_after: true,
-          space_before: true,
-        },
-      },
-    ],
+    data: ["sample-snippet-1", "sample-snippet-2"],
   },
   {
     name: "Sprinkler Noises",
     open: false,
-    data: [
-      {
-        text: "PX",
-        options: {
-          prefix: "y",
-          suffix: "",
-          default_count: 5,
-          space_after: false,
-          space_before: true,
-        },
-      },
-      {
-        text: "HJ",
-        options: {
-          prefix: "a",
-          suffix: "",
-          default_count: 5,
-          space_after: false,
-          space_before: true,
-        },
-      },
-      {
-        text: "ﬆ",
-        options: {
-          prefix: "",
-          suffix: "",
-          default_count: 5,
-          space_after: false,
-          space_before: true,
-        },
-      },
-    ],
+    data: ["sample-snippet-3", "sample-snippet-4", "sample-snippet-5"],
   },
 ];
 

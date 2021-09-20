@@ -7,10 +7,10 @@ import { useStateIfMounted } from "~/view/utils";
 
 export const SnippetsSectionModal: Preact.FunctionComponent<{
   section?: TTS.SnippetsSection;
-  setName: (value: string) => void;
+  updateSection: (value: TTS.SnippetsSection) => void;
   deleteSection: () => void;
   dismiss: () => void;
-}> = ({ section, setName, deleteSection, dismiss }) => {
+}> = ({ section, updateSection, deleteSection, dismiss }) => {
   const name = section?.name;
   const input_ref = useRef<HTMLInputElement>();
   const [value, set_value] = useStateIfMounted(name);
@@ -58,7 +58,10 @@ export const SnippetsSectionModal: Preact.FunctionComponent<{
         <button
           className="btn btn-primary"
           onClick={() => {
-            setName(value);
+            updateSection({
+              ...section,
+              name: value,
+            });
             dismiss();
           }}
           disabled={!value}

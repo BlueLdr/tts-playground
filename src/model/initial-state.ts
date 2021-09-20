@@ -49,7 +49,9 @@ const message_categories: TTS.MessageCategory[] =
   common.get_stored_message_categories() ?? [];
 const uncategorized_msgs: TTS.MessageCategory =
   common.get_stored_uncategorized_messages() ?? common.DEFAULT_UNCAT_MESSAGES;
-const snippets: TTS.SnippetsSection[] = common.get_stored_snippets() ?? [];
+const snippets: TTS.Snippet[] = common.get_stored_snippets() ?? [];
+const snippets_sections: TTS.SnippetsSection[] =
+  common.get_stored_snippets_sections() ?? [];
 const help: TTS.HelpCompletedMap = common.get_stored_help() ?? {};
 
 export const INITIAL_STATE = {
@@ -58,5 +60,6 @@ export const INITIAL_STATE = {
   message_categories,
   uncategorized_msgs,
   snippets,
+  snippets_sections,
   help,
 } as const;

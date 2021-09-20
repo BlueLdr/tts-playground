@@ -6,11 +6,11 @@ import {
   Editor,
   ImportExport,
   MessagesList,
-  Snippets,
   SettingsModal,
   HelpButton,
   Footer,
   validate_import_data,
+  SnippetsList,
 } from "~/view/components";
 import {
   useModal,
@@ -132,7 +132,7 @@ const View: Preact.FunctionComponent = () => {
           </div>
           <div className="tts-col tts-col-snippets">
             <div data-help-intro-highlight={help_item === "intro-snippets"}>
-              <Snippets />
+              <SnippetsList />
             </div>
           </div>
         </div>
