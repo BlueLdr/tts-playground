@@ -1,6 +1,7 @@
 import * as Preact from "preact";
 
 const data: TTS.Snippet = {
+  id: "sample",
   text: "Main",
   options: {
     space_after: true,

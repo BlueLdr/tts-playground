@@ -1,12 +1,17 @@
 import * as Preact from "preact";
-import { useEffect, useRef } from "preact/hooks";
+import { useEffect, useMemo, useRef } from "preact/hooks";
+import { generate_id } from "~/common";
 import {
   AudioPlayer,
   ExportSnippet,
   Modal,
   ModalHeader,
 } from "~/view/components";
-import { usePlaySnippet, useStateIfMounted } from "~/view/utils";
+import {
+  snippet_to_string,
+  usePlaySnippet,
+  useStateIfMounted,
+} from "~/view/utils";
 
 const SNIPPETS_EDIT_MODAL_REQUEST: TTS.TTSRequest = {
   text: "",
@@ -42,6 +47,7 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
   }, []);
 
   const new_row = {
+    id: row.id,
     text: value,
     options: {
       prefix,
@@ -51,6 +57,14 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
       space_after: space_after,
     },
   };
+
+  new_row.id = useMemo(() => {
+    if (row.id) {
+      return row.id;
+    }
+    return row.id ?? generate_id(snippet_to_string(new_row));
+  }, [row.id, value, prefix, suffix, count, space_before, space_after]);
+
   return (
     <Modal className="tts-snippets-modal" dismiss={dismiss}>
       <ModalHeader dismiss={dismiss}>

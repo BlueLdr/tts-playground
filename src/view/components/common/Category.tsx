@@ -35,8 +35,8 @@ export const Category: Preact.FunctionComponent<
           data-toggle={`${toggleOnClickTitle}`}
           onClick={toggleOnClickTitle ? toggle : undefined}
         >
-          <div
-            className={class_names("-expand")}
+          <button
+            className={`${class_names("-expand")} icon-button`}
             onClick={toggleOnClickTitle ? undefined : toggle}
             onMouseDown={
               toggleOnClickTitle
@@ -52,7 +52,7 @@ export const Category: Preact.FunctionComponent<
             ) : (
               <i className="fas fa-chevron-right" />
             )}
-          </div>
+          </button>
           <span>{title}</span>
         </div>
         {controls && <div className="category-header-controls">{controls}</div>}

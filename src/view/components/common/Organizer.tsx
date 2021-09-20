@@ -44,7 +44,7 @@ const OrganizerSectionControls = <T extends any>({
           onDragEnter={onDragEnter(0)}
         />
       )}
-      <div className="organizer-section-reorder-button">
+      <div className="icon-button organizer-section-reorder-button">
         <i className="fas fa-grip-lines" />
       </div>
       <div
@@ -321,7 +321,7 @@ const OrganizerBase = <T extends any>({
                     </OrganizerItem>
                   );
                 })}
-                {!reorderEnabled && RenderSectionExtras && (
+                {RenderSectionExtras && (
                   <RenderSectionExtras section={s} id={s.name} />
                 )}
               </Category>

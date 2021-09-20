@@ -4,6 +4,7 @@ import { SnippetsRow } from "~/view/components";
 import { useInsertSnippet, useStateIfMounted } from "~/view/utils";
 
 const snippet: TTS.Snippet = {
+  id: "test",
   text: "TEXT",
   options: {
     prefix: "pre",

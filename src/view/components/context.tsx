@@ -21,6 +21,7 @@ import {
   OPTIMIZE_MESSAGE_CALLBACK,
   SNIPPETS,
   UNCATEGORIZED_MESSAGES,
+  SNIPPETS_SECTIONS,
   VOLUME_CTX,
 } from "~/model";
 import {
@@ -75,6 +76,10 @@ const CONTEXTS = {
   SNIPPETS: {
     context: SNIPPETS,
     initialValue: INITIAL_STATE.snippets,
+  },
+  SNIPPETS_SECTIONS: {
+    context: SNIPPETS_SECTIONS,
+    initialValue: INITIAL_STATE.snippets_sections,
   },
   HELP_ITEM: {
     context: HELP_ITEM,
@@ -179,6 +184,7 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
     UNCATEGORIZED_MESSAGES
   );
   const snippets = hooks.useContext(SNIPPETS).value;
+  const sections = hooks.useContext(SNIPPETS_SECTIONS).value;
   const volume = hooks.useContext(VOLUME_CTX).value;
   const editor_state = hooks.useContext(EDITOR_STATE).value;
   const editor_settings = hooks.useContext(EDITOR_SETTINGS).value;
@@ -268,6 +274,10 @@ export const WithContextHooks: Preact.FunctionComponent = ({ children }) => {
   useEffect(() => {
     storage.set_stored_snippets(snippets);
   }, [snippets]);
+
+  useEffect(() => {
+    storage.set_stored_snippets_sections(sections);
+  }, [sections]);
 
   useEffect(() => {
     storage.set_stored_help(help_completed);

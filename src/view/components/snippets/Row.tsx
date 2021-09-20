@@ -1,26 +1,30 @@
 import * as Preact from "preact";
-import { useCallback, useRef } from "preact/hooks";
+import { useCallback, useContext, useRef } from "preact/hooks";
+import { ADD_SNIPPET_CALLBACK } from "~/model";
 import { Snippet, SnippetsRowControls } from "~/view/components";
 import { useHoldClick, useStateIfMounted, useValueRef } from "~/view/utils";
 
 export const SnippetsRow: Preact.FunctionComponent<{
   row: TTS.Snippet;
-  updateRow: (row: TTS.Snippet) => void;
-  onClickDelete: () => void;
-  onClickEdit: () => void;
+  // updateRow: (row: TTS.Snippet) => void;
+  onClickDelete: (id: string) => void;
+  onClickEdit: (id: string) => void;
   previewText: (snippet: TTS.Snippet, count?: number) => Promise<void>;
-  addToMessage: (text: string, flag?: "start" | "end") => void;
-}> = ({
-  row,
-  updateRow,
-  onClickDelete,
-  onClickEdit,
-  previewText,
-  addToMessage,
-}) => {
+  buttons?: Preact.ComponentChildren | null;
+}> = ({ row, onClickDelete, onClickEdit, previewText, buttons }) => {
+  const addToMessage = useContext(ADD_SNIPPET_CALLBACK).value;
   const [edit, set_edit] = useStateIfMounted(!row.text);
   const is_right_click = useRef(false);
   const options_ref = useValueRef(row?.options);
+
+  const on_click_edit = useCallback(
+    () => onClickEdit(row.id),
+    [onClickEdit, row.id]
+  );
+  const on_click_delete = useCallback(
+    () => onClickDelete(row.id),
+    [onClickDelete, row.id]
+  );
 
   const add_to_message = useCallback(
     e => {
@@ -61,28 +65,32 @@ export const SnippetsRow: Preact.FunctionComponent<{
   return (
     <li className="tts-snippets-row" data-edit={`${edit}`}>
       <div className="tts-snippets-row-left">
-        <button
-          type="button"
-          className="icon-button tts-snippets-row-control tts-snippets-row-control-add"
-          title="Add to message"
-          {...add_listeners}
-          onContextMenu={e => e.preventDefault()}
-          data-help="snippet-insert"
-        >
-          <i className="fas fa-plus" />
-        </button>
+        {buttons || (
+          <button
+            type="button"
+            className="icon-button tts-snippets-row-control tts-snippets-row-control-add"
+            title="Add to message"
+            {...add_listeners}
+            onContextMenu={e => e.preventDefault()}
+            data-help="snippet-insert"
+          >
+            <i className="fas fa-plus" />
+          </button>
+        )}
         <div className="tts-snippets-row-text" data-help="snippet-text">
           <Snippet data={row} />
         </div>
       </div>
-      <SnippetsRowControls
-        row={row}
-        open={edit}
-        setOpen={set_edit}
-        onClickEdit={onClickEdit}
-        onClickDelete={onClickDelete}
-        previewText={previewText}
-      />
+      {!buttons && (
+        <SnippetsRowControls
+          row={row}
+          open={edit}
+          setOpen={set_edit}
+          onClickEdit={on_click_edit}
+          onClickDelete={on_click_delete}
+          previewText={previewText}
+        />
+      )}
     </li>
   );
 };

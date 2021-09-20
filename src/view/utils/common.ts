@@ -101,3 +101,8 @@ export const get_uncategorized_messages = (
     data,
   };
 };
+
+export const snippet_to_string = (snippet: TTS.Snippet): string =>
+  `${snippet.options.space_before ? " " : ""}${snippet.options.prefix ?? ""}${
+    snippet.text
+  }${snippet.options.suffix ?? ""}${snippet.options.space_after ? " " : ""}`;

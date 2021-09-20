@@ -10,7 +10,7 @@ export const Snippet: Preact.FunctionComponent<{
     <div className={`snippet tts-text${maybeClassName(className)}`}>
       <div
         className="snippet-space-before"
-        data-show={`${data.options.space_before}`}
+        data-show={`${!!data.options.space_before}`}
       />
       {data.options.prefix && (
         <div className="snippet-prefix">{data.options.prefix}</div>
@@ -29,7 +29,7 @@ export const Snippet: Preact.FunctionComponent<{
       )}
       <div
         className="snippet-space-after"
-        data-show={`${data.options.space_after}`}
+        data-show={`${!!data.options.space_after}`}
       />
     </div>
   );

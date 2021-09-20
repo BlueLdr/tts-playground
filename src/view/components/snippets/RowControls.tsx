@@ -1,7 +1,11 @@
 import * as Preact from "preact";
 import { useCallback, useEffect } from "preact/hooks";
 import { do_confirm } from "~/common";
-import { useCopyToClipboard, useRequestStatus } from "~/view/utils";
+import {
+  snippet_to_string,
+  useCopyToClipboard,
+  useRequestStatus,
+} from "~/view/utils";
 
 const listener_opts = { once: true };
 export const SnippetsRowControls: Preact.FunctionComponent<{
@@ -13,8 +17,7 @@ export const SnippetsRowControls: Preact.FunctionComponent<{
   previewText: (snippet: TTS.Snippet, count?: number) => Promise<void>;
 }> = ({ row, open, setOpen, onClickEdit, onClickDelete, previewText }) => {
   const {
-    text,
-    options: { prefix = "", default_count, suffix = "" },
+    options: { default_count },
   } = row;
   const [status, fetch_tts] = useRequestStatus(previewText);
   useEffect(() => {
@@ -39,9 +42,7 @@ export const SnippetsRowControls: Preact.FunctionComponent<{
     }
   }, [onClickDelete]);
 
-  const copy_all = useCopyToClipboard(
-    `${prefix}${text.repeat(default_count || 1)}${suffix}`
-  );
+  const copy_all = useCopyToClipboard(snippet_to_string(row).trim());
   const copy_main = useCopyToClipboard(
     row.text.repeat(Math.round((default_count || 2) / 2))
   );

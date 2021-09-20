@@ -4,10 +4,10 @@ import {
   DEFAULT_SPEED_CHAR,
   DEFAULT_VOICE,
   do_confirm,
-  generate_id,
   sample_message_categories,
   sample_messages,
   sample_snippets,
+  sample_snippets_sections,
   UNCATEGORIZED_GROUP_NAME,
 } from "~/common";
 import { OptimizeLevel, OptimizeTrigger } from "~/model/types";
@@ -20,26 +20,18 @@ const load_storage_or = (key, def) => {
   return def;
 };
 
-export const get_stored_snippets = (): TTS.SnippetsSection[] =>
-  load_storage_or("tts-snippets", sample_snippets).map(section => ({
-    ...section,
-    data: section.data.map(row => {
-      const { defaultCount, ...options } = row.options ?? {};
-      const mapped = { ...row, options };
-      if (!isNaN(parseInt(defaultCount))) {
-        mapped.options.defaultCount = parseInt(defaultCount);
-      }
-      return mapped;
-    }),
-  }));
-export const set_stored_snippets = (value: TTS.SnippetsSection[]) =>
+export const get_stored_snippets = (): TTS.Snippet[] =>
+  load_storage_or("tts-snippets", sample_snippets);
+export const set_stored_snippets = (value: TTS.Snippet[]) =>
   localStorage.setItem("tts-snippets", JSON.stringify(value));
 
+export const get_stored_snippets_sections = (): TTS.SnippetsSection[] =>
+  load_storage_or("tts-snippets-sections", sample_snippets_sections);
+export const set_stored_snippets_sections = (value: TTS.SnippetsSection[]) =>
+  localStorage.setItem("tts-snippets-sections", JSON.stringify(value));
+
 export const get_stored_messages = (): TTS.Message[] =>
-  load_storage_or("tts-messages", sample_messages).map(m => ({
-    ...m,
-    id: m.id ?? generate_id(m.name),
-  }));
+  load_storage_or("tts-messages", sample_messages);
 export const set_stored_messages = (value: TTS.Message[]) =>
   localStorage.setItem("tts-messages", JSON.stringify(value));
 

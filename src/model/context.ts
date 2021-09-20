@@ -92,9 +92,14 @@ export const UNCATEGORIZED_MESSAGES = createNamedContext<TTS.MessageCategory>(
     (uncat: TTS.MessageCategory, new_categories?: TTS.MessageCategory[]) => void
   >
 >;
-export const SNIPPETS = createNamedContext<TTS.SnippetsSection[]>(
+
+export const SNIPPETS = createNamedContext<TTS.Snippet[]>(
   INITIAL_STATE.snippets,
   "SNIPPETS"
+);
+export const SNIPPETS_SECTIONS = createNamedContext<TTS.SnippetsSection[]>(
+  INITIAL_STATE.snippets_sections,
+  "SNIPPETS_SECTIONS"
 );
 
 export const IS_OPTIMIZED = Preact.createContext<() => boolean>(() => false);

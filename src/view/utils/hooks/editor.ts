@@ -247,3 +247,64 @@ export const useSaveMessage = () => {
 
   return [loaded_message, update_messages] as const;
 };
+
+export const useSaveSnippetInSection = (
+  sections_ref: preact.RefObject<TTS.SnippetsSection[]>,
+  set_sections: (value: TTS.SnippetsSection[]) => void
+) => {
+  const update_in_section = useCallback(
+    (section_name: string, snippet_id: string): boolean => {
+      const section = sections_ref.current.find(s => s.name === section_name);
+      if (section.data.includes(snippet_id)) {
+        return;
+      }
+      const sects = sections_ref.current.map(s => ({
+        ...s,
+        data:
+          s.name === section_name
+            ? s.data
+            : remove_item_from(s.data, id => id === snippet_id),
+      }));
+      set_sections(
+        replace_item_in(
+          sects,
+          s => s.name === section_name,
+          {
+            ...section,
+            data: replace_item_in(
+              section.data,
+              id => id === snippet_id,
+              snippet_id,
+              "end"
+            ),
+          },
+          "end"
+        )
+      );
+    },
+    []
+  );
+
+  const remove_from_section = useCallback((snippet_id: string) => {
+    set_sections(
+      sections_ref.current.map(c => ({
+        ...c,
+        data: remove_item_from(c.data, id => id === snippet_id),
+      }))
+    );
+  }, []);
+
+  return useCallback(
+    (id: string | null, value: TTS.Snippet | undefined, section: string) => {
+      if ((value && !value.id) || (id && value && value.id !== id)) {
+        return;
+      }
+      if (!value) {
+        remove_from_section(id);
+      } else if (section) {
+        update_in_section(section, value.id);
+      }
+    },
+    []
+  );
+};

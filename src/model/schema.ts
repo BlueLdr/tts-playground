@@ -55,6 +55,7 @@ export const SNIPPET_OPTIONS_SCHEMA: SchemaOf<TTS.SnippetOptions> = {
 } as const;
 
 export const SNIPPET_SCHEMA: SchemaOf<TTS.Snippet> = {
+  id: { type: "string" },
   text: { type: "string" },
   options: { type: SNIPPET_OPTIONS_SCHEMA },
 } as const;
@@ -62,7 +63,7 @@ export const SNIPPET_SCHEMA: SchemaOf<TTS.Snippet> = {
 export const SNIPPET_SECTION_SCHEMA: SchemaOf<TTS.SnippetsSection> = {
   name: { type: "string" },
   open: { type: "boolean", default: false },
-  data: { type: SNIPPET_SCHEMA, default: [], multi: true },
+  data: { type: "string", default: [], multi: true },
 } as const;
 
 export const MESSAGE_OPTIONS_SCHEMA: SchemaOf<TTS.MessageOptions> = {
