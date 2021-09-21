@@ -1,7 +1,7 @@
 import * as Preact from "preact";
 import { useCallback, useMemo, useRef } from "preact/hooks";
 import { remove_item_from, replace_item_in } from "~/common";
-import { SNIPPETS, SNIPPETS_SECTIONS } from "~/model";
+import { ImmutableContextValue, SNIPPETS, SNIPPETS_SECTIONS } from "~/model";
 import {
   AudioPlayer,
   Organizer,
@@ -10,6 +10,12 @@ import {
   SnippetsSectionModal,
 } from "~/view/components";
 import {
+  SEARCH_BAR,
+  SearchBar,
+  useOrganizerSearch,
+} from "~/view/components/common/SearchBar";
+import {
+  snippet_to_string,
   useContextState,
   useModal,
   usePlaySnippet,
@@ -23,6 +29,9 @@ const snippets_section_header_props = () =>
   ({ "data-help": "snippets-group" } as HTMLDivProps);
 
 const get_item_key = (_, snip, __) => snip.id;
+
+const regex_test_snippet = (item: TTS.Snippet, regex) =>
+  regex.test(snippet_to_string(item));
 
 const SNIPPETS_PREVIEW_REQUEST: TTS.TTSRequest = {
   text: "",
@@ -126,23 +135,53 @@ export const SnippetsList: Preact.FunctionComponent = () => {
     []
   );
 
+  const [search, set_search] = useStateIfMounted("");
+  const search_ctx_value = useMemo(
+    () => new ImmutableContextValue(search, set_search),
+    [search]
+  );
+  const search_inputs = useMemo(() => (search ? [search] : null), [search]);
+
+  const [search_results_items, search_results_sections] = useOrganizerSearch(
+    snippets,
+    sections,
+    undefined,
+    search_inputs,
+    regex_test_snippet
+  );
+  const is_search = useValueRef(
+    !!search_results_items || !!search_results_sections
+  );
+
   const list_sections = useMemo(
     () =>
-      sections.map(c => ({
+      (search_results_sections ?? sections).map(c => ({
         ...c,
         data: c.data.map(id => snippets.find(m => m.id === id)),
       })),
-    [sections, snippets]
+    [search_results_sections, sections, snippets]
   );
 
   const set_list_sections = useCallback(
     (sections_: TTS.SnippetsSectionPopulated[]) => {
-      set_sections(
-        sections_.map(section => ({
+      let results: TTS.SnippetsSection[] = [];
+      if (!!is_search.current) {
+        results = sections_.reduce(
+          (list, updated) =>
+            replace_item_in(
+              list,
+              sec => sec.name === updated.name,
+              prev_value => ({ ...prev_value, open: updated.open })
+            ),
+          sections_ref.current
+        );
+      } else {
+        results = sections_.map(section => ({
           ...section,
           data: section.data.map(s => s.id),
-        }))
-      );
+        }));
+      }
+      set_sections(results);
     },
     []
   );
@@ -228,20 +267,22 @@ export const SnippetsList: Preact.FunctionComponent = () => {
 
   return (
     <div className="tts-snippets">
-      <div className="tts-snippets-list">
-        <Organizer<TTS.Snippet>
-          RenderHeader={RenderHeader}
-          RenderSectionHeaderControls={RenderSectionHeaderControls}
-          RenderSectionExtras={RenderSectionExtras}
-          RenderItem={RenderItem}
-          getSectionHeaderProps={snippets_section_header_props}
-          getItemKey={get_item_key}
-          sections={list_sections}
-          reorderEnabled={reorder_enabled}
-          setReorderEnabled={set_reorder_enabled}
-          updateSections={set_list_sections}
-        />
-      </div>
+      <SEARCH_BAR.Provider value={search_ctx_value}>
+        <div className="tts-snippets-list">
+          <Organizer<TTS.Snippet>
+            RenderHeader={RenderHeader}
+            RenderSectionHeaderControls={RenderSectionHeaderControls}
+            RenderSectionExtras={RenderSectionExtras}
+            RenderItem={RenderItem}
+            getSectionHeaderProps={snippets_section_header_props}
+            getItemKey={get_item_key}
+            sections={list_sections}
+            reorderEnabled={reorder_enabled}
+            setReorderEnabled={set_reorder_enabled}
+            updateSections={set_list_sections}
+          />
+        </div>
+      </SEARCH_BAR.Provider>
       <AudioPlayer
         id="snippets-sidebar-player"
         className="tts-snippets-sidebar-player invisible"
@@ -293,6 +334,7 @@ export const SnippetsHeader: Preact.FunctionComponent<{
 }> = ({ className, buttons, reorderEnabled, onClickAdd }) => {
   return (
     <div className={`row tts-col-header ${className}`}>
+      <SearchBar />
       <h4 data-help="snippets-overview">Snippets</h4>
       <div className="tts-col-header-controls">
         {buttons}

@@ -1,16 +1,6 @@
 import * as Preact from "preact";
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from "preact/hooks";
-import {
-  comparator,
-  replace_item_in,
-  UNCATEGORIZED_GROUP_NAME,
-} from "~/common";
+import { useCallback, useContext, useMemo } from "preact/hooks";
+import { replace_item_in, UNCATEGORIZED_GROUP_NAME } from "~/common";
 import {
   EDITOR_SETTINGS,
   ImmutableContextValue,
@@ -27,7 +17,11 @@ import {
   MessagesListItem,
   Organizer,
 } from "~/view/components";
-import { SEARCH_BAR, SearchBar } from "~/view/components/common/SearchBar";
+import {
+  SEARCH_BAR,
+  SearchBar,
+  useOrganizerSearch,
+} from "~/view/components/common/SearchBar";
 import {
   maybeClassName,
   optimize_message,
@@ -37,7 +31,6 @@ import {
   useStateIfMounted,
   useValueRef,
 } from "~/view/utils";
-import { filter_options_with_score } from "~/view/utils/filter-on-regex";
 
 const message_category_header_props = (
   category: TTS.MessageCategoryPopulated
@@ -50,6 +43,9 @@ const message_category_header_props = (
   } as HTMLDivProps);
 
 const get_item_key = (_, msg, __) => msg.id;
+
+const regex_test_message = (opt, regex) =>
+  regex.test(opt.name) || regex.test(opt.text);
 
 export const MessagesList: Preact.FunctionComponent<{
   updateMessages: (
@@ -113,11 +109,28 @@ export const MessagesList: Preact.FunctionComponent<{
     [search]
   );
 
-  const [search_results_items, search_results_sections] = useMessageSearch(
+  const settings = useContext(EDITOR_SETTINGS).value;
+  const search_inputs = useMemo<string[] | null>(() => {
+    if (!search) {
+      return null;
+    }
+    const strs: string[] = [search];
+    for (let level of ["safe", "normal", "max"]) {
+      strs.push(
+        optimize_message(search, { current: null }, OptimizeTrigger.manual, {
+          ...settings,
+          optimize_level: OptimizeLevel[level],
+        })[0]
+      );
+    }
+    return strs;
+  }, [search, settings]);
+  const [search_results_items, search_results_sections] = useOrganizerSearch(
     messages,
     categories,
     uncategorized_msgs,
-    search
+    search_inputs,
+    regex_test_message
   );
   const is_search = useValueRef(
     !!search_results_items || !!search_results_sections
@@ -312,159 +325,4 @@ export const MessagesHeader: Preact.FunctionComponent<{
       </div>
     </div>
   );
-};
-
-const useMessageSearch = (
-  messages: TTS.Message[],
-  categories: TTS.MessageCategory[],
-  uncategorized_messages: TTS.MessageCategory,
-  search: string
-) => {
-  const settings = useContext(EDITOR_SETTINGS).value;
-  const uncat_open = useValueRef(uncategorized_messages.open);
-  const inputs = useMemo<string[] | null>(() => {
-    if (!search) {
-      return null;
-    }
-    const strs: string[] = [search];
-    for (let level of ["safe", "normal", "max"]) {
-      strs.push(
-        optimize_message(search, { current: null }, OptimizeTrigger.manual, {
-          ...settings,
-          optimize_level: OptimizeLevel[level],
-        })[0]
-      );
-    }
-    return strs;
-  }, [search, settings]);
-  const open_all = useRef<boolean>(true);
-  useMemo(() => {
-    open_all.current = true;
-  }, [search]);
-
-  const messages_results_raw = useMemo<
-    ScoredMatch<TTS.Message>[] | null
-  >(() => {
-    if (!inputs) {
-      return null;
-    }
-    const [first, ...results] = inputs.map(text =>
-      filter_options_with_score(
-        text,
-        messages,
-        (opt, regex) => regex.test(opt.name) || regex.test(opt.text)
-      )
-    );
-
-    return results
-      .reduce(
-        (output, list) =>
-          list.reduce((cur_output, msg) => {
-            return !msg
-              ? cur_output
-              : replace_item_in(
-                  cur_output,
-                  m => m.opt.id === msg.opt.id,
-                  prev_value =>
-                    prev_value
-                      ? {
-                          ...prev_value,
-                          score: msg.score + (prev_value?.score ?? 0),
-                        }
-                      : msg,
-                  "end"
-                );
-          }, output),
-        first
-      )
-      .sort(comparator("score", "desc"));
-  }, [inputs, messages]);
-
-  const categories_results = useMemo<TTS.MessageCategory[] | null>(() => {
-    if (!inputs) {
-      return null;
-    }
-    const matches_in_cats = categories
-      .map(c => {
-        const msgs = c.data
-          .map(id => messages_results_raw.find(o => o.opt.id === id))
-          .filter(_ => !!_);
-        const score = msgs.reduce(
-          (score, item) => score + (item?.score ?? 0),
-          0
-        );
-        return msgs.length === 0
-          ? null
-          : {
-              score,
-              opt: {
-                ...c,
-                open: open_all.current ? true : c.open,
-                data: msgs.map(m => m.opt.id),
-              },
-            };
-      })
-      .filter(_ => !!_);
-    const matched_cats = filter_options_with_score(
-      search,
-      categories,
-      (opt, regex) => regex.test(opt.name)
-    );
-
-    const results = matches_in_cats.reduce(
-      (results, item) =>
-        !item
-          ? results
-          : replace_item_in(
-              results,
-              c => c.opt.name === item.opt.name,
-              prev_value =>
-                prev_value
-                  ? {
-                      ...prev_value,
-                      score: prev_value.score + item.score,
-                    }
-                  : item,
-              "end"
-            ),
-      matched_cats
-    );
-
-    const uncat_msgs = messages_results_raw.filter(
-      i => !results.some(c => c.opt.data.includes(i.opt.id))
-    );
-    const uncat =
-      uncat_msgs.length > 0
-        ? [
-            {
-              score: uncat_msgs.reduce(
-                (score, msg) => score + (msg?.score ?? 0),
-                0
-              ),
-              opt: {
-                name: UNCATEGORIZED_GROUP_NAME,
-                open: open_all.current ? true : uncat_open.current,
-                data: uncat_msgs.map(m => m.opt.id),
-              },
-            },
-          ]
-        : [];
-
-    return results
-      .concat(uncat)
-      .sort(comparator("score", "desc"))
-      .map(({ opt }) => opt);
-  }, [messages_results_raw, search, categories]);
-
-  const messages_results = useMemo<TTS.Message[] | null>(
-    () =>
-      messages_results_raw ? messages_results_raw.map(({ opt }) => opt) : null,
-    [messages_results_raw]
-  );
-
-  useEffect(() => {
-    open_all.current = false;
-  }, [search]);
-
-  return [messages_results, categories_results] as const;
 };
