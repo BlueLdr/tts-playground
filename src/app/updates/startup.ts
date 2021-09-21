@@ -9,7 +9,7 @@ import {
   set_stored_snippets_sections,
   set_stored_snippets,
 } from "~/common";
-import { sample_messages } from "~/common/sample-data";
+import { sample_messages, sample_snippets } from "~/common/sample-data";
 import { snippet_to_string } from "~/view/utils";
 
 const prev_version = localStorage.getItem("tts-loaded-version");
@@ -67,6 +67,10 @@ export const convert_snippets_to_categories = () => {
     TTS.SnippetsSection,
     "data"
   > & { data: TTS.Snippet[] })[];
+  // @ts-expect-error:
+  if (snippet_sections === sample_snippets) {
+    return;
+  }
   const snippets: TTS.Snippet[] = [];
   const snippet_categories: TTS.SnippetsSection[] = snippet_sections.map(s => ({
     ...s,
