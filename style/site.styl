@@ -52,6 +52,21 @@
         &:first-child
           margin-left 0
 
+    .organizer[data-reorder="true"] & .search-bar
+      opacity 0
+      pointer-events none
+      & + *
+        margin-left 0
+    .search-bar
+      .icon-button
+        width 2.5rem
+        height 2.5rem
+      & + *
+        margin-left 3rem
+        transition margin 200ms ease-out
+      &[data-active="true"] ~ *
+        pointer-events none !important
+
     [data-help-active="true"] &
       position static
       [data-help]

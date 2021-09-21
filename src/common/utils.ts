@@ -1,3 +1,10 @@
+export const capitalize = (str: string | undefined) =>
+  str != null
+    ? str.length > 1
+      ? `${str[0].toUpperCase()}${str.slice(1, str.length)}`
+      : str.toUpperCase()
+    : "";
+
 export type ArrayInsertPosSpecifier<T> =
   | "start"
   | "end"
@@ -48,21 +55,23 @@ export const remove_item_from = <T>(
   return list.slice(0, index).concat(list.slice(index + 1));
 };
 
-export const replace_item_in = <T>(
+export const replace_item_in = <T extends string | number | boolean | object>(
   list: readonly T[],
   match: (item: T, index?: number) => boolean,
-  new_item: T,
+  new_item: T | ((prev_value?: T) => T),
   append_if_missing?: ArrayInsertPosSpecifier<T>
 ): T[] => {
   const index = list.findIndex(match);
+  const new_value =
+    typeof new_item === "function" ? new_item(list[index]) : new_item;
   if (index === -1) {
     return append_if_missing
-      ? add_item_to(list, new_item, append_if_missing)
+      ? add_item_to(list, new_value, append_if_missing)
       : list.slice();
   }
   return list
     .slice(0, index)
-    .concat([new_item])
+    .concat([new_value])
     .concat(list.slice(index + 1));
 };
 
@@ -70,15 +79,15 @@ export const union_arrays = <T>(
   arr1: T[],
   arr2: T[],
   is_equal?: keyof T | ((a: T, b: T) => boolean)
-) =>
-  arr1.concat(
+) => {
+  if (arr1.length === 0) {
+    return arr2;
+  }
+  if (arr2.length === 0) {
+    return arr1;
+  }
+  return arr1.concat(
     arr2.filter(b => {
-      if (arr1.length === 0) {
-        return arr2;
-      }
-      if (arr2.length === 0) {
-        return arr1;
-      }
       if (is_equal != null) {
         if (typeof is_equal === "function") {
           return !arr1.some(a => is_equal(b, a));
@@ -88,6 +97,7 @@ export const union_arrays = <T>(
       return !arr1.includes(b);
     })
   );
+};
 
 export const deep_equals = (
   a: any,
@@ -190,3 +200,19 @@ export const generate_id = (base: string) => {
     .map((c, i) => `${rd[i]}${c}`)
     .join("");
 };
+
+export const comparator =
+  <T extends object>(
+    extract: PropsOfType<T, string | number> | ((item: T) => number),
+    direction: "asc" | "desc" = "asc",
+    fallback?: (a: T, b: T) => -1 | 0 | 1
+  ) =>
+  (a: T, b: T): -1 | 0 | 1 => {
+    const v_a = typeof extract === "function" ? extract(a) : a[extract];
+    const v_b = typeof extract === "function" ? extract(b) : b[extract];
+    return ((direction === "asc" ? 1 : -1) *
+      (v_a < v_b ? -1 : v_a > v_b ? 1 : fallback ? fallback(a, b) : 0)) as
+      | 1
+      | 0
+      | -1;
+  };
