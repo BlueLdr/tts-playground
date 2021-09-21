@@ -17,7 +17,6 @@ import { SETTINGS } from "./data/settings.ts";
 import {
   SNIPPET_ONE,
   SNIPPET_SECTION_ONE,
-  SNIPPET_TWO,
   // @ts-expect-error:
 } from "./data/snippets.ts";
 
@@ -85,6 +84,12 @@ test("reject snippet with missing required property", t => {
   t.is(conformed, null);
 });
 
+test("reject snippet with missing id property", t => {
+  const { id, ...initial } = SNIPPET_ONE;
+  const conformed = conform_to_schema(initial, SNIPPET_SCHEMA);
+  t.is(conformed, null);
+});
+
 test("conform snippet with extra property in options", t => {
   const { __type, ...initial } = SNIPPET_ONE;
   const conformed = conform_to_schema(
@@ -109,36 +114,27 @@ test("conform snippet with missing optional property in options", t => {
 
 test("conform valid snippet section", t => {
   const { __type, ...section_one } = SNIPPET_SECTION_ONE;
-  const initial = {
-    ...section_one,
-    data: section_one.data.map(({ __type: _, ...d }) => d),
-  };
-  const conformed = conform_to_schema(initial, SNIPPET_SECTION_SCHEMA);
-  t.deepEqual(conformed, initial);
+  const conformed = conform_to_schema(
+    SNIPPET_SECTION_ONE,
+    SNIPPET_SECTION_SCHEMA
+  );
+  t.deepEqual(conformed, section_one);
 });
 
 test("conform snippet section with extra property", t => {
   const { __type, ...section_one } = SNIPPET_SECTION_ONE;
-  const initial = {
-    ...section_one,
-    data: section_one.data.map(({ __type: _, ...d }) => d),
-  };
   const conformed = conform_to_schema(
-    { ...initial, bad_property: "bad" },
+    { ...SNIPPET_SECTION_ONE, bad_property: "bad" },
     SNIPPET_SECTION_SCHEMA
   );
-  t.deepEqual(conformed, initial);
+  t.deepEqual(conformed, section_one);
 });
 
 test("conform snippet section with missing optional property", t => {
   const { __type, open, ...section_one } = SNIPPET_SECTION_ONE;
-  const initial = {
-    ...section_one,
-    data: section_one.data.map(({ __type: _, ...d }) => d),
-  };
-  const conformed = conform_to_schema(initial, SNIPPET_SECTION_SCHEMA);
+  const conformed = conform_to_schema(section_one, SNIPPET_SECTION_SCHEMA);
   t.deepEqual(conformed, {
-    ...initial,
+    ...section_one,
     open: SNIPPET_SECTION_SCHEMA.open.default,
   });
 });
@@ -147,75 +143,6 @@ test("reject snippet section with missing required property", t => {
   const { __type, name, ...initial } = SNIPPET_SECTION_ONE;
   const conformed = conform_to_schema(initial, SNIPPET_SECTION_SCHEMA);
   t.is(conformed, null);
-});
-
-test("conform snippet section with snippet with extra property", t => {
-  const { __type: _1, ...snippet_one } = SNIPPET_ONE;
-  const { __type: _2, ...snippet_two } = SNIPPET_TWO;
-  const { __type: _3, ...section } = SNIPPET_SECTION_ONE;
-  const conformed = conform_to_schema(
-    {
-      ...section,
-      data: [{ ...snippet_one, bad_property: "bad" }, snippet_two],
-    },
-    SNIPPET_SECTION_SCHEMA
-  );
-  t.deepEqual(conformed, { ...section, data: [snippet_one, snippet_two] });
-});
-
-test("conform snippet section with rejecting snippet with missing required property", t => {
-  const { __type: _1, text, ...snippet_one } = SNIPPET_ONE;
-  const { __type: _2, ...snippet_two } = SNIPPET_TWO;
-  const { __type: _3, ...section } = SNIPPET_SECTION_ONE;
-  const conformed = conform_to_schema(
-    { ...section, data: [snippet_one, snippet_two] },
-    SNIPPET_SECTION_SCHEMA
-  );
-  t.deepEqual(conformed, { ...section, data: [snippet_two] });
-});
-
-test("conform snippet section with conforming snippet with extra property in options", t => {
-  const { __type: _1, ...snippet_one } = SNIPPET_ONE;
-  const { __type: _2, ...snippet_two } = SNIPPET_TWO;
-  const { __type: _3, ...section } = SNIPPET_SECTION_ONE;
-  const conformed = conform_to_schema(
-    {
-      ...section,
-      data: [
-        {
-          ...snippet_one,
-          options: { ...snippet_one.options, bad_property: "bad" },
-        },
-        snippet_two,
-      ],
-    },
-    SNIPPET_SECTION_SCHEMA
-  );
-  t.deepEqual(conformed, { ...section, data: [snippet_one, snippet_two] });
-});
-
-test("conform snippet section with conforming snippet with missing optional property in options", t => {
-  const { __type: _1, ...snippet_one } = SNIPPET_ONE;
-  const { __type: _2, ...snippet_two } = SNIPPET_TWO;
-  const { __type: _3, ...section } = SNIPPET_SECTION_ONE;
-  const { default_count, ...options } = snippet_one.options;
-  const conformed = conform_to_schema(
-    { ...section, data: [{ ...snippet_one, options }, snippet_two] },
-    SNIPPET_SECTION_SCHEMA
-  );
-  t.deepEqual(conformed, {
-    ...section,
-    data: [
-      {
-        ...snippet_one,
-        options: {
-          ...snippet_one.options,
-          default_count: SNIPPET_SCHEMA.options.type.default_count.default,
-        },
-      },
-      snippet_two,
-    ],
-  });
 });
 
 test("conform valid settings", t => {

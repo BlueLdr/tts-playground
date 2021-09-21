@@ -5,6 +5,7 @@ import {
   MESSAGE_CATEGORIES,
   MESSAGES,
   SNIPPETS,
+  SNIPPETS_SECTIONS,
   UNCATEGORIZED_MESSAGES,
 } from "~/model";
 import {
@@ -33,6 +34,8 @@ export const ImportForm: Preact.FunctionComponent<{
   const [uncat_msgs, set_uncat_msgs] = useContextState(UNCATEGORIZED_MESSAGES);
   const [messages, set_messages] = useContextState(MESSAGES);
   const [snippets, set_snippets] = useContextState(SNIPPETS);
+  const [snippets_sections, set_snippets_sections] =
+    useContextState(SNIPPETS_SECTIONS);
   const [step, set_step, step_ref] = useStateRef<number>(0);
   const parsed_data = useMemo(
     () =>
@@ -43,7 +46,8 @@ export const ImportForm: Preact.FunctionComponent<{
             messages,
             snippets,
             categories,
-            uncat_msgs
+            uncat_msgs,
+            snippets_sections
           )
         : null,
     [data]
@@ -54,8 +58,10 @@ export const ImportForm: Preact.FunctionComponent<{
   const [messages_final_result, set_messages_final_result] =
     useStateIfMounted<TTS.Message[]>(undefined);
   const [snippets_dupes_result, set_snippets_dupes_result] =
-    useStateIfMounted<TTS.SnippetsSection[]>(undefined);
+    useStateIfMounted<TTS.Snippet[]>(undefined);
   const [snippets_final_result, set_snippets_final_result] =
+    useStateIfMounted<TTS.Snippet[]>(undefined);
+  const [sections_final_result, set_sections_final_result] =
     useStateIfMounted<TTS.SnippetsSection[]>(undefined);
 
   const next_step = useCallback(() => set_step(step_ref.current + 1), []);
@@ -76,6 +82,7 @@ export const ImportForm: Preact.FunctionComponent<{
     messages_result_initial,
     snippets_result_initial,
     categories_result_initial,
+    sections_result_initial,
     uncat_result,
     dup_messages = [],
     rename_messages = [],
@@ -118,11 +125,30 @@ export const ImportForm: Preact.FunctionComponent<{
         )
       );
     }
+    let sections_final: TTS.SnippetsSection[] | undefined;
+    if (sections_final_result) {
+      sections_final = sections_final_result
+        .map(s => ({
+          ...s,
+          data: s.data.filter(id =>
+            (snippets_final_result ?? snippets).some(sn => sn.id === id)
+          ),
+        }))
+        .filter(
+          c =>
+            snippets_sections.some(ca => ca.name === c.name) ||
+            c.data.length > 0
+        );
+      set_snippets_sections(sections_final);
+    }
+
     set_success(true);
   }, [
     settings_result,
     messages_final_result,
     snippets_final_result,
+    sections_final_result,
+    snippets_sections,
     categories_result_initial,
     categories,
     messages,
@@ -150,6 +176,9 @@ export const ImportForm: Preact.FunctionComponent<{
       }
       if (categories_result_initial) {
         set_categories(categories_result_initial);
+      }
+      if (sections_result_initial) {
+        set_snippets_sections(sections_result_initial);
       }
       if (uncat_result) {
         set_uncat_msgs(
@@ -186,6 +215,9 @@ export const ImportForm: Preact.FunctionComponent<{
     } else if (dup_snippets.length === 0 && uncategorized_snippets.length > 0) {
       set_snippets_dupes_result(snippets);
     }
+    if (uncategorized_snippets.length > 0) {
+      set_sections_final_result(sections_result_initial);
+    }
   }, [parsed_data]);
 
   const steps = useMemo(() => {
@@ -217,6 +249,7 @@ export const ImportForm: Preact.FunctionComponent<{
     if (dup_snippets.length !== 0) {
       arr.push(
         <ImportDuplicateSnippets
+          sections={sections_result_initial ?? snippets_sections}
           current={step === arr.length}
           snippets={snippets_result_initial ?? snippets}
           updateSnippets={set_snippets_dupes_result}
@@ -230,6 +263,8 @@ export const ImportForm: Preact.FunctionComponent<{
       arr.push(
         <ImportUncategorizedSnippets
           current={step === arr.length}
+          sections={sections_result_initial}
+          updateSections={set_sections_final_result}
           snippets={snippets_dupes_result}
           updateSnippets={set_snippets_final_result}
           uncategorized={uncategorized_snippets}

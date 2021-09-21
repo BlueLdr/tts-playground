@@ -1,10 +1,16 @@
 import * as Preact from "preact";
-import { useMemo } from "preact/hooks";
-import { export_snippets_section, generate_file } from "~/view/components";
+import { useContext, useMemo } from "preact/hooks";
+import { SNIPPETS } from "~/model";
+import {
+  export_snippets,
+  export_snippets_section,
+  generate_file,
+} from "~/view/components";
 
 export const ExportSnippetsSection: Preact.FunctionComponent<{
   section: TTS.SnippetsSection;
 }> = ({ section }) => {
+  const snippets = useContext(SNIPPETS).value;
   const filename = useMemo(
     () =>
       `tts-snippets-section-${section.name
@@ -16,10 +22,13 @@ export const ExportSnippetsSection: Preact.FunctionComponent<{
         .replace(/\W/gi, "")}.json`,
     [section]
   );
-  const data = useMemo(
-    () => generate_file(export_snippets_section(section)),
-    [section]
-  );
+  const data = useMemo(() => {
+    const output = {
+      ...export_snippets_section(section),
+      data: export_snippets(snippets.filter(s => section.data.includes(s.id))),
+    };
+    return generate_file(output);
+  }, [section]);
 
   return (
     <a

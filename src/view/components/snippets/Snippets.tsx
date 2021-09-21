@@ -148,7 +148,6 @@ export const SnippetsList: Preact.FunctionComponent = () => {
   );
 
   const on_delete_section = useCallback(() => {
-    console.log(`edit_target_sec: `, edit_section_target);
     remove_snippets_in_section(edit_section_target);
     set_sections(
       remove_item_from(
@@ -267,7 +266,7 @@ export const SnippetsList: Preact.FunctionComponent = () => {
               )
             }
             isNew={!edit_row_target}
-            dismiss={() => set_edit_row_target_id(null)}
+            dismiss={() => set_edit_row_target_id(null, null)}
           />
         )}
 
