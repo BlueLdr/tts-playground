@@ -26,6 +26,7 @@ jobs:
       - run: echo "TTS_NAME=${TTS_TAG/-release/}" >> $GITHUB_ENV
       - run: echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY" >> $GITHUB_ENV
       - run: echo "export TTS_VERSION=$TTS_NAME" >> .env
+      - run: TTS_RELEASE_VERSION=$TTS_NAME node scripts/ensure-version.js
 
       - run: npm ci
       - run: npm run build
