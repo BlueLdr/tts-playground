@@ -202,7 +202,11 @@ const OrganizerBase = <T extends any>({
   );
 
   return (
-    <div className={class_names("")} onDropCapture={on_drop}>
+    <div
+      className={class_names("")}
+      onDropCapture={on_drop}
+      data-reorder={`${reorderEnabled}`}
+    >
       <RenderHeader
         className={class_names("-header")}
         buttons={
