@@ -203,6 +203,10 @@ export const ImportForm: Preact.FunctionComponent<{
       set_messages_dupes_result(messages);
     }
 
+    if (sections_result_initial) {
+      set_sections_final_result(sections_result_initial);
+    }
+
     if (snippets_result_initial) {
       set_snippets_dupes_result(snippets_result_initial);
       set_snippets_final_result(snippets_result_initial);
@@ -214,9 +218,6 @@ export const ImportForm: Preact.FunctionComponent<{
       set_snippets_final_result(snippets);
     } else if (dup_snippets.length === 0 && uncategorized_snippets.length > 0) {
       set_snippets_dupes_result(snippets);
-    }
-    if (uncategorized_snippets.length > 0) {
-      set_sections_final_result(sections_result_initial);
     }
   }, [parsed_data]);
 
