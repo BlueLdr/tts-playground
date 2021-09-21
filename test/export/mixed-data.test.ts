@@ -28,13 +28,22 @@ import {
 import {
   SNIPPET_ONE,
   SNIPPET_TWO,
+  SNIPPET_S1_ONE,
+  SNIPPET_S1_TWO,
+  SNIPPET_S1_THREE,
+  SNIPPET_S2_ONE,
+  SNIPPET_S2_TWO,
+  SNIPPET_S2_THREE,
   SNIPPET_SECTION_ONE,
   SNIPPET_SECTION_TWO,
+  SNIPPET_THREE,
+
   // @ts-expect-error:
 } from "./data/snippets.ts";
 import { map_category_msg_ids } from "./data/utils";
 const messages_list = require("./data/messages.json");
-const snippets_list = require("./data/snippets-sections.json");
+const snippets_sections_list = require("./data/snippets-sections.json");
+const snippets_list = require("./data/snippets.json");
 const categories_list = require("./data/message-categories.json");
 const uncat_messages_list = require("./data/messages-uncategorized.json");
 const settings = require("./data/settings.json");
@@ -45,6 +54,14 @@ const message_three = conform_to_schema(MESSAGE_THREE, MESSAGE_SCHEMA);
 const message_four = conform_to_schema(MESSAGE_FOUR, MESSAGE_SCHEMA);
 const snippet_one = conform_to_schema(SNIPPET_ONE, SNIPPET_SCHEMA);
 const snippet_two = conform_to_schema(SNIPPET_TWO, SNIPPET_SCHEMA);
+const snippet_three = conform_to_schema(SNIPPET_THREE, SNIPPET_SCHEMA);
+
+const snippet_s1_one = conform_to_schema(SNIPPET_S1_ONE, SNIPPET_SCHEMA);
+const snippet_s1_two = conform_to_schema(SNIPPET_S1_TWO, SNIPPET_SCHEMA);
+const snippet_s1_three = conform_to_schema(SNIPPET_S1_THREE, SNIPPET_SCHEMA);
+const snippet_s2_one = conform_to_schema(SNIPPET_S2_ONE, SNIPPET_SCHEMA);
+const snippet_s2_two = conform_to_schema(SNIPPET_S2_TWO, SNIPPET_SCHEMA);
+const snippet_s2_three = conform_to_schema(SNIPPET_S2_THREE, SNIPPET_SCHEMA);
 const snippet_section_one = conform_to_schema(
   SNIPPET_SECTION_ONE,
   SNIPPET_SECTION_SCHEMA
@@ -92,6 +109,9 @@ test("successfully import array of mixed data", t => {
   const input = [
     MESSAGE_ONE,
     SNIPPET_TWO,
+    SNIPPET_S2_ONE,
+    SNIPPET_S2_TWO,
+    SNIPPET_S2_THREE,
     SNIPPET_SECTION_TWO,
     settings_input,
     MESSAGE_CATEGORY_THREE,
@@ -105,6 +125,7 @@ test("successfully import array of mixed data", t => {
     messages_result,
     snippets_result,
     categories_result,
+    snippets_sections_result,
     uncat_result,
     dup_messages,
     rename_messages,
@@ -116,7 +137,8 @@ test("successfully import array of mixed data", t => {
     [...initial_messages, message_two, message_four],
     snippets_list,
     [...categories_list, category_five],
-    uncat_category
+    uncat_category,
+    snippets_sections_list
   );
 
   const settings_output = {
@@ -138,7 +160,16 @@ test("successfully import array of mixed data", t => {
     category_three,
     category_two,
   ]);
-  t.deepEqual(snippets_result, [...snippets_list, snippet_section_two]);
+  t.deepEqual(snippets_result, [
+    ...snippets_list,
+    snippet_s2_one,
+    snippet_s2_two,
+    snippet_s2_three,
+  ]);
+  t.deepEqual(snippets_sections_result, [
+    ...snippets_sections_list,
+    snippet_section_two,
+  ]);
   t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
@@ -160,7 +191,7 @@ test("successfully import array of mixed data with duplicates", t => {
   const DUPLICATE_M_THREE = { ...MESSAGE_THREE, id: "duplicate-msg-3" };
   const { __type: _1, ...duplicate_m_one } = DUPLICATE_M_ONE;
   const { __type: _2, ...duplicate_m_two } = DUPLICATE_M_TWO;
-  const duplicate_s_one = {
+  const DUPLICATE_S_ONE = {
     ...SNIPPET_ONE,
     options: {
       ...SNIPPET_ONE.options,
@@ -169,7 +200,7 @@ test("successfully import array of mixed data with duplicates", t => {
   };
   const duplicate_ss_one = {
     ...SNIPPET_SECTION_ONE,
-    data: [duplicate_s_one, SNIPPET_TWO],
+    data: [DUPLICATE_S_ONE, SNIPPET_TWO],
   };
   const CATEGORY_WITH_DUPS = {
     ...MESSAGE_CATEGORY_TWO,
@@ -184,11 +215,15 @@ test("successfully import array of mixed data with duplicates", t => {
     duplicate_ss_one,
     DUPLICATE_M_THREE,
     SNIPPET_SECTION_TWO,
+    SNIPPET_S2_ONE,
+    SNIPPET_S2_TWO,
+    SNIPPET_S2_THREE,
     SNIPPET_TWO,
     MESSAGE_FOUR,
     MESSAGE_CATEGORY_THREE,
     MESSAGE_CATEGORY_FOUR,
     CATEGORY_WITH_DUPS,
+    SNIPPET_THREE,
   ];
   const messages_before = [
     ...initial_messages,
@@ -198,9 +233,16 @@ test("successfully import array of mixed data with duplicates", t => {
   ];
   const snippets_before = [
     ...snippets_list,
+    snippet_s1_one,
+    snippet_s1_two,
+    snippet_s1_three,
+    snippet_one,
+  ];
+  const snippets_sections_before = [
+    ...snippets_sections_list,
     {
       ...snippet_section_one,
-      data: [...snippet_section_one.data, snippet_one],
+      data: [...snippet_section_one.data, snippet_one.id],
     },
   ];
   const categories_before = [...categories_list, category_one, category_five];
@@ -209,6 +251,7 @@ test("successfully import array of mixed data with duplicates", t => {
     messages_result,
     snippets_result,
     categories_result,
+    snippets_sections_result,
     uncat_result,
     dup_messages,
     rename_messages,
@@ -220,34 +263,36 @@ test("successfully import array of mixed data with duplicates", t => {
     messages_before,
     snippets_before,
     categories_before,
-    uncat_category
+    uncat_category,
+    snippets_sections_before
   );
 
-  const { __type, ...duplicate_s_one_after } = duplicate_s_one;
+  const { __type, ...duplicate_s_one } = DUPLICATE_S_ONE;
 
   t.is(settings_result, undefined);
   t.deepEqual(messages_result, [...messages_before, message_four]);
   t.deepEqual(snippets_result, [
-    ...snippets_list,
-    {
-      ...snippet_section_one,
-      data: [...snippet_section_one.data, snippet_one, snippet_two],
-    },
-    snippet_section_two,
+    ...snippets_before,
+    snippet_two,
+    snippet_s2_one,
+    snippet_s2_two,
+    snippet_s2_three,
   ]);
   t.deepEqual(categories_result, [
     ...categories_before,
     category_four,
     { ...category_with_dups, data: [duplicate_m_one.id] },
   ]);
+  t.deepEqual(snippets_sections_result, [
+    ...snippets_sections_before,
+    snippet_section_two,
+  ]);
 
   t.deepEqual(dup_messages, [duplicate_m_two]);
   t.deepEqual(rename_messages, [duplicate_m_one]);
-  t.deepEqual(dup_snippets, [
-    { ...snippet_section_one, data: [duplicate_s_one_after] },
-  ]);
+  t.deepEqual(dup_snippets, [duplicate_s_one]);
   t.deepEqual(uncat_result, uncat_category);
-  t.deepEqual(uncategorized_snippets, []);
+  t.deepEqual(uncategorized_snippets, [snippet_three]);
 });
 
 test("successfully import ExportData object", t => {
@@ -264,7 +309,7 @@ test("successfully import ExportData object", t => {
   const DUPLICATE_M_THREE = { ...MESSAGE_THREE, id: "duplicate-msg-3" };
   const { __type: _1, ...duplicate_m_one } = DUPLICATE_M_ONE;
   const { __type: _2, ...duplicate_m_two } = DUPLICATE_M_TWO;
-  const duplicate_s_one = {
+  const DUPLICATE_S_ONE = {
     ...SNIPPET_ONE,
     options: {
       ...SNIPPET_ONE.options,
@@ -273,7 +318,7 @@ test("successfully import ExportData object", t => {
   };
   const duplicate_ss_one = {
     ...SNIPPET_SECTION_ONE,
-    data: [duplicate_s_one, SNIPPET_TWO],
+    data: [DUPLICATE_S_ONE.id, SNIPPET_TWO.id],
   };
   const CATEGORY_WITH_DUPS = {
     ...MESSAGE_CATEGORY_TWO,
@@ -295,7 +340,14 @@ test("successfully import ExportData object", t => {
       MESSAGE_CATEGORY_FOUR,
       CATEGORY_WITH_DUPS,
     ],
-    snippets: [duplicate_ss_one, SNIPPET_SECTION_TWO],
+    snippets: [
+      DUPLICATE_S_ONE,
+      SNIPPET_TWO,
+      SNIPPET_S2_ONE,
+      SNIPPET_S2_TWO,
+      SNIPPET_S2_THREE,
+    ],
+    snippetsSections: [duplicate_ss_one, SNIPPET_SECTION_TWO],
     settings: {
       __type: "settings",
       ...settings,
@@ -308,11 +360,19 @@ test("successfully import ExportData object", t => {
     message_two,
     message_three,
   ];
+
   const snippets_before = [
     ...snippets_list,
+    snippet_s1_one,
+    snippet_s1_two,
+    snippet_s1_three,
+    snippet_one,
+  ];
+  const snippets_sections_before = [
+    ...snippets_sections_list,
     {
       ...snippet_section_one,
-      data: [...snippet_section_one.data, snippet_one],
+      data: [...snippet_section_one.data, snippet_one.id],
     },
   ];
   const categories_before = [...categories_list, category_one, category_five];
@@ -321,6 +381,7 @@ test("successfully import ExportData object", t => {
     messages_result,
     snippets_result,
     categories_result,
+    snippets_sections_result,
     uncat_result,
     dup_messages,
     rename_messages,
@@ -332,10 +393,11 @@ test("successfully import ExportData object", t => {
     messages_before,
     snippets_before,
     categories_before,
-    uncat_category
+    uncat_category,
+    snippets_sections_before
   );
 
-  const { __type, ...duplicate_s_one_after } = duplicate_s_one;
+  const { __type, ...duplicate_s_one } = DUPLICATE_S_ONE;
 
   t.deepEqual(settings_result, {
     ...settings,
@@ -343,24 +405,25 @@ test("successfully import ExportData object", t => {
   });
   t.deepEqual(messages_result, [...messages_before, message_four]);
   t.deepEqual(snippets_result, [
-    ...snippets_list,
-    {
-      ...snippet_section_one,
-      data: [...snippet_section_one.data, snippet_one, snippet_two],
-    },
-    snippet_section_two,
+    ...snippets_before,
+    snippet_two,
+    snippet_s2_one,
+    snippet_s2_two,
+    snippet_s2_three,
   ]);
   t.deepEqual(categories_result, [
     ...categories_before,
     category_four,
     { ...category_with_dups, data: [duplicate_m_one.id] },
   ]);
+  t.deepEqual(snippets_sections_result, [
+    ...snippets_sections_before,
+    snippet_section_two,
+  ]);
 
   t.deepEqual(dup_messages, [duplicate_m_two]);
   t.deepEqual(rename_messages, [duplicate_m_one]);
-  t.deepEqual(dup_snippets, [
-    { ...snippet_section_one, data: [duplicate_s_one_after] },
-  ]);
+  t.deepEqual(dup_snippets, [duplicate_s_one]);
   t.deepEqual(uncat_result, uncat_category);
   t.deepEqual(uncategorized_snippets, []);
 });

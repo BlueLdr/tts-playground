@@ -11,6 +11,7 @@ import {
   MESSAGE_CATEGORIES,
   MESSAGES,
   SNIPPETS,
+  SNIPPETS_SECTIONS,
   UNCATEGORIZED_MESSAGES,
 } from "~/model";
 import {
@@ -18,8 +19,8 @@ import {
   export_message_categories,
   export_messages,
   export_snippets,
+  export_snippets_sections,
   generate_file,
-  is_duplicate_snippet,
   ResetStorage,
   Snippet,
 } from "~/view/components";
@@ -33,27 +34,12 @@ export const ExportForm: Preact.FunctionComponent<{ dismiss: () => void }> = ({
   const categories = useContext(MESSAGE_CATEGORIES).value;
   const uncat_msgs = useContext(UNCATEGORIZED_MESSAGES).value;
   const snippets = useContext(SNIPPETS).value;
+  const sections = useContext(SNIPPETS_SECTIONS).value;
   const link_ref = useRef<HTMLAnchorElement>();
 
   const [exp_messages, set_exp_messages] = useStateIfMounted(messages);
   const [exp_snippets, set_exp_snippets] = useStateIfMounted(snippets);
   const [exp_settings, set_exp_settings] = useStateIfMounted(false);
-
-  const no_snippets_selected = useMemo(() => {
-    let all_empty = true;
-    for (let i = 0; i < exp_snippets.length; i++) {
-      let exp = exp_snippets[i];
-      let data = snippets[i];
-      if (exp.name !== data?.name) {
-        data = snippets.find(s => s.name === exp.name);
-        if (!data) {
-          return false;
-        }
-      }
-      all_empty = all_empty && exp.data.length === 0;
-    }
-    return all_empty;
-  }, [exp_snippets, snippets]);
 
   const [exp_data, set_exp_data] = useStateIfMounted<string | undefined>(
     undefined
@@ -76,23 +62,31 @@ export const ExportForm: Preact.FunctionComponent<{ dismiss: () => void }> = ({
           }))
           .filter(c => c.data.length > 0)
       );
-      if (no_snippets_selected && !exp_settings) {
+      if (exp_snippets.length === 0 && !exp_settings) {
         set_filename(`tts-data-messages`);
         set_exp_data(generate_file(export_data));
         return;
       }
     }
-    if (!no_snippets_selected) {
+    if (exp_snippets.length > 0) {
       export_data.snippets = export_snippets(exp_snippets);
+      export_data.snippetsSections = export_snippets_sections(
+        sections
+          .map(s => ({
+            ...s,
+            data: s.data.filter(id => exp_snippets.some(sn => sn.id === id)),
+          }))
+          .filter(s => s.data.length > 0)
+      );
       if (exp_messages.length === 0 && !exp_settings) {
         set_filename(`tts-data-snippets`);
-        set_exp_data(generate_file(export_data.snippets));
+        set_exp_data(generate_file(export_data));
         return;
       }
     }
     if (exp_settings) {
       export_data.settings = { ...settings, __type: "settings" };
-      if (!exp_messages && !exp_snippets) {
+      if (exp_messages.length === 0 && exp_snippets.length === 0) {
         set_filename(`tts-data-settings`);
         set_exp_data(generate_file(export_data.settings));
         return;
@@ -139,6 +133,7 @@ export const ExportForm: Preact.FunctionComponent<{ dismiss: () => void }> = ({
             </li>
             <li>
               <ExportSnippetsTree
+                sections={sections}
                 snippets={snippets}
                 selection={exp_snippets}
                 setSelection={set_exp_snippets}
@@ -255,6 +250,7 @@ export const ExportMessageTree: Preact.FunctionComponent<{
         Render: RenderLabel,
       });
     }
+    return cats;
   }, []);
 
   const [checklist_items, set_checklist_items] = useStateIfMounted(
@@ -286,30 +282,30 @@ export const ExportMessageTree: Preact.FunctionComponent<{
 };
 
 export const ExportSnippetsTree: Preact.FunctionComponent<{
-  snippets: TTS.SnippetsSection[];
-  selection: TTS.SnippetsSection[];
-  setSelection: (items: TTS.SnippetsSection[]) => void;
-}> = ({ snippets, selection, setSelection }) => {
-  const checklist_items_initial = useMemo(
+  sections: TTS.SnippetsSection[];
+  snippets: TTS.Snippet[];
+  selection: TTS.Snippet[];
+  setSelection: (items: TTS.Snippet[]) => void;
+}> = ({ snippets, sections, selection, setSelection }) => {
+  const checklist_items_initial = useMemo<
+    ExpandableChecklistItem<TTS.SnippetsSectionPopulated>[]
+  >(
     () =>
-      snippets.map(g => {
-        const group_selected = selection.find(gr => g.name === gr.name);
-        return {
-          data: g,
-          key: g.name,
-          selected: group_selected
-            ? g.data.map(s => ({
-                data: s,
-                key: `${s.options.prefix}${s.text}${s.options.suffix}`,
-                selected: !!group_selected?.data?.filter(sn =>
-                  is_duplicate_snippet(sn, s)
-                ),
-                Render: Snippet,
-              }))
-            : [],
-          Render: RenderLabel,
-        } as ExpandableChecklistItem<TTS.SnippetsSection>;
-      }),
+      sections.map(s => ({
+        // @ts-expect-error:
+        data: s as TTS.SnippetsSectionPopulated,
+        key: s.name,
+        selected: s.data.map(
+          id =>
+            ({
+              data: snippets.find(m => m.id === id),
+              key: id,
+              selected: !!selection.find(snip => snip.id === id),
+              Render: Snippet,
+            } as ExpandableChecklistItem<TTS.Snippet>)
+        ),
+        Render: RenderLabel,
+      })),
     []
   );
 
@@ -324,12 +320,11 @@ export const ExportSnippetsTree: Preact.FunctionComponent<{
       return;
     }
     setSelection(
-      checklist_items
-        .map(i => ({
-          ...i.data,
-          data: i.selected.filter(s => s.selected).map(s => s.data),
-        }))
-        .filter(i => i.data.length > 0)
+      checklist_items.reduce(
+        (items, c) =>
+          items.concat(c.selected.filter(i => i.selected).map(i => i.data)),
+        [] as TTS.Snippet[]
+      )
     );
   }, [checklist_items]);
 

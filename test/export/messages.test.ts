@@ -52,6 +52,7 @@ test("import one message", t => {
     messages_result,
     snippets_result,
     categories_result,
+    snippets_sections_result,
     uncat_result,
     dup_messages,
     rename_messages,
@@ -63,7 +64,8 @@ test("import one message", t => {
     messages_list,
     [],
     message_categories,
-    uncat_category
+    uncat_category,
+    []
   );
   t.deepEqual(messages_result, [...messages_list, message_one]);
   t.deepEqual(get_uncategorized(messages_result, message_categories), [
@@ -77,6 +79,7 @@ test("import one message", t => {
 
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.is(snippets_sections_result, undefined);
   t.is(categories_result, undefined);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
@@ -91,6 +94,7 @@ test("import one message in array", t => {
     messages_result,
     snippets_result,
     categories_result,
+    snippets_sections_result,
     uncat_result,
     dup_messages,
     rename_messages,
@@ -102,7 +106,8 @@ test("import one message in array", t => {
     messages_list,
     [],
     message_categories,
-    uncat_category
+    uncat_category,
+    []
   );
   t.deepEqual(messages_result, [...messages_list, message_one]);
   t.deepEqual(get_uncategorized(messages_result, message_categories), [
@@ -116,6 +121,7 @@ test("import one message in array", t => {
 
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.is(snippets_sections_result, undefined);
   t.is(categories_result, undefined);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
@@ -132,6 +138,7 @@ test("import many messages", t => {
     messages_result,
     snippets_result,
     categories_result,
+    snippets_sections_result,
     uncat_result,
     dup_messages,
     rename_messages,
@@ -143,7 +150,8 @@ test("import many messages", t => {
     messages_list,
     [],
     message_categories,
-    uncat_category
+    uncat_category,
+    []
   );
   t.deepEqual(messages_result, [
     ...messages_list,
@@ -169,6 +177,7 @@ test("import many messages", t => {
 
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.is(snippets_sections_result, undefined);
   t.is(categories_result, undefined);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
@@ -192,6 +201,7 @@ test("import message with duplicate text", t => {
     messages_result,
     snippets_result,
     categories_result,
+    snippets_sections_result,
     uncat_result,
     dup_messages,
     rename_messages,
@@ -203,7 +213,8 @@ test("import message with duplicate text", t => {
     [...messages_list, message_one],
     [],
     message_categories,
-    uncat_input
+    uncat_input,
+    []
   );
 
   t.is(messages_result, undefined);
@@ -212,6 +223,7 @@ test("import message with duplicate text", t => {
   t.is(categories_result, undefined);
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.is(snippets_sections_result, undefined);
   t.deepEqual(uncat_result, uncat_input);
   t.deepEqual(rename_messages, []);
   t.deepEqual(dup_snippets, []);
@@ -235,6 +247,7 @@ test("import message with duplicate name", t => {
     messages_result,
     snippets_result,
     categories_result,
+    snippets_sections_result,
     uncat_result,
     dup_messages,
     rename_messages,
@@ -246,7 +259,8 @@ test("import message with duplicate name", t => {
     [...messages_list, message_one],
     [],
     message_categories,
-    uncat_input
+    uncat_input,
+    []
   );
 
   t.is(messages_result, undefined);
@@ -254,6 +268,7 @@ test("import message with duplicate name", t => {
 
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.is(snippets_sections_result, undefined);
   t.is(categories_result, undefined);
   t.deepEqual(uncat_result, uncat_input);
   t.deepEqual(dup_messages, []);
@@ -272,6 +287,7 @@ test("reject importing exact duplicate message", t => {
     messages_result,
     snippets_result,
     categories_result,
+    snippets_sections_result,
     uncat_result,
     dup_messages,
     rename_messages,
@@ -283,12 +299,14 @@ test("reject importing exact duplicate message", t => {
     [...messages_list, message_one],
     [],
     message_categories,
-    uncat_input
+    uncat_input,
+    []
   );
 
   t.is(messages_result, undefined);
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.is(snippets_sections_result, undefined);
   t.is(categories_result, undefined);
   t.deepEqual(uncat_result, uncat_input);
   t.deepEqual(dup_messages, []);
@@ -330,6 +348,7 @@ test("import mix of duplicate messages", t => {
     messages_result,
     snippets_result,
     categories_result,
+    snippets_sections_result,
     uncat_result,
     dup_messages,
     rename_messages,
@@ -348,7 +367,8 @@ test("import mix of duplicate messages", t => {
         message_two.id,
         message_three.id,
       ]),
-    }
+    },
+    []
   );
 
   t.deepEqual(messages_result, [...initial_messages, message_four]);
@@ -381,6 +401,7 @@ test("import mix of duplicate messages", t => {
 
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.is(snippets_sections_result, undefined);
   t.is(categories_result, undefined);
   t.deepEqual(dup_snippets, []);
   t.deepEqual(uncategorized_snippets, []);
@@ -394,6 +415,7 @@ test("create new id for different message with same id", t => {
     messages_result,
     snippets_result,
     categories_result,
+    snippets_sections_result,
     uncat_result,
     dup_messages,
     rename_messages,
@@ -408,7 +430,8 @@ test("create new id for different message with same id", t => {
     {
       ...uncat_category,
       data: uncat_category.data.concat([message_one.id]),
-    }
+    },
+    []
   );
 
   const new_msg = messages_result?.find(
@@ -428,6 +451,7 @@ test("create new id for different message with same id", t => {
 
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.is(snippets_sections_result, undefined);
   t.is(categories_result, undefined);
   t.deepEqual(dup_messages, []);
   t.deepEqual(rename_messages, []);
@@ -447,6 +471,7 @@ test("reject duplicate message with different id", t => {
     messages_result,
     snippets_result,
     categories_result,
+    snippets_sections_result,
     uncat_result,
     dup_messages,
     rename_messages,
@@ -458,12 +483,14 @@ test("reject duplicate message with different id", t => {
     [...messages_list, message_one],
     [],
     message_categories,
-    uncat_input
+    uncat_input,
+    []
   );
 
   t.is(messages_result, undefined);
   t.is(settings_result, undefined);
   t.is(snippets_result, undefined);
+  t.is(snippets_sections_result, undefined);
   t.is(categories_result, undefined);
   t.deepEqual(uncat_result, uncat_input);
   t.deepEqual(dup_messages, []);

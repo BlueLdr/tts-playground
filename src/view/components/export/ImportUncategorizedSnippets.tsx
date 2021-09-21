@@ -18,15 +18,19 @@ interface UncategorizedSnippetRow {
 
 export const ImportUncategorizedSnippets: Preact.FunctionComponent<{
   current: boolean;
-  snippets: TTS.SnippetsSection[];
-  updateSnippets: (snippets: TTS.SnippetsSection[]) => void;
+  sections: TTS.SnippetsSection[];
+  updateSections: (snippets: TTS.SnippetsSection[]) => void;
+  snippets: TTS.Snippet[];
+  updateSnippets: (snippets: TTS.Snippet[]) => void;
   uncategorized: TTS.Snippet[];
   nextStep: () => void;
   prevStep: () => void;
 }> = ({
   uncategorized,
-  updateSnippets,
+  sections,
+  updateSections,
   snippets,
+  updateSnippets,
   nextStep,
   prevStep,
   current,
@@ -99,13 +103,28 @@ export const ImportUncategorizedSnippets: Preact.FunctionComponent<{
     [result]
   );
 
+  const list = useMemo(
+    () =>
+      sections?.concat(
+        result
+          .filter(
+            r =>
+              !!r.selected &&
+              !sections.find(sec => sec.name === r.selected?.name)
+          )
+          .map(r => r.selected)
+      ),
+    [sections, result]
+  );
+
   const on_submit = useCallback(
     e => {
       e.preventDefault();
       if (!finished) {
         return;
       }
-      let output = snippets ?? [];
+      let output = list ?? [];
+      let snippets_output = snippets ?? [];
       if (select_all_ref.current === true) {
         nextStep();
         return;
@@ -115,6 +134,9 @@ export const ImportUncategorizedSnippets: Preact.FunctionComponent<{
         if (!row.selected || row.discard) {
           continue;
         }
+        if (!snippets_output.some(s => s.id === row.snippet.id)) {
+          snippets_output.push(row.snippet);
+        }
         const section =
           output.find(s => s.name === row.selected.name) ?? row.selected;
         output = replace_item_in(
@@ -122,29 +144,18 @@ export const ImportUncategorizedSnippets: Preact.FunctionComponent<{
           s => s.name === row.selected.name,
           {
             ...section,
-            data: add_item_to(section.data, row.snippet),
+            data: add_item_to(section.data, row.snippet.id),
           },
           "end"
         );
       }
-      updateSnippets(output);
+      updateSections(output);
+      updateSnippets(
+        snippets_output.filter(sn => output.some(s => s.data.includes(sn.id)))
+      );
       nextStep();
     },
-    [finished, result, snippets]
-  );
-
-  const sections = useMemo(
-    () =>
-      snippets?.concat(
-        result
-          .filter(
-            r =>
-              !!r.selected &&
-              !snippets.find(sec => sec.name === r.selected?.name)
-          )
-          .map(r => r.selected)
-      ),
-    [snippets, result]
+    [finished, result, sections, snippets]
   );
 
   return current ? (
@@ -181,7 +192,7 @@ export const ImportUncategorizedSnippets: Preact.FunctionComponent<{
                 <ImportSnippetCategorizeItem
                   key={i}
                   row={s}
-                  sections={sections}
+                  sections={list}
                   onChangeDiscard={on_change_discard}
                   onSelect={on_select_section}
                 />

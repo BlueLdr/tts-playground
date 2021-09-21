@@ -7,7 +7,7 @@ import {
   SNIPPET_SCHEMA,
   SNIPPET_SECTION_SCHEMA,
 } from "~/model";
-import { get_uncategorized_messages } from "~/view/utils";
+import { get_uncategorized_messages, snippet_to_string } from "~/view/utils";
 
 const MAX_TYPE_CHECK_DEPTH = 6;
 export const MESSAGE_DUPE_PROPS: readonly (keyof TTS.MessageOptions)[] = [
@@ -41,26 +41,27 @@ export const export_message_categories = (
   data: TTS.MessageCategory[]
 ): TTS.ExportData["messageCategories"] => data.map(export_message_category);
 
-export const export_snippets = (
-  data: TTS.SnippetsSection[]
-): TTS.ExportData["snippets"] => {
-  return data.map(s => ({
-    ...conform_to_schema({ ...s, data: [] }, SNIPPET_SECTION_SCHEMA),
-    __type: "snippets-section" as const,
-    data: s.data.map(sn => export_snippet(sn)),
-  }));
-};
-
 export const export_snippet = (data: TTS.Snippet) => ({
   ...conform_to_schema(data, SNIPPET_SCHEMA),
   __type: "snippet" as const,
 });
 
+export const export_snippets = (
+  data: TTS.Snippet[]
+): TTS.ExportData["snippets"] => {
+  return data.map(export_snippet);
+};
+
 export const export_snippets_section = (data: TTS.SnippetsSection) => ({
-  ...conform_to_schema({ ...data, data: [] }, SNIPPET_SECTION_SCHEMA),
+  ...conform_to_schema(data, SNIPPET_SECTION_SCHEMA),
   __type: "snippets-section" as const,
-  data: data.data.map(sn => export_snippet(sn)),
 });
+
+export const export_snippets_sections = (
+  data: TTS.SnippetsSection[]
+): TTS.ExportData["snippetsSections"] => {
+  return data.map(export_snippets_section);
+};
 
 export const generate_file = (data: object) => JSON.stringify(data, null, "  ");
 
@@ -75,13 +76,15 @@ export const import_data = (
   data: TTS.AnyExportData,
   settings: TTS.EditorSettings,
   messages: TTS.Message[],
-  snippets: TTS.SnippetsSection[],
+  snippets: TTS.Snippet[],
   categories: TTS.MessageCategory[],
-  uncategorized_msgs: TTS.MessageCategory
+  uncategorized_msgs: TTS.MessageCategory,
+  snippets_sections: TTS.SnippetsSection[]
 ) => {
   let new_messages: TTS.Message[] = [];
   let new_categories: TTS.MessageCategory[] = [];
-  let new_snippets: TTS.SnippetsSection[] = [];
+  let new_snippets: TTS.Snippet[] = [];
+  let new_snippets_sections: TTS.SnippetsSection[] = [];
   let new_uncategorized_msgs: TTS.MessageCategory = {
     ...uncategorized_msgs,
     data: [...uncategorized_msgs.data],
@@ -90,8 +93,7 @@ export const import_data = (
   const dup_messages: TTS.Message[] = [];
   const rename_messages: TTS.Message[] = [];
   const merge_categories: TTS.MessageCategory[] = [];
-  const uncategorized_snippets: TTS.Snippet[] = [];
-  const dup_snippets_in_section: TTS.SnippetsSection[] = [];
+  const dup_snippets: TTS.Snippet[] = [];
   const merge_snippet_sections: TTS.SnippetsSection[] = [];
 
   const process_message = (msg: TTS.Message) => {
@@ -178,60 +180,74 @@ export const import_data = (
     return category;
   };
 
-  const process_snippet_section = (section: TTS.SnippetsSection) => {
-    const existing = new_snippets.find(s => s.name === section.name);
-    if (existing) {
-      return existing;
+  const process_snippet = (snip: TTS.Snippet) => {
+    const dupe =
+      snippets.find(s => is_duplicate_snippet(s, snip)) ||
+      new_snippets.find(s => is_duplicate_snippet(s, snip));
+    const exact =
+      !!dupe &&
+      deep_equals(
+        { ...snip, id: "" },
+        conform_to_schema({ ...dupe, id: "" }, SNIPPET_SCHEMA)
+      );
+
+    if (dupe) {
+      if (!exact && !dup_snippets.some(s => is_duplicate_snippet(snip, s))) {
+        dup_snippets.push(snip);
+      }
+      return snip.id;
     }
-    const new_section = { ...section, data: [] };
-    new_snippets.push(new_section);
-    return new_section;
+
+    if (
+      snippets.some(s => s.id === snip.id) ||
+      new_snippets.some(s => s.id === snip.id) /*||
+      dup_snippets.some(s => s.id === snip.id)*/
+    ) {
+      snip = {
+        ...snip,
+        id: generate_id(snippet_to_string(snip)),
+      };
+    }
+
+    new_snippets.push(snip);
+    return snip.id;
   };
 
-  const process_snippet = (
-    snip: TTS.Snippet,
-    section?: TTS.SnippetsSection
+  const process_snippets_section = (
+    sec: TTS.SnippetsSection | TTS.SnippetsSectionPopulated
   ) => {
-    let search = uncategorized_snippets;
-    if (section) {
-      section = process_snippet_section(section);
-      search = section.data;
-    }
-    const dupe =
-      search.find(s => is_duplicate_snippet(s, snip)) ||
-      snippets
-        .find(sect => sect.name === section?.name)
-        ?.data?.find(s => is_duplicate_snippet(s, snip));
+    const all_sects = snippets_sections.concat(new_snippets_sections);
 
-    if (!dupe) {
-      if (!section) {
-        uncategorized_snippets.push(snip);
-      } else {
-        section.data.push(snip);
+    const existing = new_snippets_sections.find(s => s.name === sec.name);
+    const section = existing ??
+      snippets_sections.find(s => s.name === sec.name) ?? {
+        ...sec,
+        data: [],
+      };
+
+    sec.data.forEach(s => {
+      let id: string = s;
+      if (typeof s !== "string") {
+        const { __type, ...snip } = s;
+        id = process_snippet(snip);
       }
-      return;
-    }
-    if (deep_equals(snip, dupe)) {
-      return;
-    }
-    if (!section) {
-      return;
-    }
+      if (!all_sects.find(s => s.data.includes(id))) {
+        section.data.push(id);
+      }
+    });
 
-    const existing = dup_snippets_in_section.find(s => s.name === section.name);
-    if (existing) {
-      existing.data.push(snip);
-    } else {
-      const new_section = { ...section, data: [snip] };
-      dup_snippets_in_section.push(new_section);
+    if (!existing) {
+      new_snippets_sections.push(section);
     }
+    return section;
   };
 
   let settings_result: TTS.EditorSettings | undefined;
   let messages_result: TTS.Message[] | undefined;
   let categories_result: TTS.MessageCategory[] | undefined;
   let uncategorized_msgs_result: TTS.MessageCategory | undefined;
-  let snippets_result: TTS.SnippetsSection[] | undefined;
+  let snippets_result: TTS.Snippet[] | undefined;
+  let snippets_sections_result: TTS.SnippetsSection[] | undefined;
   if (!Array.isArray(data)) {
     if (data.__type === "export-data") {
       const {
@@ -239,6 +255,7 @@ export const import_data = (
         messages: imp_messages,
         messageCategories: imp_categories,
         snippets: imp_snippets,
+        snippetsSections: imp_sections,
       } = data;
 
       if (new_settings) {
@@ -255,9 +272,14 @@ export const import_data = (
           process_message_category(c as TTS.MessageCategory);
         }
       });
-      imp_snippets?.forEach(({ __type, ...s }) => {
+      imp_sections?.forEach(({ __type, ...s }) => {
         if (__type === "snippets-section") {
-          s.data.forEach(({ __type, ...snip }) => process_snippet(snip, s));
+          process_snippets_section(s as TTS.SnippetsSection);
+        }
+      });
+      imp_snippets?.forEach(({ __type, ...s }) => {
+        if (__type === "snippet") {
+          process_snippet(s);
         }
       });
     } else if (data.__type === "settings") {
@@ -272,9 +294,7 @@ export const import_data = (
       process_message_category(new_category);
     } else if (data.__type === "snippets-section") {
       const { __type, ...new_section } = data;
-      new_section.data.forEach(({ __type, ...snip }) =>
-        process_snippet(snip, new_section)
-      );
+      process_snippets_section(new_section as TTS.SnippetsSection);
     } else if (data.__type === "snippet") {
       const { __type, ...new_snippet } = data;
       process_snippet(new_snippet);
@@ -286,9 +306,7 @@ export const import_data = (
       } else if (__type === "message-category") {
         process_message_category(d as TTS.MessageCategory);
       } else if (__type === "snippets-section") {
-        (d as TTS.ExportedSnippetsSection).data.forEach(({ __type, ...snip }) =>
-          process_snippet(snip as TTS.Snippet, d as TTS.SnippetsSection)
-        );
+        process_snippets_section(d as TTS.SnippetsSection);
       } else if (__type === "snippet") {
         process_snippet(d as TTS.Snippet);
       } else if (__type === "settings") {
@@ -359,27 +377,78 @@ export const import_data = (
     ).data,
   };
 
-  new_snippets = new_snippets.filter(ns => {
-    if (snippets.find(s => s.name === ns.name)) {
-      if (ns.data.length > 0) {
-        merge_snippet_sections.push(ns);
+  const uncategorized_snippets = new_snippets.filter(
+    sn =>
+      !snippets_sections
+        .concat(new_snippets_sections)
+        .concat(merge_snippet_sections)
+        .some(s =>
+          s.data.some(
+            snip =>
+              sn.id ===
+              (typeof snip === "string" ? snip : (snip as TTS.Snippet).id)
+          )
+        )
+  );
+  new_snippets = new_snippets.filter(
+    s => !uncategorized_snippets.some(sn => sn.id === s.id)
+  );
+
+  if (new_snippets.length > 0) {
+    snippets_result = snippets.concat(new_snippets);
+  }
+  new_snippets_sections = new_snippets_sections
+    .map(s => ({
+      ...s,
+      data: s.data.filter(sn =>
+        (snippets_result ?? snippets)
+          .concat(dup_snippets)
+          .find(
+            snip =>
+              snip.id === (typeof sn === "string" ? sn : (sn as TTS.Snippet).id)
+          )
+      ),
+    }))
+    .filter(ns => {
+      if (
+        ns.data.length === 0 ||
+        snippets_sections.find(s => s.name === ns.name)
+      ) {
+        if (ns.data.length > 0) {
+          merge_snippet_sections.push(ns);
+        }
+        return false;
       }
-      return false;
-    }
-    return true;
-  });
+      return true;
+    });
 
   if (merge_snippet_sections.length > 0) {
-    snippets_result = snippets.map(s => {
+    snippets_sections_result = snippets_sections.map(s => {
       const new_data = merge_snippet_sections.find(ns => ns.name === s.name);
       if (!new_data) {
         return s;
       }
-      return { ...s, data: s.data.concat(new_data.data) };
+      return {
+        ...s,
+        data: s.data.concat(
+          new_data.data
+            .map(sn => (typeof sn === "string" ? sn : (sn as TTS.Snippet).id))
+            .filter(sn => !s.data.includes(sn))
+        ),
+      };
     });
   }
-  if (new_snippets.length > 0) {
-    snippets_result = (snippets_result ?? snippets).concat(new_snippets);
+  if (new_snippets_sections.length > 0) {
+    snippets_sections_result = (
+      snippets_sections_result ?? snippets_sections
+    ).concat(
+      new_snippets_sections.map(s => ({
+        ...s,
+        data: s.data.map(sn =>
+          typeof sn === "string" ? sn : (sn as TTS.Snippet).id
+        ),
+      }))
+    );
   }
 
   return [
@@ -387,20 +456,12 @@ export const import_data = (
     messages_result,
     snippets_result,
     categories_result,
+    snippets_sections_result,
     uncategorized_msgs_result,
     dup_messages,
     rename_messages,
-    dup_snippets_in_section,
-    uncategorized_snippets.filter(
-      snip =>
-        !(snippets_result ?? snippets ?? []).find(
-          (sect: TTS.SnippetsSection) => {
-            if (sect.data) {
-              return !!sect.data.find(s => is_duplicate_snippet(s, snip));
-            }
-          }
-        )
-    ),
+    dup_snippets,
+    uncategorized_snippets,
   ] as const;
 };
 
@@ -421,7 +482,8 @@ export const validate_import_data = (
     return validated as
       | TTS.ExportData["messages"]
       | TTS.ExportData["snippets"]
-      | TTS.ExportData["messageCategories"];
+      | TTS.ExportData["messageCategories"]
+      | TTS.ExportData["snippetsSections"];
     // }
     // return null;
   }
@@ -471,8 +533,15 @@ export const validate_import_data = (
       output.snippets = validate_import_data(
         data["snippets"],
         depth + 1,
-        "snippets-section"
+        "snippet"
       ) as TTS.ExportData["snippets"];
+    }
+    if (data["snippetsSections"]) {
+      output.snippetsSections = validate_import_data(
+        data["snippetsSections"],
+        depth + 1,
+        "snippets-section"
+      ) as TTS.ExportData["snippetsSections"];
     }
     return output;
   }
@@ -522,17 +591,36 @@ export const validate_import_data = (
 
   if (data["__type"] === "snippets-section") {
     const { data: snippets, ...section } = data as TTS.ExportedSnippetsSection;
-    return {
-      __type: "snippets-section",
-      ...conform_to_schema({ ...section, data: [] }, SNIPPET_SECTION_SCHEMA),
-      data: snippets
-        .filter(s => !!s)
-        .map(
-          s =>
-            validate_import_data(s, depth + 1, "snippet") as TTS.ExportedSnippet
-        )
-        .filter(s => !!s),
-    } as TTS.ExportedSnippetsSection;
+    // if category.data contains a mix of ids and messages, throw it out
+    // @ts-expect-error:
+    const data_type = snippets.reduce((cur, d) => {
+      const this_type = typeof d === "string" ? "string" : "snippet";
+      return !cur || cur === this_type ? this_type : "";
+    }, "");
+    if (data_type === "string") {
+      return {
+        __type: "snippets-section",
+        ...conform_to_schema(data, SNIPPET_SECTION_SCHEMA),
+      };
+    }
+
+    if (data_type === "snippet") {
+      return {
+        __type: "snippets-section",
+        ...conform_to_schema({ ...section, data: [] }, SNIPPET_SECTION_SCHEMA),
+        data: (snippets as TTS.ExportedSnippet[])
+          .filter(s => !!s)
+          .map(
+            s =>
+              validate_import_data(
+                s,
+                depth + 1,
+                "snippet"
+              ) as TTS.ExportedSnippet
+          )
+          .filter(s => !!s),
+      } as TTS.ExportedSnippetsSection;
+    }
   }
 
   return null;

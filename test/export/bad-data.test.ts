@@ -19,13 +19,13 @@ test("return null when validating data without a `__type` in an array", t => {
   t.deepEqual(result, [MESSAGE_TWO]);
 });
 
-test("return null when validating snippet without a `__type` in a snippet section", t => {
+test("return null when validating section with mix of ids and records", t => {
   const { __type, ...s_one } = SNIPPET_ONE;
   const result = validate_import_data({
     ...SNIPPET_SECTION_ONE,
     data: [...SNIPPET_SECTION_ONE.data, s_one],
   });
-  t.deepEqual(result, SNIPPET_SECTION_ONE);
+  t.deepEqual(result, null);
 });
 
 test("return null when validating category with mix of ids and records", t => {

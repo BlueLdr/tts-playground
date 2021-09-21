@@ -4,75 +4,57 @@ import { deep_equals, replace_item_in } from "~/common";
 import { is_duplicate_snippet, Snippet } from "~/view/components";
 import { useStateRef, useStateWithRef } from "~/view/utils";
 
-interface DuplicateSnippetRow {
-  section: TTS.SnippetsSection;
+interface DuplicateSnippet {
+  old_section: TTS.SnippetsSection;
+  new_section: TTS.SnippetsSection;
   old_snippet: TTS.Snippet;
   new_snippet: TTS.Snippet;
   selected: "old" | "new" | undefined;
 }
 
-interface DuplicateSnippetSection {
-  rows: DuplicateSnippetRow[];
-  section: TTS.SnippetsSection;
-}
-
 export const ImportDuplicateSnippets: Preact.FunctionComponent<{
   current: boolean;
-  snippets: TTS.SnippetsSection[];
-  updateSnippets: (snippets: TTS.SnippetsSection[]) => void;
-  duplicates: TTS.SnippetsSection[];
+  snippets: TTS.Snippet[];
+  sections: TTS.SnippetsSection[];
+  updateSnippets: (snippets: TTS.Snippet[]) => void;
+  duplicates: TTS.Snippet[];
   nextStep: () => void;
   prevStep: () => void;
 }> = ({
   current,
   snippets,
+  sections,
   updateSnippets,
   duplicates,
   nextStep,
   prevStep,
 }) => {
-  const result_ref = useRef<DuplicateSnippetSection[]>();
+  const result_ref = useRef<DuplicateSnippet[]>();
   const [select_all, set_select_all, select_all_ref] = useStateRef<
     "old" | "new" | undefined
   >(undefined);
 
-  const items = useMemo<DuplicateSnippetSection[]>(
+  const items = useMemo<DuplicateSnippet[]>(
     () =>
       duplicates
-        .map(sec => {
-          const orig_sec = snippets?.find(sect => sect.name === sec.name);
-          if (!orig_sec) {
+        .map(snip => {
+          const orig_snip = snippets.find(s => is_duplicate_snippet(s, snip));
+          if (!orig_snip) {
             return null;
           }
-          const result_sec = result_ref.current?.find(
-            sect => sect.section.name === sec.name
+          const existing_row = result_ref.current?.find(r =>
+            deep_equals(r.new_snippet, snip)
           );
-          const rows = sec.data
-            .map(snip => {
-              const orig_snip = orig_sec.data.find(s =>
-                is_duplicate_snippet(s, snip)
-              );
-              if (!orig_snip) {
-                return null;
-              }
-              const existing_row = result_sec?.rows?.find(r =>
-                deep_equals(r.new_snippet, snip)
-              );
-              return {
-                section: sec,
-                old_snippet: orig_snip,
-                new_snippet: snip,
-                selected: select_all_ref.current ?? existing_row?.selected,
-              };
-            })
-            .filter(r => !!r);
           return {
-            rows,
-            section: sec,
+            old_section: sections.find(s => s.data.includes(orig_snip.id)),
+            new_section: sections.find(s => s.data.includes(snip.id)),
+            old_snippet: orig_snip,
+            new_snippet: snip,
+            selected: select_all_ref.current ?? existing_row?.selected,
           };
         })
-        .filter(a => !!a),
-    [snippets, duplicates]
+        .filter(r => !!r),
+    [snippets, duplicates, sections]
   );
 
   const [result, set_result] = useStateWithRef(items, result_ref);
@@ -81,46 +63,27 @@ export const ImportDuplicateSnippets: Preact.FunctionComponent<{
     if (!select_all) {
       return;
     }
-    set_result(
-      result.map(s => ({
-        ...s,
-        rows: s.rows.map(r => ({ ...r, selected: select_all })),
-      }))
-    );
+    set_result(result.map(s => ({ ...s, selected: select_all })));
   }, [select_all]);
 
   const on_select = useCallback(
-    (row: DuplicateSnippetRow, selected: "old" | "new") => {
+    (row: DuplicateSnippet, selected: "old" | "new") => {
       set_select_all(undefined);
-      const section = result_ref.current.find(
-        s => s.section.name === row.section.name
-      );
-      const new_section = {
-        ...section,
-        rows: replace_item_in(
-          section.rows,
+      set_result(
+        replace_item_in(
+          result_ref.current,
           r => deep_equals(r.new_snippet, row.new_snippet),
           {
             ...row,
             selected,
           }
-        ),
-      };
-      set_result(
-        replace_item_in(
-          result_ref.current,
-          s => s.section.name === row.section.name,
-          new_section
         )
       );
     },
     []
   );
 
-  const finished = useMemo(
-    () => result.every(s => s.rows.every(r => !!r.selected)),
-    [result]
-  );
+  const finished = useMemo(() => result.every(s => !!s.selected), [result]);
   const on_submit = useCallback(
     e => {
       e.preventDefault();
@@ -128,26 +91,23 @@ export const ImportDuplicateSnippets: Preact.FunctionComponent<{
         return;
       }
       let output = snippets;
-      for (let section of result) {
-        let section_data = section.section.data;
-        for (let row of section.rows) {
-          if (row.selected === "new") {
-            section_data = replace_item_in(
-              section_data,
-              s => is_duplicate_snippet(s, row.old_snippet),
-              row.new_snippet
-            );
+      for (let row of result) {
+        if (row.selected === "new") {
+          if (!row.new_section) {
+            row.new_snippet.id = row.old_snippet.id;
           }
+          output = replace_item_in(
+            output,
+            s => s.id === row.old_snippet.id,
+            row.new_snippet
+          );
         }
-        output = replace_item_in(output, s => s.name === section.section.name, {
-          ...section.section,
-          data: section_data,
-        });
       }
+
       updateSnippets(output);
       nextStep();
     },
-    [finished, result]
+    [finished, result, snippets]
   );
 
   return current ? (
@@ -212,10 +172,10 @@ export const ImportDuplicateSnippets: Preact.FunctionComponent<{
               </tr>
             </thead>
             <tbody>
-              {result.map(s => (
-                <ImportSnippetCompareSection
-                  key={s.section.name}
-                  {...s}
+              {result.map((s, i) => (
+                <ImportSnippetCompareItem
+                  key={i}
+                  row={s}
                   onSelect={on_select}
                 />
               ))}
@@ -239,24 +199,9 @@ export const ImportDuplicateSnippets: Preact.FunctionComponent<{
   ) : null;
 };
 
-export const ImportSnippetCompareSection: Preact.FunctionComponent<{
-  section: TTS.SnippetsSection;
-  rows: DuplicateSnippetRow[];
-  onSelect: (row: DuplicateSnippetRow, selected: "old" | "new") => void;
-}> = ({ section, rows, onSelect }) => (
-  <Preact.Fragment>
-    <tr className="tts-import-compare-snippet-section">
-      <td colSpan={2}>{section.name}</td>
-    </tr>
-    {rows.map((row, i) => (
-      <ImportSnippetCompareItem key={i} row={row} onSelect={onSelect} />
-    ))}
-  </Preact.Fragment>
-);
-
 export const ImportSnippetCompareItem: Preact.FunctionComponent<{
-  row: DuplicateSnippetRow;
-  onSelect: (row: DuplicateSnippetRow, selected: "old" | "new") => void;
+  row: DuplicateSnippet;
+  onSelect: (row: DuplicateSnippet, selected: "old" | "new") => void;
 }> = ({ row, onSelect }) => {
   const { old_snippet, new_snippet, selected } = row;
 
