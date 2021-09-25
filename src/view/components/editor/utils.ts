@@ -1,5 +1,11 @@
-import * as hooks from "preact/hooks";
-import { useCallback, useEffect, useMemo, useRef } from "preact/hooks";
+import {
+  useContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from "preact/hooks";
+import { get_tts_data } from "~/common";
 import { EDITOR_STATE, EditorHistory } from "~/model";
 import { useStateRef, useValueRef } from "~/view/utils";
 
@@ -9,7 +15,7 @@ type TextAction = "type" | "backspace" | "delete" | "replace" | "snippet";
 export const useHistoryListeners = (
   input_ref: preact.RefObject<HTMLTextAreaElement>
 ) => {
-  const editor_state = hooks.useContext(EDITOR_STATE).value;
+  const editor_state = useContext(EDITOR_STATE).value;
   const state_ref = useValueRef(editor_state);
   const { max_length, speed, bits, speed_char, voice } = editor_state;
 
@@ -248,4 +254,33 @@ export const useCtrlZListener = (
       }
     };
   }, [enabled]);
+};
+
+const DURATION_REQUEST: TTS.TTSRequest = {
+  text: "",
+  promise: new Promise(() => {}),
+  data: "",
+};
+const START_AT_CURSOR_OFFSET = 0.6;
+
+export const useSpeechDuration = () => {
+  const voice = useContext(EDITOR_STATE).value.voice;
+  const elem = useMemo(() => document.createElement("audio"), []);
+  return useCallback(
+    async (text: string) => {
+      const data = await get_tts_data(text.trim(), DURATION_REQUEST, voice);
+      return new Promise<number>(resolve => {
+        elem.src = data;
+        elem.addEventListener(
+          "canplaythrough",
+          () => {
+            resolve(elem.duration - START_AT_CURSOR_OFFSET);
+          },
+          { once: true }
+        );
+        elem.load();
+      });
+    },
+    [voice]
+  );
 };

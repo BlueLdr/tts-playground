@@ -15,7 +15,7 @@ export const EditorMain: Preact.FunctionComponent<{
   setState: <T extends TTS.EditorState>(
     new_state: Partial<T> | ((prev_state: T) => T)
   ) => void;
-  onSubmit: (text?: string) => void;
+  onSubmit: (text?: string, start_at_cursor?: boolean) => void;
   inputRef: Preact.RefObject<HTMLTextAreaElement>;
   speed: boolean;
   speedChar: string;
@@ -114,7 +114,7 @@ export const EditorMain: Preact.FunctionComponent<{
             type="submit"
             onClick={e => {
               e.preventDefault();
-              onSubmit(text);
+              onSubmit(text, e.shiftKey);
             }}
           >
             Submit
