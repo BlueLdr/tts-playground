@@ -24,6 +24,7 @@ import {
   SaveMessage,
   StatusIndicator,
   useHistoryListeners,
+  useSpeechDuration,
 } from "~/view/components";
 import {
   ensure_number,
@@ -159,9 +160,26 @@ export const Editor: Preact.FunctionComponent<{
     [max_length, speed, text, message?.name, bits, speed_char, voice]
   );
 
-  const [data, status, submit_message, message_text] =
+  const [data, status, submit_message_, message_text] =
     usePlayMessage(new_message);
+  const get_duration = useSpeechDuration();
+  const should_start_at_timestamp = useRef<boolean>(false);
   const should_submit = useRef<boolean>(false);
+  const submit_message = useCallback(
+    async (new_text: string = text_ref.current) => {
+      let timestamp = 0;
+      if (should_start_at_timestamp.current) {
+        should_start_at_timestamp.current = false;
+        const cursor =
+          new_cursor_start.current > 0
+            ? new_cursor_start.current
+            : input_ref.current.selectionStart;
+        timestamp = await get_duration(new_text.slice(0, cursor));
+      }
+      submit_message_(timestamp);
+    },
+    [submit_message_]
+  );
 
   const text_ref = useValueRef(text);
   const last_update = useRef<string>();
@@ -204,24 +222,31 @@ export const Editor: Preact.FunctionComponent<{
     []
   );
 
-  useEffect(() => {
-    if (should_submit.current) {
-      should_submit.current = false;
-      EditorHistory.keep();
-      submit_message();
-    }
-    if (text === last_update.current) {
-      if (new_cursor_start.current !== -1 && new_cursor_end.current !== -1) {
-        if (input_ref.current) {
-          input_ref.current.selectionStart = new_cursor_start.current;
-          input_ref.current.selectionEnd = new_cursor_end.current;
-        }
-        new_cursor_start.current = -1;
-        new_cursor_end.current = -1;
+  const on_text_change = useCallback(
+    async (new_text: string) => {
+      if (should_submit.current) {
+        should_submit.current = false;
+        EditorHistory.keep();
+        submit_message();
       }
-      push_current_state();
-      last_update.current = "";
-    }
+      if (new_text === last_update.current) {
+        if (new_cursor_start.current !== -1 && new_cursor_end.current !== -1) {
+          if (input_ref.current) {
+            input_ref.current.selectionStart = new_cursor_start.current;
+            input_ref.current.selectionEnd = new_cursor_end.current;
+          }
+          new_cursor_start.current = -1;
+          new_cursor_end.current = -1;
+        }
+        push_current_state();
+        last_update.current = "";
+      }
+    },
+    [submit_message]
+  );
+
+  useEffect(() => {
+    on_text_change(text);
   }, [text]);
 
   const optimize_message = useOptimizeMessageTrigger(
@@ -231,7 +256,10 @@ export const Editor: Preact.FunctionComponent<{
   );
 
   const on_submit = useCallback(
-    () => optimize_message(OptimizeTrigger.submit),
+    (msg_text: string, start_at_cursor?: boolean) => {
+      should_start_at_timestamp.current = start_at_cursor;
+      optimize_message(OptimizeTrigger.submit);
+    },
     [optimize_message]
   );
 

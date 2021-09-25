@@ -50,7 +50,8 @@ export const get_tts_data = async (
 
 export const play_audio = (
   audioElemId?: string,
-  should_load: boolean = true
+  should_load: boolean = true,
+  timestamp: number = 0
 ) => {
   const audio = document.getElementById(
     audioElemId ? `${audioElemId}-audio` : "audio"
@@ -60,9 +61,18 @@ export const play_audio = (
   }
   audio.pause();
   if (should_load) {
+    if (timestamp > 0) {
+      audio.addEventListener(
+        "canplaythrough",
+        () => {
+          audio.currentTime = timestamp;
+        },
+        { once: true }
+      );
+    }
     audio.load();
   } else {
-    audio.currentTime = 0;
+    audio.currentTime = timestamp;
   }
   audio.play();
 };

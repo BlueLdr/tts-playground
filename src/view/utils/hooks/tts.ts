@@ -20,6 +20,7 @@ export const usePlayMessage = (
     options: { speed, max_length, bits, voice, speed_char },
   } = message;
   const voice_ref = useValueRef(voice);
+  const timestamp_ref = hooks.useRef<number>(0);
 
   const [data, set_data, data_ref] = useStateRef("");
   const full_text = useMemoRef(() => {
@@ -30,18 +31,25 @@ export const usePlayMessage = (
   }, [speed, text, max_length, bits, bits_string, speed_char]);
 
   const [status, fetch_tts] = useRequestStatus(get_tts_data);
-  const on_submit = hooks.useCallback(() => {
-    fetch_tts(full_text.current, request, voice_ref.current).then(d => {
-      if (d === data_ref.current) {
-        if (data_ref.current) play_audio(player_id, false);
-      } else {
-        set_data(d);
-      }
-    });
-  }, [request, player_id]);
+  const on_submit = hooks.useCallback(
+    (timestamp?: number) => {
+      fetch_tts(full_text.current, request, voice_ref.current).then(d => {
+        if (d === data_ref.current) {
+          if (data_ref.current) play_audio(player_id, false, timestamp);
+        } else {
+          timestamp_ref.current = timestamp;
+          set_data(d);
+        }
+      });
+    },
+    [request, player_id]
+  );
 
   hooks.useEffect(() => {
-    if (data) play_audio(player_id);
+    if (data) {
+      play_audio(player_id, true, timestamp_ref.current);
+      timestamp_ref.current = 0;
+    }
   }, [data]);
 
   return [

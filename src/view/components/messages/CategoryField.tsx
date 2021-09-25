@@ -25,6 +25,7 @@ export const CategoryField: Preact.FunctionComponent<{
         onChange={e => set_value(e.target.value)}
         list="message-categories-list"
         autocomplete="off"
+        placeholder="Not Categorized"
       />
       <datalist id="message-categories-list">
         {categories?.map(s => (
