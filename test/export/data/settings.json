@@ -4,5 +4,6 @@
   "optimize_words": 0,
   "optimize_level": 1,
   "bits_string": "uni300",
-  "history_steps": 256
+  "history_steps": 256,
+  "stop_playback_at_modifier": true
 }

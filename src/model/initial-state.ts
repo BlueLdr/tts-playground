@@ -26,6 +26,9 @@ const initial_state: TTS.AppState = {
     skip_tutorials:
       stored_state?.settings?.skip_tutorials ??
       common.DEFAULT_STATE.settings.skip_tutorials,
+    stop_playback_at_modifier:
+      stored_state?.settings?.stop_playback_at_modifier ??
+      common.DEFAULT_STATE.settings.stop_playback_at_modifier,
   },
   editor: {
     text: stored_state?.editor?.text ?? common.DEFAULT_STATE.editor.text,
@@ -53,7 +56,6 @@ const snippets: TTS.Snippet[] = common.get_stored_snippets() ?? [];
 const snippets_sections: TTS.SnippetsSection[] =
   common.get_stored_snippets_sections() ?? [];
 const help: TTS.HelpCompletedMap = common.get_stored_help() ?? {};
-
 export const INITIAL_STATE = {
   ...initial_state,
   messages,

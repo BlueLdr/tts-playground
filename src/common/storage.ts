@@ -80,6 +80,7 @@ export const DEFAULT_STATE: TTS.AppState = {
     optimize_level: OptimizeLevel.normal,
     history_steps: DEFAULT_HISTORY_STEPS_LIMIT,
     skip_tutorials: false,
+    stop_playback_at_modifier: true,
   },
   message: null,
   volume: 0.5,

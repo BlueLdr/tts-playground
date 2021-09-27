@@ -7,5 +7,6 @@ export const SETTINGS = {
   bits_string: "uni300",
   history_steps: 256,
   skip_tutorials: false,
+  stop_playback_at_modifier: true,
   __type: "settings",
 };
