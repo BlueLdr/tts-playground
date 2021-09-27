@@ -10,6 +10,7 @@ import {
   AudioPlayer,
   CategoryField,
   ClipboardButton,
+  DiffButton,
   ExportMessage,
   Modal,
   ModalHeader,
@@ -247,6 +248,7 @@ export const MessageModalBase: Preact.FunctionComponent<{
         {!isNew && (
           <div className="tts-message-modal-export">
             <ExportMessage message={message} />
+            <DiffButton message={message} />
           </div>
         )}
       </div>
