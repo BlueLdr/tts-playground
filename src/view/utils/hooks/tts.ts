@@ -136,8 +136,11 @@ export const useMessageFullText = (message: TTS.Message) => {
   const {
     text,
     options: { max_length, speed, bits, speed_char },
-  } = message;
+  } = message ?? { options: {} };
   return hooks.useMemo(() => {
+    if (!text) {
+      return "";
+    }
     let text_ = bits ? `${bits} ${text}` : text;
     if (!speed || text_.length >= max_length - 1) {
       return text_;
