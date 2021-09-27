@@ -4,4 +4,3 @@ export * from "./filter-on-regex";
 export * from "./hooks";
 export * from "./optimize";
 export * from "./optimize-transforms";
-export * from "./tts";

@@ -39,6 +39,29 @@ export const GeneralSettings: Preact.FunctionComponent<{
           </label>
         </div>
       </div>*/}
+      <div className="tts-settings-item">
+        <label
+          className="checkbox toggle tts-settings-item tts-settings-skip"
+          title="Automatically stop audio playback when the speed modifier starts"
+          data-help="tutorials-auto-stop"
+        >
+          <span className="checkbox-label">
+            Automatically Stop Audio at Speed Modifier
+          </span>
+          <input
+            type="checkbox"
+            className="invisible"
+            checked={form.stop_playback_at_modifier}
+            onChange={() =>
+              onChangeSettings(
+                "stop_playback_at_modifier",
+                !form.stop_playback_at_modifier
+              )
+            }
+          />
+          <div className="toggle-switch" />
+        </label>
+      </div>
       <div
         className="tts-settings-item tts-settings-bits"
         data-help="bits-default"

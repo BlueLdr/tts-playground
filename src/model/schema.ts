@@ -44,6 +44,7 @@ export const SETTINGS_SCHEMA: SchemaOf<TTS.EditorSettings> = {
   bits_string: { type: "string", default: DEFAULT_BITS_STRING },
   history_steps: { type: "number", default: DEFAULT_HISTORY_STEPS_LIMIT },
   skip_tutorials: { type: "boolean", default: false },
+  stop_playback_at_modifier: { type: "boolean", default: true },
 };
 
 export const SNIPPET_OPTIONS_SCHEMA: SchemaOf<TTS.SnippetOptions> = {

@@ -1,8 +1,12 @@
 import * as hooks from "preact/hooks";
-import { get_tts_data, play_audio } from "~/common";
+import {
+  get_speed_duration,
+  get_tts_data,
+  play_audio,
+  get_speed_modifier,
+} from "~/common";
 import { EDITOR_SETTINGS, EDITOR_STATE } from "~/model";
 import {
-  get_speed_modifier,
   useMemoRef,
   useRequestStatus,
   useStateRef,
@@ -14,7 +18,8 @@ export const usePlayMessage = (
   player_id?: string,
   request?: TTS.TTSRequest
 ) => {
-  const { bits_string } = hooks.useContext(EDITOR_SETTINGS).value ?? {};
+  const { bits_string, stop_playback_at_modifier } =
+    hooks.useContext(EDITOR_SETTINGS).value ?? {};
   const {
     text,
     options: { speed, max_length, bits, voice, speed_char },
@@ -29,15 +34,20 @@ export const usePlayMessage = (
     }
     return text;
   }, [speed, text, max_length, bits, bits_string, speed_char]);
+  const speed_dur = useMemoRef(
+    () => (stop_playback_at_modifier ? get_speed_duration(message) : undefined),
+    [message, stop_playback_at_modifier]
+  );
 
   const [status, fetch_tts] = useRequestStatus(get_tts_data);
   const on_submit = hooks.useCallback(
-    (timestamp?: number) => {
+    (start_time?: number) => {
       fetch_tts(full_text.current, request, voice_ref.current).then(d => {
         if (d === data_ref.current) {
-          if (data_ref.current) play_audio(player_id, false, timestamp);
+          if (data_ref.current)
+            play_audio(player_id, false, start_time, speed_dur.current);
         } else {
-          timestamp_ref.current = timestamp;
+          timestamp_ref.current = start_time;
           set_data(d);
         }
       });
@@ -47,7 +57,7 @@ export const usePlayMessage = (
 
   hooks.useEffect(() => {
     if (data) {
-      play_audio(player_id, true, timestamp_ref.current);
+      play_audio(player_id, true, timestamp_ref.current, speed_dur.current);
       timestamp_ref.current = 0;
     }
   }, [data]);
