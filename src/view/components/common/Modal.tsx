@@ -1,4 +1,5 @@
 import * as Preact from "preact";
+import { createPortal } from "preact/compat";
 import {
   useCallback,
   useEffect,
@@ -6,7 +7,14 @@ import {
   useMemo,
   useRef,
 } from "preact/hooks";
-import { getFirstFocusable, maybeClassName } from "~/view/utils";
+import { do_confirm } from "~/common";
+import { ImmutableContextValue, MODAL_DIRTY } from "~/model";
+import {
+  getFirstFocusable,
+  maybeClassName,
+  useStateRef,
+  useValueRef,
+} from "~/view/utils";
 
 export const Modal: Preact.FunctionComponent<
   {
@@ -125,4 +133,44 @@ export const ModalHeader: Preact.FunctionComponent<{
       )}
     </div>
   );
+};
+
+export const useModal = (
+  container_selector: string = "#modal-container",
+  dismiss_message?: string
+) => {
+  const container = useValueRef(document.querySelector(container_selector));
+  const [dirty, set_dirty, dirty_ref] = useStateRef<boolean>(false);
+  const [open, set_open, open_ref] = useStateRef<boolean>(false);
+  const modal_dirty_ctx = useMemo(
+    () => new ImmutableContextValue(dirty, set_dirty),
+    [dirty, set_dirty]
+  );
+
+  const toggle_modal = useCallback((should_open: boolean) => {
+    if (should_open || !dirty_ref.current) {
+      set_open(should_open);
+      return true;
+    } else if (do_confirm(dismiss_message ?? "Discard changes?")) {
+      set_dirty(false);
+      set_open(false);
+      return true;
+    }
+    return false;
+  }, []);
+
+  const content = useCallback(
+    (props: Preact.RenderableProps<{}>) =>
+      open_ref.current && container.current
+        ? createPortal(
+            <MODAL_DIRTY.Provider value={modal_dirty_ctx}>
+              {props.children}
+            </MODAL_DIRTY.Provider>,
+            container.current
+          )
+        : null,
+    []
+  );
+
+  return [content, toggle_modal, open] as const;
 };

@@ -1,5 +1,4 @@
 import * as Preact from "preact";
-import { createPortal } from "preact/compat";
 import { useCallback, useMemo } from "preact/hooks";
 import * as hooks from "preact/hooks";
 import { import_multiple_files } from "~/view/components";
@@ -67,17 +66,6 @@ export const useHoldClick = (
     }
     return l;
   }, [clicked]);
-};
-
-export const useModal = (
-  content: Preact.VNode | null,
-  container_selector: string = "#modal-container"
-) => {
-  const container = document.querySelector(container_selector);
-  if (container && content) {
-    return createPortal(content, container);
-  }
-  return null;
 };
 
 export const useRenderPropsFunc = <T extends object>(

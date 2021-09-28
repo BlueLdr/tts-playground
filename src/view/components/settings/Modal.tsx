@@ -1,6 +1,7 @@
 import * as Preact from "preact";
-import { useCallback } from "preact/hooks";
-import { EDITOR_SETTINGS } from "~/model";
+import { useCallback, useContext, useEffect } from "preact/hooks";
+import { deep_equals } from "~/common";
+import { EDITOR_SETTINGS, MODAL_DIRTY } from "~/model";
 import {
   Modal,
   ModalHeader,
@@ -13,6 +14,7 @@ import { useContextState, useStateObject } from "~/view/utils";
 export const SettingsModal: Preact.FunctionComponent<{ dismiss }> = ({
   dismiss,
 }) => {
+  const set_dirty = useContext(MODAL_DIRTY).setValue;
   const [settings, set_settings] = useContextState(EDITOR_SETTINGS);
   const [form, set_form] = useStateObject(settings);
   const on_change_settings = useCallback(
@@ -25,6 +27,10 @@ export const SettingsModal: Preact.FunctionComponent<{ dismiss }> = ({
       }),
     []
   );
+
+  useEffect(() => {
+    set_dirty(!deep_equals(form, settings));
+  }, [form, settings]);
 
   return (
     <Modal className="tts-settings-modal" dismiss={dismiss}>
@@ -46,6 +52,7 @@ export const SettingsModal: Preact.FunctionComponent<{ dismiss }> = ({
             className="btn btn-large btn-primary"
             onClick={() => {
               set_settings(form);
+              set_dirty(false);
               dismiss();
             }}
           >

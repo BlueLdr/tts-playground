@@ -1,6 +1,7 @@
 import * as Preact from "preact";
-import { useEffect, useMemo, useRef } from "preact/hooks";
-import { generate_id } from "~/common";
+import { useContext, useEffect, useMemo, useRef } from "preact/hooks";
+import { deep_equals, generate_id } from "~/common";
+import { MODAL_DIRTY } from "~/model";
 import {
   AudioPlayer,
   ExportSnippet,
@@ -25,6 +26,7 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
   dismiss: () => void;
   isNew?: boolean;
 }> = ({ row = {}, updateRow, dismiss, isNew }) => {
+  const set_dirty = useContext(MODAL_DIRTY).setValue;
   const [value, set_value] = useStateIfMounted(row.text ?? "");
   const [prefix, set_prefix] = useStateIfMounted(row.options?.prefix ?? "");
   const [suffix, set_suffix] = useStateIfMounted(row.options?.suffix ?? "");
@@ -57,6 +59,12 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
       space_after: space_after,
     },
   };
+
+  useEffect(() => {
+    set_dirty(
+      isNew ? !!value || !!prefix || !!suffix : !deep_equals(new_row, row)
+    );
+  }, [new_row, row]);
 
   new_row.id = useMemo(() => {
     if (row.id) {
@@ -181,6 +189,7 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
           className="btn btn-primary"
           onClick={() => {
             updateRow(new_row);
+            set_dirty(false);
             dismiss();
           }}
           disabled={!value}

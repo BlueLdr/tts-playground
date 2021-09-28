@@ -1,11 +1,12 @@
 import * as Preact from "preact";
-import { useCallback, useEffect, useRef } from "preact/hooks";
+import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 import {
   DEFAULT_SPEED_CHAR,
   DEFAULT_VOICE,
   do_alert,
   do_confirm,
 } from "~/common";
+import { MODAL_DIRTY } from "~/model";
 import {
   AudioPlayer,
   CategoryField,
@@ -47,6 +48,7 @@ export const MessageModal: Preact.FunctionComponent<{
   dismiss,
   isNew,
 }) => {
+  const set_dirty = useContext(MODAL_DIRTY).setValue;
   const { name = "", options } = message || {};
   const text = useMessageFullText(message);
   const [value, set_value] = useStateIfMounted(name);
@@ -65,9 +67,14 @@ export const MessageModal: Preact.FunctionComponent<{
     );
     if (should_delete) {
       deleteMessage(initial_category);
+      set_dirty(false);
       dismiss();
     }
   }, []);
+
+  useEffect(() => {
+    set_dirty(name !== value || category !== initial_category);
+  }, [name, value, category, initial_category]);
 
   if (!message) {
     return null;
@@ -141,6 +148,7 @@ export const MessageModal: Preact.FunctionComponent<{
               category || undefined
             )
           ) {
+            set_dirty(false);
             dismiss();
           } else {
             saved.current = false;

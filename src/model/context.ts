@@ -114,3 +114,5 @@ export const HELP_COMPLETED = createNamedContext<TTS.HelpCompletedMap>(
   INITIAL_STATE.help,
   "HELP_COMPLETED"
 );
+
+export const MODAL_DIRTY = createNamedContext<boolean>(false, "MODAL_DIRTY");

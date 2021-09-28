@@ -1,6 +1,6 @@
 import * as Preact from "preact";
 import { memo } from "preact/compat";
-import { useCallback, useContext, useEffect } from "preact/hooks";
+import { useContext, useEffect } from "preact/hooks";
 import { HELP_ITEM } from "~/model";
 import {
   Editor,
@@ -11,19 +11,13 @@ import {
   Footer,
   validate_import_data,
   SnippetsList,
-} from "~/view/components";
-import {
   useModal,
-  useSaveMessage,
-  useStateIfMounted,
-  useStateRef,
-  useUploadFiles,
-} from "~/view/utils";
+} from "~/view/components";
+import { useSaveMessage, useStateRef, useUploadFiles } from "~/view/utils";
 
 const View: Preact.FunctionComponent = () => {
   const help_item = useContext(HELP_ITEM).value;
-  const [settings_open, set_settings_open] = useStateIfMounted(false);
-  const dismiss = useCallback(() => set_settings_open(false), []);
+  const [ModalContainer, toggle_modal] = useModal();
 
   const [loaded_message, update_messages] = useSaveMessage();
 
@@ -103,7 +97,7 @@ const View: Preact.FunctionComponent = () => {
           <button
             className="header-button"
             type="button"
-            onClick={() => set_settings_open(true)}
+            onClick={() => toggle_modal(true)}
           >
             <i className="fas fa-cog" />
           </button>
@@ -137,7 +131,9 @@ const View: Preact.FunctionComponent = () => {
           </div>
         </div>
       </div>
-      {settings_open && useModal(<SettingsModal dismiss={dismiss} />)}
+      <ModalContainer>
+        <SettingsModal dismiss={() => toggle_modal(false)} />
+      </ModalContainer>
     </Preact.Fragment>
   );
 };

@@ -1,13 +1,8 @@
 import * as Preact from "preact";
 import { useCallback, useEffect } from "preact/hooks";
-import { HelpModal } from "~/view/components";
+import { HelpModal, useModal } from "~/view/components";
 import { HELP_DATA } from "~/view/components/help/help-data";
-import {
-  silence_event,
-  useHelpItem,
-  useModal,
-  useStateRef,
-} from "~/view/utils";
+import { silence_event, useHelpItem, useStateRef } from "~/view/utils";
 
 const options: EventListenerOptions = { capture: true };
 export const HelpButton: Preact.FunctionComponent = () => {
@@ -66,8 +61,11 @@ export const HelpButton: Preact.FunctionComponent = () => {
     }
   }, [item]);
 
+  const [ModalContainer, toggle_modal] = useModal();
+
   useEffect(() => {
     set_enabled(false);
+    toggle_modal(!!item);
   }, [item]);
 
   return (
@@ -90,7 +88,9 @@ export const HelpButton: Preact.FunctionComponent = () => {
           <i class="far fa-question-circle" />
         )}
       </button>
-      {!!item && useModal(<HelpModal isTutorial={is_tutorial} />)}
+      <ModalContainer>
+        <HelpModal isTutorial={is_tutorial} />
+      </ModalContainer>
     </Preact.Fragment>
   );
 };

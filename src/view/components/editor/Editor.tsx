@@ -24,13 +24,13 @@ import {
   SaveMessage,
   StatusIndicator,
   useHistoryListeners,
+  useModal,
   useSpeechDuration,
 } from "~/view/components";
 import {
   ensure_number,
   useContextState,
   useInsertSnippet,
-  useModal,
   useOptimizeMessageTrigger,
   usePlayMessage,
   useStateObject,
@@ -412,12 +412,17 @@ export const Editor: Preact.FunctionComponent<{
     </div>
   );
 
+  const [ModalContainer, toggle_modal] = useModal(
+    "#modal-container .modal-backdrop[data-intro-key]"
+  );
+  useEffect(() => {
+    toggle_modal(is_intro);
+  }, [is_intro]);
+
   return (
     <Preact.Fragment>
       {content}
-      {is_intro
-        ? useModal(content, "#modal-container .modal-backdrop[data-intro-key]")
-        : null}
+      {is_intro ? <ModalContainer>{content}</ModalContainer> : null}
     </Preact.Fragment>
   );
 };

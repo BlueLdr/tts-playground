@@ -6,3 +6,4 @@ export * from "./ExpandableChecklist";
 export * from "./Modal";
 export * from "./Organizer";
 export * from "./StatusIndicator";
+export * from "./SearchBar";

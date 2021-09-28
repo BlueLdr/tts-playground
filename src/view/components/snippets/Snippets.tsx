@@ -1,5 +1,5 @@
 import * as Preact from "preact";
-import { useCallback, useMemo, useRef } from "preact/hooks";
+import { useCallback, useEffect, useMemo, useRef } from "preact/hooks";
 import { remove_item_from, replace_item_in } from "~/common";
 import { ImmutableContextValue, SNIPPETS, SNIPPETS_SECTIONS } from "~/model";
 import {
@@ -8,16 +8,14 @@ import {
   SnippetsRow,
   SnippetsRowEdit,
   SnippetsSectionModal,
-} from "~/view/components";
-import {
   SEARCH_BAR,
   SearchBar,
   useOrganizerSearch,
-} from "~/view/components/common/SearchBar";
+  useModal,
+} from "~/view/components";
 import {
   snippet_to_string,
   useContextState,
-  useModal,
   usePlaySnippet,
   useRenderPropsFunc,
   useSaveSnippetInSection,
@@ -265,6 +263,16 @@ export const SnippetsList: Preact.FunctionComponent = () => {
     "SnippetsRow"
   );
 
+  const [SnipModalContainer, toggle_snip_modal] = useModal();
+  useEffect(() => {
+    toggle_snip_modal(edit_row_target_id != null);
+  }, [edit_row_target_id]);
+
+  const [SecModalContainer, toggle_sec_modal] = useModal();
+  useEffect(() => {
+    toggle_sec_modal(edit_section_target_id != null);
+  }, [edit_section_target_id]);
+
   return (
     <div className="tts-snippets">
       <SEARCH_BAR.Provider value={search_ctx_value}>
@@ -288,40 +296,47 @@ export const SnippetsList: Preact.FunctionComponent = () => {
         className="tts-snippets-sidebar-player invisible"
         data={tts_data}
       />
-      {edit_row_target_id != null &&
-        useModal(
-          <SnippetsRowEdit
-            row={edit_row_target}
-            updateRow={value =>
-              update_snippet(
-                edit_row_target_id,
-                value,
-                edit_row_target_section.current?.name
-              )
+      <SnipModalContainer>
+        <SnippetsRowEdit
+          row={edit_row_target}
+          updateRow={value =>
+            update_snippet(
+              edit_row_target_id,
+              value,
+              edit_row_target_section.current?.name
+            )
+          }
+          onClickDelete={() =>
+            update_snippet(
+              edit_row_target_id,
+              undefined,
+              edit_row_target_section.current?.name
+            )
+          }
+          isNew={!edit_row_target}
+          dismiss={() => {
+            if (toggle_snip_modal(false)) {
+              set_edit_row_target_id(null, null);
             }
-            onClickDelete={() =>
-              update_snippet(
-                edit_row_target_id,
-                undefined,
-                edit_row_target_section.current?.name
-              )
-            }
-            isNew={!edit_row_target}
-            dismiss={() => set_edit_row_target_id(null, null)}
-          />
-        )}
+          }}
+        />
+        )
+      </SnipModalContainer>
 
-      {edit_section_target_id != null &&
-        useModal(
-          <SnippetsSectionModal
-            section={edit_section_target}
-            updateSection={(value: TTS.SnippetsSection) =>
-              update_section(edit_section_target_id, value)
+      <SecModalContainer>
+        <SnippetsSectionModal
+          section={edit_section_target}
+          updateSection={(value: TTS.SnippetsSection) =>
+            update_section(edit_section_target_id, value)
+          }
+          deleteSection={on_delete_section}
+          dismiss={() => {
+            if (toggle_sec_modal(false)) {
+              set_edit_section_target_id(null);
             }
-            deleteSection={on_delete_section}
-            dismiss={() => set_edit_section_target_id(null)}
-          />
-        )}
+          }}
+        />
+      </SecModalContainer>
     </div>
   );
 };
