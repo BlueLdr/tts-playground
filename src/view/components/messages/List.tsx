@@ -1,5 +1,5 @@
 import * as Preact from "preact";
-import { useCallback, useContext, useMemo } from "preact/hooks";
+import { useCallback, useContext, useEffect, useMemo } from "preact/hooks";
 import { replace_item_in, UNCATEGORIZED_GROUP_NAME } from "~/common";
 import {
   EDITOR_SETTINGS,
@@ -16,17 +16,15 @@ import {
   MessageModal,
   MessagesListItem,
   Organizer,
-} from "~/view/components";
-import {
   SEARCH_BAR,
   SearchBar,
   useOrganizerSearch,
-} from "~/view/components/common/SearchBar";
+  useModal,
+} from "~/view/components";
 import {
   maybeClassName,
   optimize_message,
   useContextState,
-  useModal,
   useRenderPropsFunc,
   useStateIfMounted,
   useValueRef,
@@ -254,6 +252,16 @@ export const MessagesList: Preact.FunctionComponent<{
     "MessageSectionExtras"
   );
 
+  const [MsgModalContainer, toggle_msg_modal] = useModal();
+  useEffect(() => {
+    toggle_msg_modal(edit_target != null);
+  }, [edit_target]);
+
+  const [CatModalContainer, toggle_cat_modal] = useModal();
+  useEffect(() => {
+    toggle_cat_modal(cat_edit_target != null);
+  }, [cat_edit_target]);
+
   return (
     <div className="tts-messages">
       <SEARCH_BAR.Provider value={search_ctx_value}>
@@ -272,27 +280,33 @@ export const MessagesList: Preact.FunctionComponent<{
           />
         </div>
       </SEARCH_BAR.Provider>
-      {edit_target != null &&
-        useModal(
-          <MessageModal
-            message={edit_target_msg}
-            loadMessage={() => set_loaded_id(edit_target)}
-            updateMessage={(value, cat) =>
-              updateMessages(edit_target, value, cat)
+      <MsgModalContainer>
+        <MessageModal
+          message={edit_target_msg}
+          loadMessage={() => set_loaded_id(edit_target)}
+          updateMessage={(value, cat) =>
+            updateMessages(edit_target, value, cat)
+          }
+          deleteMessage={cat => updateMessages(edit_target, undefined, cat)}
+          dismiss={() => {
+            if (toggle_msg_modal(false)) {
+              set_edit_target(null);
             }
-            deleteMessage={cat => updateMessages(edit_target, undefined, cat)}
-            dismiss={() => set_edit_target(null)}
-          />
-        )}
-      {cat_edit_target != null &&
-        useModal(
-          <CategoryModal
-            category={edit_target_cat}
-            updateCategory={update_category}
-            onDeleteCategory={remove_messages_in_category}
-            dismiss={() => set_cat_edit_target(null)}
-          />
-        )}
+          }}
+        />
+      </MsgModalContainer>
+      <CatModalContainer>
+        <CategoryModal
+          category={edit_target_cat}
+          updateCategory={update_category}
+          onDeleteCategory={remove_messages_in_category}
+          dismiss={() => {
+            if (toggle_cat_modal(false)) {
+              set_cat_edit_target(null);
+            }
+          }}
+        />
+      </CatModalContainer>
     </div>
   );
 };

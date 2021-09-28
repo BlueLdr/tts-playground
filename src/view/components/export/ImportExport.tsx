@@ -1,17 +1,16 @@
 import * as Preact from "preact";
 import { useEffect } from "preact/hooks";
-import { ImportExportModal } from "~/view/components";
-import { useModal, useStateIfMounted } from "~/view/utils";
+import { ImportExportModal, useModal } from "~/view/components";
 
 export const ImportExport: Preact.FunctionComponent<{
   importData: TTS.AnyExportData;
   setImportData: (data: TTS.AnyExportData | null) => void;
 }> = ({ importData, setImportData }) => {
-  const [open, set_open] = useStateIfMounted(false);
+  const [ModalContainer, toggle_modal] = useModal();
 
   useEffect(() => {
     if (importData) {
-      set_open(true);
+      toggle_modal(true);
     }
   }, [importData]);
 
@@ -19,23 +18,23 @@ export const ImportExport: Preact.FunctionComponent<{
     <Preact.Fragment>
       <button
         className="header-button tts-export-button"
-        onClick={() => set_open(true)}
+        onClick={() => toggle_modal(true)}
         title="Import/Export"
         data-help="import-export-overview"
       >
         <i className="fas fa-share-square" />
       </button>
-      {open &&
-        useModal(
-          <ImportExportModal
-            importData={importData}
-            setImportData={setImportData}
-            dismiss={() => {
-              set_open(false);
+      <ModalContainer>
+        <ImportExportModal
+          importData={importData}
+          setImportData={setImportData}
+          dismiss={() => {
+            if (toggle_modal(false)) {
               setImportData(null);
-            }}
-          />
-        )}
+            }
+          }}
+        />
+      </ModalContainer>
     </Preact.Fragment>
   );
 };

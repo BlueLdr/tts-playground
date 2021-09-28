@@ -1,6 +1,7 @@
 import * as Preact from "preact";
-import { useCallback, useEffect, useRef } from "preact/hooks";
+import { useCallback, useContext, useEffect, useRef } from "preact/hooks";
 import { do_confirm } from "~/common";
+import { MODAL_DIRTY } from "~/model";
 import { Modal, ModalHeader, ExportMessageCategory } from "~/view/components";
 import { useStateIfMounted } from "~/view/utils";
 
@@ -10,6 +11,7 @@ export const CategoryModal: Preact.FunctionComponent<{
   onDeleteCategory: (category: TTS.MessageCategory) => void;
   dismiss: () => void;
 }> = ({ category, updateCategory, onDeleteCategory, dismiss }) => {
+  const set_dirty = useContext(MODAL_DIRTY).setValue;
   const name = category?.name;
   const input_ref = useRef<HTMLInputElement>();
   const [value, set_value] = useStateIfMounted(name);
@@ -19,11 +21,16 @@ export const CategoryModal: Preact.FunctionComponent<{
     );
     if (should_delete) {
       onDeleteCategory(category);
+      set_dirty(false);
       updateCategory(name, null);
       dismiss();
     }
   }, [updateCategory, onDeleteCategory, category]);
   useEffect(() => input_ref.current?.focus(), []);
+
+  useEffect(() => {
+    set_dirty(!!category && name !== value);
+  }, [name, value, !!category]);
 
   return (
     <Modal className="tts-message-category-modal" dismiss={dismiss}>
@@ -66,6 +73,7 @@ export const CategoryModal: Preact.FunctionComponent<{
               ...category,
               name: value,
             });
+            set_dirty(false);
             dismiss();
           }}
           disabled={!value}

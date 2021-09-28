@@ -2,32 +2,35 @@ import * as Preact from "preact";
 import { useContext, useEffect, useRef } from "preact/hooks";
 import { generate_id } from "~/common";
 import { MESSAGES } from "~/model";
-import { MessageModalBase, useCategoryField } from "~/view/components";
-import { useLoadedMessage, useModal, useStateIfMounted } from "~/view/utils";
+import {
+  MessageModalBase,
+  useCategoryField,
+  useModal,
+} from "~/view/components";
+import { useLoadedMessage, useStateIfMounted } from "~/view/utils";
 
 export const SaveMessage: Preact.FunctionComponent<{
   message: TTS.Message;
   updateMessages: (id: string | null, value: TTS.Message) => boolean;
   disabled?: boolean;
 }> = ({ message, updateMessages, disabled }) => {
-  const [open, set_open] = useStateIfMounted(false);
+  const [ModalContainer, toggle_modal] = useModal();
 
   return (
     <button
       className="btn"
       disabled={!message.text || disabled}
-      onClick={() => set_open(true)}
+      onClick={() => toggle_modal(true)}
     >
       <i className="fas fa-save" />
       Save Message
-      {open &&
-        useModal(
-          <SaveMessageModal
-            message={message}
-            updateMessages={updateMessages}
-            dismiss={() => set_open(false)}
-          />
-        )}
+      <ModalContainer>
+        <SaveMessageModal
+          message={message}
+          updateMessages={updateMessages}
+          dismiss={() => toggle_modal(false)}
+        />
+      </ModalContainer>
     </button>
   );
 };

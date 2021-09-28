@@ -4,6 +4,7 @@ import {
   EDITOR_SETTINGS,
   MESSAGE_CATEGORIES,
   MESSAGES,
+  MODAL_DIRTY,
   SNIPPETS,
   SNIPPETS_SECTIONS,
   UNCATEGORIZED_MESSAGES,
@@ -29,6 +30,7 @@ export const ImportForm: Preact.FunctionComponent<{
   data?: TTS.AnyExportData;
   setData: (data: TTS.AnyExportData | null) => void;
 }> = ({ dismiss, data, setData }) => {
+  const [, set_dirty] = useContextState(MODAL_DIRTY);
   const [settings, set_settings] = useContextState(EDITOR_SETTINGS);
   const [categories, set_categories] = useContextState(MESSAGE_CATEGORIES);
   const [uncat_msgs, set_uncat_msgs] = useContextState(UNCATEGORIZED_MESSAGES);
@@ -91,6 +93,9 @@ export const ImportForm: Preact.FunctionComponent<{
   ] = parsed_data ?? [];
 
   const [success, set_success] = useStateIfMounted(false);
+  useEffect(() => {
+    set_dirty(!!parsed_data && !success);
+  }, [success, parsed_data]);
 
   const on_finish = useCallback(() => {
     if (settings_result) {
