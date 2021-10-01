@@ -52,13 +52,11 @@ export const AudioPlayer: Preact.FunctionComponent<
         onVolumeChange={set_volume}
         {...props}
       >
-        {data && (
-          <source
-            id={id ? `${id}-source` : "source"}
-            type="audio/wav"
-            src={data}
-          />
-        )}
+        <source
+          id={id ? `${id}-source` : "source"}
+          type="audio/wav"
+          src={data || undefined}
+        />
       </audio>
     </div>
   );
