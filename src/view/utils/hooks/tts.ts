@@ -1,9 +1,9 @@
 import * as hooks from "preact/hooks";
 import {
-  get_speed_duration,
   get_tts_data,
   play_audio,
   get_speed_modifier,
+  predict_duration,
 } from "~/common";
 import { EDITOR_SETTINGS, EDITOR_STATE } from "~/model";
 import {
@@ -26,6 +26,7 @@ export const usePlayMessage = (
   } = message;
   const voice_ref = useValueRef(voice);
   const timestamp_ref = hooks.useRef<number>(0);
+  const end_time_ref = hooks.useRef<number>(undefined);
 
   const [data, set_data, data_ref] = useStateRef("");
   const full_text = useMemoRef(() => {
@@ -34,30 +35,45 @@ export const usePlayMessage = (
     }
     return text;
   }, [speed, text, max_length, bits, bits_string, speed_char]);
-  const speed_dur = useMemoRef(
-    () => (stop_playback_at_modifier ? get_speed_duration(message) : undefined),
-    [message, stop_playback_at_modifier]
+
+  const get_tts_audio = hooks.useCallback(
+    async (
+      msg_text: string,
+      req?: TTS.TTSRequest,
+      voice?: string
+    ): Promise<[string, number?]> => {
+      let duration;
+      const data = await get_tts_data(msg_text, req, voice);
+      if (stop_playback_at_modifier && speed) {
+        duration = await predict_duration(message);
+      }
+      return [data, duration];
+    },
+    [stop_playback_at_modifier, message, speed]
   );
 
-  const [status, fetch_tts] = useRequestStatus(get_tts_data);
+  const [status, fetch_tts] = useRequestStatus(get_tts_audio);
   const on_submit = hooks.useCallback(
     (start_time?: number) => {
-      fetch_tts(full_text.current, request, voice_ref.current).then(d => {
-        if (d === data_ref.current) {
-          if (data_ref.current)
-            play_audio(player_id, false, start_time, speed_dur.current);
-        } else {
-          timestamp_ref.current = start_time;
-          set_data(d);
+      fetch_tts(full_text.current, request, voice_ref.current).then(
+        ([d, end_time]) => {
+          end_time_ref.current = end_time;
+          if (d === data_ref.current) {
+            if (data_ref.current)
+              play_audio(player_id, false, start_time, end_time);
+          } else {
+            timestamp_ref.current = start_time;
+            set_data(d);
+          }
         }
-      });
+      );
     },
     [request, player_id]
   );
 
   hooks.useEffect(() => {
     if (data) {
-      play_audio(player_id, true, timestamp_ref.current, speed_dur.current);
+      play_audio(player_id, true, timestamp_ref.current, end_time_ref.current);
       timestamp_ref.current = 0;
     }
   }, [data]);

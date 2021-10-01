@@ -55,11 +55,13 @@ const test_speed = async (
 
   const max = start + runs;
   const test_results = {};
-  const audio = document.createElement("AUDIO") as HTMLAudioElement;
-  audio.classList.add("invisible");
+  const audio = document.getElementById("audio") as HTMLAudioElement;
   const source = document.createElement("SOURCE") as HTMLSourceElement;
   audio.appendChild(source);
-  document.body.appendChild(audio);
+  const button = document.createElement("button");
+  button.innerText = "Continue";
+  button.classList.add("btn", "btn-primary");
+  document.querySelector(".tts-main-bottom").appendChild(button);
 
   const test_one_ = async (
     voice: string,
@@ -73,7 +75,15 @@ const test_speed = async (
     console.log(`str: `, str);
     source.src = await get_tts_data(str, test_req, voice);
     audio.load();
-    return await_timeout(() => audio.duration, 1000);
+    return new Promise(resolve => {
+      button.addEventListener(
+        "click",
+        e => {
+          resolve(audio.duration - audio.currentTime);
+        },
+        { once: true }
+      );
+    });
   };
 
   const test_one = (voice: string, char: string, count: number, msg?: string) =>
@@ -83,8 +93,25 @@ const test_speed = async (
     const results = {};
     if (!msg) {
       for (let i = start; i < max; i++) {
-        results[i] = await test_one(voice, char, i);
-        console.log(`results${char}][${i}]: `, results[i]);
+        results[i] = await test_one(voice, char, i)
+          .then(res => {
+            results[i] = res;
+            console.log(`results${char}][${i}]: `, results[i]);
+          })
+          .catch(() => {
+            button.innerText = "Retry";
+            return new Promise<void>(resolve => {
+              button.addEventListener(
+                "click",
+                e => {
+                  i--;
+                  button.innerText = "Continue";
+                  resolve();
+                },
+                { once: true }
+              );
+            });
+          });
       }
     } else {
       for (let i = start; i <= max; i += step) {
@@ -96,7 +123,7 @@ const test_speed = async (
 
   const msg_parts = [];
   if (message) {
-    for (let i = 1; i < 8; i++) {
+    for (let i = 1; i < 7; i++) {
       msg_parts.push(SPEED_TEST_MESSAGE.slice(0, i * 20));
     }
   }
@@ -127,16 +154,7 @@ const test_speed = async (
     test_results[voice] = await test_voice(voice);
   }
 
-  const download_json = document.createElement("A") as HTMLAnchorElement;
-  download_json.href = `data:application/json;charset=utf-8,${encodeURIComponent(
-    JSON.stringify(test_results, null, "  ")
-  )}`;
-  download_json.download = "speed-duration.json";
-  document.body.appendChild(download_json);
-  download_json.click();
-
-  const to_csv_arr = message ? json_to_csv_with_msg : json_to_csv_arr;
-  csv_arr_to_csv(to_csv_arr(test_results, start, runs));
+  download_results(test_results, start, runs, message);
 
   window.removeEventListener("beforeunload", onBeforeUnload, {
     capture: true,
@@ -242,4 +260,26 @@ export const csv_arr_to_csv = (data: string[][]) => {
   download_csv.click();
 };
 
+export const download_results = (
+  results: object,
+  start: number,
+  runs: number,
+  message?: boolean
+) => {
+  const download_json = document.createElement("A") as HTMLAnchorElement;
+  download_json.href = `data:application/json;charset=utf-8,${encodeURIComponent(
+    JSON.stringify(results, null, "  ")
+  )}`;
+  download_json.download = "speed-duration.json";
+  document.body.appendChild(download_json);
+  download_json.click();
+
+  const to_csv_arr = message ? json_to_csv_with_msg : json_to_csv_arr;
+  csv_arr_to_csv(to_csv_arr(results, start, runs));
+};
+
+// @ts-expect-error:
+window.download_results = download_results;
+// @ts-expect-error:
+window.test_speed = test_speed;
 export default test_speed;
