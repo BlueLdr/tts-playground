@@ -20,6 +20,7 @@ export const SEARCH_BAR = createNamedContext<string>("", "SearchBarState");
 export const SearchBar: Preact.FunctionComponent = () => {
   const { value, setValue } = useContext(SEARCH_BAR);
   const input_ref = useRef<HTMLInputElement>();
+  const btn_ref = useRef<HTMLButtonElement>();
   const [text, set_text] = useStateIfMounted(value);
   const [active, set_active] = useStateIfMounted(!!value);
   const [update_value, cancel_update] = useDebounce(setValue, 150);
@@ -37,6 +38,8 @@ export const SearchBar: Preact.FunctionComponent = () => {
     set_text("");
     setValue("");
     set_active(false);
+    input_ref.current?.blur();
+    btn_ref.current?.blur();
   }, [cancel_update]);
 
   return (
@@ -52,6 +55,7 @@ export const SearchBar: Preact.FunctionComponent = () => {
       </button>
       <input
         ref={input_ref}
+        tabIndex={active ? 0 : -1}
         className="search-bar-input"
         value={text}
         onInput={on_change}
@@ -60,8 +64,24 @@ export const SearchBar: Preact.FunctionComponent = () => {
             on_clear();
           }
         }}
+        onKeyDown={e => {
+          if (e.key === "Escape") {
+            e.preventDefault();
+            on_clear();
+          }
+        }}
       />
-      <button className="icon-button search-bar-close" onClick={on_clear}>
+      <button
+        ref={btn_ref}
+        tabIndex={active ? 0 : -1}
+        className="icon-button search-bar-close"
+        onClick={on_clear}
+        onFocus={() => {
+          if (!active) {
+            btn_ref.current?.blur();
+          }
+        }}
+      >
         <i class="fas fa-times" />
       </button>
     </div>
