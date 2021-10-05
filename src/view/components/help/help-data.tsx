@@ -126,6 +126,21 @@ export const HELP_DATA = help_data_type({
     ),
   },
 
+  "submit-button": {
+    key: "submit-button",
+    name: "Submit Button",
+    content: () => (
+      <Preact.Fragment>
+        <p>Click to listen to your message.</p>
+        <p>
+          If you want to automatically skip ahead to a certain part of the
+          message, place the text cursor in the editor at the point you want to
+          skip to, and hold the Shift key while clicking Submit.
+        </p>
+      </Preact.Fragment>
+    ),
+  },
+
   /* ======================================
    * ============= SNIPPETS ===============
      ====================================== */
