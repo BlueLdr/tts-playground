@@ -1,11 +1,5 @@
 import { get_tts_data, SPEED_CHARS } from "../src/common";
 
-const test_req: TTS.TTSRequest = {
-  text: "",
-  promise: new Promise(() => {}),
-  data: "",
-};
-
 let hist = [];
 const MSG_PER_MIN = 20;
 const rate_limit = async <T>(cb: () => Promise<T>) => {
@@ -73,7 +67,7 @@ const test_speed = async (
       .repeat(Math.ceil(count / char.length))
       .slice(0, count)}`;
     console.log(`str: `, str);
-    source.src = await get_tts_data(str, test_req, voice);
+    source.src = await get_tts_data(str, voice);
     audio.load();
     return new Promise(resolve => {
       button.addEventListener(

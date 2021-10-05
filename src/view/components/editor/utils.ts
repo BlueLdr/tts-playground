@@ -5,7 +5,6 @@ import {
   useMemo,
   useRef,
 } from "preact/hooks";
-import { get_tts_data } from "~/common";
 import { EDITOR_STATE, EditorHistory } from "~/model";
 import { useStateRef, useValueRef } from "~/view/utils";
 
@@ -254,33 +253,4 @@ export const useCtrlZListener = (
       }
     };
   }, [enabled]);
-};
-
-const DURATION_REQUEST: TTS.TTSRequest = {
-  text: "",
-  promise: new Promise(() => {}),
-  data: "",
-};
-const START_AT_CURSOR_OFFSET = 0.6;
-
-export const useSpeechDuration = () => {
-  const voice = useContext(EDITOR_STATE).value.voice;
-  const elem = useMemo(() => document.createElement("audio"), []);
-  return useCallback(
-    async (text: string) => {
-      const data = await get_tts_data(text.trim(), DURATION_REQUEST, voice);
-      return new Promise<number>(resolve => {
-        elem.src = data;
-        elem.addEventListener(
-          "canplaythrough",
-          () => {
-            resolve(elem.duration - START_AT_CURSOR_OFFSET);
-          },
-          { once: true }
-        );
-        elem.load();
-      });
-    },
-    [voice]
-  );
 };

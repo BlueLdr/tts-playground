@@ -7,7 +7,6 @@ import {
   useCtrlZListener,
   AudioPlayer,
 } from "~/view/components";
-import "../../../scripts/test_speed_duration";
 
 export const App: Preact.FunctionComponent = () => {
   const modal_container = useRef<HTMLDivElement>();
@@ -21,7 +20,7 @@ export const App: Preact.FunctionComponent = () => {
           className="clipboard-input invisible"
           tabIndex={-1}
         />
-        <AudioPlayer data=" " className="invisible" id="measure-duration" />
+        <AudioPlayer data="" className="invisible" id="measure-duration" />
         <div
           ref={modal_container}
           id="modal-container"

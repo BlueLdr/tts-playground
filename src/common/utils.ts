@@ -216,3 +216,21 @@ export const comparator =
       | 0
       | -1;
   };
+
+export const regex_last_match = (
+  str: string,
+  regex: RegExp,
+  from_index?: number
+): RegExpExecArray | null => {
+  let result = null;
+  let match = null;
+  while (
+    (match = regex.exec(str)) != null &&
+    match?.index < (from_index ?? str.length) &&
+    // prevent inf loop
+    (!!result ? match?.index !== result.index : true)
+  ) {
+    result = match;
+  }
+  return result;
+};

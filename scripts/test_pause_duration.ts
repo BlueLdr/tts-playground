@@ -4,11 +4,6 @@ import {
   VOICE_NAMES,
 } from "../src/common";
 
-const test_req: TTS.TTSRequest = {
-  text: "",
-  promise: new Promise(() => {}),
-  data: "",
-};
 const await_timeout = <T extends any>(cb: () => T, delay) =>
   new Promise<T>(resolve => {
     setTimeout(() => resolve(cb()), delay);
@@ -23,7 +18,7 @@ const test_pauses = async () => {
 
   const test_one = async (voice: string, char: string, count: number) => {
     const str = `t. ${char.repeat(count)} t`;
-    source.src = await get_tts_data(str, test_req, voice);
+    source.src = await get_tts_data(str, voice);
     audio.load();
     return await_timeout(() => audio.duration, 1000);
   };

@@ -31,12 +31,6 @@ const get_item_key = (_, snip, __) => snip.id;
 const regex_test_snippet = (item: TTS.Snippet, regex) =>
   regex.test(snippet_to_string(item));
 
-const SNIPPETS_PREVIEW_REQUEST: TTS.TTSRequest = {
-  text: "",
-  promise: new Promise(() => {}),
-  data: "",
-};
-
 export const SnippetsList: Preact.FunctionComponent = () => {
   const [snippets, set_snippets] = useContextState(SNIPPETS);
   const [sections, set_sections] = useContextState(SNIPPETS_SECTIONS);
@@ -86,10 +80,7 @@ export const SnippetsList: Preact.FunctionComponent = () => {
     [update_snippet_in_sections]
   );
 
-  const [tts_data, , preview_tts] = usePlaySnippet(
-    "snippets-sidebar-player",
-    SNIPPETS_PREVIEW_REQUEST
-  );
+  const [tts_data, , preview_tts] = usePlaySnippet("snippets-sidebar-player");
 
   const edit_row_target = useMemo(
     () => snippets.find(s => s.id === edit_row_target_id),
