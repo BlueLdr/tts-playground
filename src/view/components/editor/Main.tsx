@@ -111,6 +111,7 @@ export const EditorMain: Preact.FunctionComponent<{
           <button
             className="btn btn-primary"
             disabled={status.pending || !text}
+            data-help="submit-button"
             type="submit"
             onClick={e => {
               e.preventDefault();
