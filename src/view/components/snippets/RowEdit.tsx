@@ -14,11 +14,6 @@ import {
   useStateIfMounted,
 } from "~/view/utils";
 
-const SNIPPETS_EDIT_MODAL_REQUEST: TTS.TTSRequest = {
-  text: "",
-  promise: new Promise(() => {}),
-  data: "",
-};
 export const SnippetsRowEdit: Preact.FunctionComponent<{
   row: TTS.Snippet;
   updateRow: (row: TTS.Snippet) => void;
@@ -39,8 +34,7 @@ export const SnippetsRowEdit: Preact.FunctionComponent<{
   );
 
   const [tts_data, status, preview_tts] = usePlaySnippet(
-    "snippet-modal-player",
-    SNIPPETS_EDIT_MODAL_REQUEST
+    "snippet-modal-player"
   );
 
   const input_ref = useRef<HTMLInputElement>();

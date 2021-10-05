@@ -4,22 +4,13 @@ import { DEFAULT_SPEED_CHAR } from "~/common";
 import { AudioPlayer, generate_pause } from "~/view/components";
 import { useAudioPlayer } from "~/view/utils";
 
-const PAUSE_DEMO_MODAL_REQUEST: TTS.TTSRequest = {
-  text: "",
-  promise: new Promise(() => {}),
-  data: "",
-};
-
 const create_text = str =>
   `this is before the pause ${str} this is after the pause ${DEFAULT_SPEED_CHAR.repeat(
     20
   )}`;
 
 export const PauseSpeedDemo: Preact.FunctionComponent = () => {
-  const [tts_data, preview_tts] = useAudioPlayer(
-    "pause-demo-modal-player",
-    PAUSE_DEMO_MODAL_REQUEST
-  );
+  const [tts_data, preview_tts] = useAudioPlayer("pause-demo-modal-player");
 
   const [text_normal, text_preserved] = useMemo(
     () => [

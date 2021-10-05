@@ -25,7 +25,6 @@ import {
   StatusIndicator,
   useHistoryListeners,
   useModal,
-  useSpeechDuration,
 } from "~/view/components";
 import {
   ensure_number,
@@ -162,24 +161,19 @@ export const Editor: Preact.FunctionComponent<{
 
   const [data, status, submit_message_, message_text] =
     usePlayMessage(new_message);
-  const get_duration = useSpeechDuration();
   const should_start_at_timestamp = useRef<boolean>(false);
   const should_submit = useRef<boolean>(false);
-  const submit_message = useCallback(
-    async (new_text: string = text_ref.current) => {
-      let timestamp = 0;
-      if (should_start_at_timestamp.current) {
-        should_start_at_timestamp.current = false;
-        const cursor =
-          new_cursor_start.current > 0
-            ? new_cursor_start.current
-            : input_ref.current.selectionStart;
-        timestamp = await get_duration(new_text.slice(0, cursor));
-      }
-      submit_message_(timestamp);
-    },
-    [submit_message_]
-  );
+  const submit_message = useCallback(async () => {
+    let cursor;
+    if (should_start_at_timestamp.current) {
+      should_start_at_timestamp.current = false;
+      cursor =
+        new_cursor_start.current > 0
+          ? new_cursor_start.current
+          : input_ref.current.selectionStart;
+    }
+    submit_message_(cursor);
+  }, [submit_message_]);
 
   const text_ref = useValueRef(text);
   const last_update = useRef<string>();

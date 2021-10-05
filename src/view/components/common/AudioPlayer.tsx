@@ -3,6 +3,9 @@ import { useCallback, useEffect, useRef } from "preact/hooks";
 import { VOLUME_CTX } from "~/model";
 import { maybeClassName, useContextState, useDebounce } from "~/view/utils";
 
+const EMPTY_SRC =
+  "data:audio/wav;base64,UklGRiUAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQEAAACA";
+
 export const AudioPlayer: Preact.FunctionComponent<
   {
     data: string;
@@ -55,7 +58,7 @@ export const AudioPlayer: Preact.FunctionComponent<
         <source
           id={id ? `${id}-source` : "source"}
           type="audio/wav"
-          src={data || undefined}
+          src={data || EMPTY_SRC}
         />
       </audio>
     </div>

@@ -13,11 +13,7 @@ import {
   useValueRef,
 } from "~/view/utils";
 
-export const usePlayMessage = (
-  message: TTS.Message,
-  player_id?: string,
-  request?: TTS.TTSRequest
-) => {
+export const usePlayMessage = (message: TTS.Message, player_id?: string) => {
   const { bits_string, stop_playback_at_modifier } =
     hooks.useContext(EDITOR_SETTINGS).value ?? {};
   const {
@@ -25,6 +21,7 @@ export const usePlayMessage = (
     options: { speed, max_length, bits, voice, speed_char },
   } = message;
   const voice_ref = useValueRef(voice);
+  const message_ref = useValueRef(message);
   const timestamp_ref = hooks.useRef<number>(0);
   const end_time_ref = hooks.useRef<number>(undefined);
 
@@ -39,24 +36,28 @@ export const usePlayMessage = (
   const get_tts_audio = hooks.useCallback(
     async (
       msg_text: string,
-      req?: TTS.TTSRequest,
-      voice?: string
-    ): Promise<[string, number?]> => {
-      let duration;
-      const data = await get_tts_data(msg_text, req, voice);
-      if (stop_playback_at_modifier && speed) {
-        duration = await predict_duration(message);
+      voice?: string,
+      start_time?: number
+    ): Promise<[string, number?, number?]> => {
+      let duration = [];
+      const data = await get_tts_data(msg_text, voice);
+      if ((stop_playback_at_modifier && speed) || start_time) {
+        duration = await predict_duration(message_ref.current, start_time);
       }
-      return [data, duration];
+      return [
+        data,
+        stop_playback_at_modifier ? duration[0] : undefined,
+        duration[1],
+      ];
     },
-    [stop_playback_at_modifier, message, speed]
+    [stop_playback_at_modifier, speed]
   );
 
   const [status, fetch_tts] = useRequestStatus(get_tts_audio);
   const on_submit = hooks.useCallback(
-    (start_time?: number) => {
-      fetch_tts(full_text.current, request, voice_ref.current).then(
-        ([d, end_time]) => {
+    (start_index?: number) => {
+      fetch_tts(full_text.current, voice_ref.current, start_index).then(
+        ([d, end_time, start_time]) => {
           end_time_ref.current = end_time;
           if (d === data_ref.current) {
             if (data_ref.current)
@@ -68,7 +69,7 @@ export const usePlayMessage = (
         }
       );
     },
-    [request, player_id]
+    [player_id, fetch_tts, speed, stop_playback_at_modifier]
   );
 
   hooks.useEffect(() => {
@@ -86,10 +87,7 @@ export const usePlayMessage = (
   ] as const;
 };
 
-export const usePlaySnippet = (
-  player_id?: string,
-  request?: TTS.TTSRequest
-) => {
+export const usePlaySnippet = (player_id?: string) => {
   const voice = hooks.useContext(EDITOR_STATE).value?.voice;
   const voice_ref = useValueRef(voice);
   const [data, set_data, data_ref] = useStateRef("");
@@ -104,7 +102,7 @@ export const usePlaySnippet = (
       const full_text = `${prefix}${text.repeat(
         count || default_count || 1
       )}${suffix}`;
-      return fetch_tts(full_text, request, voice_ref.current).then(d => {
+      return fetch_tts(full_text, voice_ref.current).then(d => {
         if (d === data_ref.current) {
           if (data_ref.current) play_audio(player_id, false);
         } else {
@@ -122,10 +120,7 @@ export const usePlaySnippet = (
   return [data, status, on_submit] as const;
 };
 
-export const useAudioPlayer = (
-  player_id?: string,
-  request?: TTS.TTSRequest
-) => {
+export const useAudioPlayer = (player_id?: string) => {
   const voice = hooks.useContext(EDITOR_STATE).value?.voice;
   const voice_ref = useValueRef(voice);
   const [data, set_data, data_ref] = useStateRef<string>("");
@@ -136,7 +131,7 @@ export const useAudioPlayer = (
     if (!text) {
       return Promise.resolve();
     }
-    return get_tts_data(text, request, voice_ref.current).then(d => {
+    return get_tts_data(text, voice_ref.current).then(d => {
       if (d === data_ref.current) {
         play_audio(player_id, false);
       } else {

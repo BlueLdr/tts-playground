@@ -24,12 +24,6 @@ import {
   useStateIfMounted,
 } from "~/view/utils";
 
-const MESSAGE_MODAL_REQUEST: TTS.TTSRequest = {
-  text: "",
-  promise: new Promise(() => {}),
-  data: "",
-};
-
 export const MessageModal: Preact.FunctionComponent<{
   message: TTS.Message;
   loadMessage: () => void;
@@ -193,8 +187,7 @@ export const MessageModalBase: Preact.FunctionComponent<{
 
   const [data, status, submit_message, text] = usePlayMessage(
     message,
-    "message-modal-player",
-    MESSAGE_MODAL_REQUEST
+    "message-modal-player"
   );
 
   const on_play = useCallback(
