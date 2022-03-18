@@ -28,7 +28,7 @@ export const ExportMessage: Preact.FunctionComponent<{ message: TTS.Message }> =
         className="btn btn-large btn-with-icon"
         href={`data:application/json;charset=utf-8,${encodeURIComponent(data)}`}
         download={filename}
-        data-help="export-message"
+        data-help="messages-export"
       >
         <i class="fas fa-share-square" />
         Export

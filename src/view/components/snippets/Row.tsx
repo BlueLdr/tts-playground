@@ -4,15 +4,27 @@ import { ADD_SNIPPET_CALLBACK } from "~/model";
 import { Snippet, SnippetsRowControls } from "~/view/components";
 import { useHoldClick, useStateIfMounted, useValueRef } from "~/view/utils";
 
-export const SnippetsRow: Preact.FunctionComponent<{
+interface SnippetsRowProps {
   row: TTS.Snippet;
   // updateRow: (row: TTS.Snippet) => void;
   onClickDelete: (id: string) => void;
   onClickEdit: (id: string) => void;
   previewText: (snippet: TTS.Snippet, count?: number) => Promise<void>;
   buttons?: Preact.ComponentChildren | null;
-}> = ({ row, onClickDelete, onClickEdit, previewText, buttons }) => {
-  const addToMessage = useContext(ADD_SNIPPET_CALLBACK).value;
+}
+
+const SnippetsRowBase: Preact.FunctionComponent<
+  SnippetsRowProps & {
+    addToMessage: (text: string, flag?: "start" | "end") => void;
+  }
+> = ({
+  row,
+  onClickDelete,
+  onClickEdit,
+  previewText,
+  buttons,
+  addToMessage,
+}) => {
   const [edit, set_edit] = useStateIfMounted(!row.text);
   const is_right_click = useRef(false);
   const options_ref = useValueRef(row?.options);
@@ -92,5 +104,19 @@ export const SnippetsRow: Preact.FunctionComponent<{
         />
       )}
     </li>
+  );
+};
+
+export const SnippetsRow: Preact.FunctionComponent<
+  SnippetsRowProps & {
+    addToMessage?: (text: string, flag?: "start" | "end") => void;
+  }
+> = ({ addToMessage, ...props }) => {
+  const ctxAddToMessage = useContext(ADD_SNIPPET_CALLBACK).value;
+  return (
+    <SnippetsRowBase
+      addToMessage={addToMessage || ctxAddToMessage}
+      {...props}
+    />
   );
 };
