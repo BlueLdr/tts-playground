@@ -14,13 +14,13 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [14.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
@@ -28,7 +28,9 @@ jobs:
     - run: echo "TTS_TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
     - run: echo "TTS_NAME=${TTS_TAG/-release/}" >> $GITHUB_ENV
     - run: echo "export TTS_VERSION=$TTS_NAME" >> .env
+    - run: echo "export TTS_URL=\"${{ vars.TTS_URL }}\"" >> .env
     - run: TTS_RELEASE_VERSION=$TTS_NAME node scripts/ensure-version.js
+    - run: TTS_URL="${{ vars.TTS_URL }}" node scripts/ensure-url.js
 
     - run: npm ci
     - run: npm run build

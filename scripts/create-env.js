@@ -2,7 +2,7 @@
 
 const fs = require("fs");
 const version = require("../package.json").version;
-const { TTS_VERSION } = process.env;
+const { TTS_VERSION, TTS_URL } = process.env;
 
 let env_ = "";
 try {
@@ -17,6 +17,9 @@ if (!env_ || version !== TTS_VERSION) {
     } else {
       output = `${output}${env_}`;
     }
+  }
+  if (!/export TTS_URL=.+\n/.test(env_)) {
+    output += `export TTS_URL="${TTS_URL}"`;
   }
 
   fs.writeFileSync(`${__dirname}/../.env`, output);
