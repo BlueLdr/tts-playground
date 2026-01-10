@@ -3,7 +3,7 @@ import { DEFAULT_VOICE, SPEED_CHARS } from "~/common/constants";
 import { do_alert, regex_last_match } from "./utils";
 
 export const TTS_URL = (voice: string = DEFAULT_VOICE) =>
-  `https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=`;
+  `${process.env.TTS_URL}=${voice}&text=`;
 
 /**
  * @param text {string}
